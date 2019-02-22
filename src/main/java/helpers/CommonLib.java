@@ -27,6 +27,8 @@ public class CommonLib
             for (PrimitiveValueWrapper value : tuple) {
                if (column.getWholeColumnName().equals(value.getWholeColumnName()))
                   return value.getPrimitiveValue();
+               else if (column.getTable().getName() == null && column.getTable().getAlias() == null && column.getWholeColumnName().equals(value.getColumnDefinition().getColumnName()))
+                  return value.getPrimitiveValue();
             }
          }
          logger.error("No column with name: {}",column.getColumnName());

@@ -15,7 +15,8 @@ public class AppMain
 
       String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
       String q2 = "CREATE TABLE S(a int NOT NULL, e int, f int)";
-      String q3 = "select q.firstA from (select first.a as firstA, second.a AS secondA, first.b from R as first join S as second on first.b = second.e) as q";
+      String q3 = "select q.firstA from (select first.a as firstA, second.a AS secondA, b from R as first join S as second on first.b = second.e) as q";
+//      String q3 = "select a+b from R";
 
       String q[] = {q1,q2,q3};
       int i = 0;
