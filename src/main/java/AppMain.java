@@ -38,7 +38,7 @@ public class AppMain
                if (tuple != null) {
                   for (int index = 0; index < tuple.length; index++) {
                      System.out.print(tuple[index].getPrimitiveValue().toRawString());
-                     if (index == (tuple.length - 1))
+                     if (index != (tuple.length - 1))
                         System.out.print("|");
                   }
                   System.out.print("\n");
