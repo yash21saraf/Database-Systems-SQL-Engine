@@ -8,8 +8,8 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -20,10 +20,10 @@ public class IteratorBuilder
 
    //region Variables
 
-   private static final Logger logger = LogManager.getLogger();
+   //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private Map<String, CreateTable> schemas = new HashMap<>();
+   private Map<String, CreateTable> schemas = new HashMap();
 
    //endregion
 
@@ -59,7 +59,7 @@ public class IteratorBuilder
          return buildSelect(select);
 
       }
-      logger.error("Invalid statement.");
+       //logger.error("Invalid statement.");
       throw new Exception("Invalid statement");
 
    }

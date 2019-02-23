@@ -4,8 +4,8 @@ import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class JoinIterator implements RAIterator
 {
    //region Variables
 
-   private static final Logger logger = LogManager.getLogger();
+   //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
    private RAIterator leftChild;
@@ -50,7 +50,7 @@ public class JoinIterator implements RAIterator
             return leftChild.hasNext();
          return true;
       } catch (Exception e) {
-         logger.error("Error in reading from right table of join.");
+         //logger.error("Error in reading from right table of join.");
          throw e;
       }
 
@@ -77,7 +77,7 @@ public class JoinIterator implements RAIterator
          }
          return null;
       } catch (Exception e) {
-         logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
+         //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
          throw e;
       }
    }

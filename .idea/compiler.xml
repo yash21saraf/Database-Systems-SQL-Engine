@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="sqlparse" target="1.8" />
+      <module name="sqlparse" target="6" />
     </bytecodeTargetLevel>
   </component>
 </project>

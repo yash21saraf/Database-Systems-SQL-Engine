@@ -9,8 +9,8 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ public class MapIterator implements RAIterator
 {
    //region Variables
 
-   private static final Logger logger = LogManager.getLogger();
+   //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
    private RAIterator child;
@@ -61,7 +61,7 @@ public class MapIterator implements RAIterator
       Column column;
 
       PrimitiveValueWrapper[] tuple = child.next();
-      ArrayList<PrimitiveValueWrapper> projectedTuple = new ArrayList<>();
+      ArrayList<PrimitiveValueWrapper> projectedTuple = new ArrayList();
 
       if (tuple == null)
          return null;

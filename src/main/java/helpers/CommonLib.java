@@ -4,8 +4,8 @@ import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class CommonLib
 
    //region Variables
 
-   private static final Logger logger = LogManager.getLogger();
+   //private static final Logger logger = LogManager.getLogger();
 
    private Eval eval = new Eval()
    {
@@ -31,13 +31,13 @@ public class CommonLib
                   return value.getPrimitiveValue();
             }
          }
-         logger.error("No column with name: {}",column.getColumnName());
+         //logger.error("No column with name: {}",column.getColumnName());
          throw new SQLException("No column with name: " + column.getColumnName() + ".");
       }
    };
 
    private PrimitiveValueWrapper[] tuple;
-   private ArrayList<PrimitiveValueWrapper[]> tuples = new ArrayList<>();
+   private ArrayList<PrimitiveValueWrapper[]> tuples = new ArrayList();
 
    //endregion
 
@@ -86,7 +86,7 @@ public class CommonLib
             convertedValue.setTableName(tableName);
             convertedTuple[index] = convertedValue;
          } else {
-            logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
          }
       }
@@ -124,7 +124,7 @@ public class CommonLib
          this.tuples.remove(tuple);
          return evaluatedExpression;
       } catch (SQLException e) {
-         logger.error("Exception in eval() call.");
+         //logger.error("Exception in eval() call.");
          throw e;
       }
    }
@@ -138,7 +138,7 @@ public class CommonLib
          this.tuples.removeAll(Arrays.asList(tuples));
          return evaluatedExpression;
       } catch (SQLException e) {
-         logger.error("Exception in eval() call.");
+         // logger.error("Exception in eval() call.");
          throw e;
       }
    }

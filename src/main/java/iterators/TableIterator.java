@@ -3,8 +3,8 @@ package iterators;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+/*import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;*/
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -16,10 +16,10 @@ public class TableIterator implements RAIterator
 
    //region Variables
 
-   private static final Logger logger = LogManager.getLogger();
+   //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private static final String TABLE_DIRECTORY = "D:/";
+   private static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
@@ -43,7 +43,7 @@ public class TableIterator implements RAIterator
       try {
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
       } catch (FileNotFoundException e) {
-         logger.error("Exception in reading from file for table: {}.",tableName);
+         //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
       }
    }
@@ -68,10 +68,10 @@ public class TableIterator implements RAIterator
             return hasNextValue;
          }
       } catch (IOException e) {
-         logger.error("IOException in hasNext() of table: {}.", tableName);
+         //logger.error("IOException in hasNext() of table: {}.", tableName);
          throw e;
       } catch (Exception e) {
-         logger.error("Error in table: {} " + e.getMessage(), tableName);
+         //logger.error("Error in table: {} " + e.getMessage(), tableName);
          throw e;
       }
    }
@@ -94,10 +94,10 @@ public class TableIterator implements RAIterator
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
          nextLine = commonLib.convertTupleStringToPrimitiveValueWrapperArray(br.readLine(),columnDefinitions,tableAlias);
       } catch (FileNotFoundException e) {
-         logger.error("Exception in reading from file for table: {}.",tableName);
+         //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
       } catch (IOException e) {
-         logger.error("Exception in reading line from file for table: {}.",tableName);
+         //logger.error("Exception in reading line from file for table: {}.",tableName);
          throw e;
       } catch (Exception e) {
          throw e;
