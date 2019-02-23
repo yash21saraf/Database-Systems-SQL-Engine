@@ -16,9 +16,6 @@ public class AppMain
    {
       //long start = System.currentTimeMillis();
 
-
-
-
          //region Manual logic
 
      /* String q1 = "CREATE TABLE PLAYERS(ID string, FIRSTNAME string, LASTNAME string, FIRSTSEASON int, LASTSEASON int, WEIGHT int, BIRTHDATE date);";
@@ -47,11 +44,10 @@ public class AppMain
       /*int i = 0;
       int cnt = 0;*/
 
-
       System.out.print("$> ");
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-      StringReader input = new StringReader(reader.readLine().toLowerCase());
+      StringReader input = new StringReader(reader.readLine());
 
       CCJSqlParser parser = new CCJSqlParser(input);
 
@@ -64,9 +60,7 @@ public class AppMain
 
          try {
             rootIterator = iteratorBuilder.parseStatement(query);
-         } catch (Exception e) {
-            e.printStackTrace();
-         }
+
          if (rootIterator != null) {
             while (rootIterator.hasNext()) {
                PrimitiveValueWrapper[] tuple = rootIterator.next();
@@ -84,13 +78,19 @@ public class AppMain
             }
          }
 
-         //System.out.print("$> ");
-         //reader = new BufferedReader(new InputStreamReader(System.in));
-         //input = new StringReader(reader.readLine().toLowerCase());
-         input = new StringReader("select a from R");
+         System.out.print("$> ");
+         reader = new BufferedReader(new InputStreamReader(System.in));
+         input = new StringReader(reader.readLine());
+         //input = new StringReader(("select a from R").toLowerCase());
          parser = new CCJSqlParser(input);
 
-         //i++;
+         } catch (Exception e) {
+            System.out.print("$> ");
+            reader = new BufferedReader(new InputStreamReader(System.in));
+            input = new StringReader(reader.readLine());
+            //input = new StringReader(("select a from R").toLowerCase());
+            parser = new CCJSqlParser(input);
+         }
       }
 
      /* long end = System.currentTimeMillis();

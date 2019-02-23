@@ -121,10 +121,10 @@ public class IteratorBuilder
    private void buildCreateTable(CreateTable createTable)
    {
 
-      if (createTable.getTable().getAlias() != null)
+      /*if (createTable.getTable().getAlias() != null)
          schemas.put(createTable.getTable().getAlias(),createTable);
-      else
-         schemas.put(createTable.getTable().getName(),createTable);
+      else*/
+         schemas.put(createTable.getTable().getName().toUpperCase(),createTable);
 
    }
 
@@ -223,7 +223,7 @@ public class IteratorBuilder
       else
          tableAlias = table.getName();
 
-      ColumnDefinition[] columnDefinitions = schemas.get(table.getName()).getColumnDefinitions().toArray(new ColumnDefinition[schemas.get(table.getName()).getColumnDefinitions().size()]);
+      ColumnDefinition[] columnDefinitions = schemas.get(table.getName().toUpperCase()).getColumnDefinitions().toArray(new ColumnDefinition[schemas.get(table.getName().toUpperCase()).getColumnDefinitions().size()]);
       rootIterator = new TableIterator(table.getName(),tableAlias,columnDefinitions);
       return rootIterator;
 
