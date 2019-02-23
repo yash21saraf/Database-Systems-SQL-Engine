@@ -168,10 +168,16 @@ public class IteratorBuilder
    }
 
 
-   private RAIterator buildUnion(Union union,RAIterator rootIterator)
+   private RAIterator buildUnion(Union union,RAIterator rootIterator) throws Exception
    {
 
-      return null;
+      RAIterator[] plainSelectIterators = new RAIterator[union.getPlainSelects().size()];
+      for (int index = 0; index < plainSelectIterators.length; index++) {
+         RAIterator plainSelectIterator = null;
+         plainSelectIterators[index] = buildPlainSelect(union.getPlainSelects().get(index),null,plainSelectIterator);
+      }
+
+      return new UnionIterator(union,plainSelectIterators);
 
    }
 
@@ -202,6 +208,12 @@ public class IteratorBuilder
 
    }
 
+   /**
+    *
+    * @param table Table object using which the TableIterator will be created
+    * @param rootIterator RAIterator object upon which the TableIterator will be created
+    * @return RAIterator object containing a TableIterator
+    */
    private RAIterator buildTable(Table table,RAIterator rootIterator) throws Exception
    {
 
@@ -217,6 +229,12 @@ public class IteratorBuilder
 
    }
 
+   /**
+    *
+    * @param subSelect SELECT statement which is used as a FROM clause
+    * @param rootIterator RAIterator upon which the SubSelect's iterators will be added
+    * @return RAIterator object containing the SubSelect's iterators
+    */
    private RAIterator buildSubSelect(SubSelect subSelect,RAIterator rootIterator) throws Exception
    {
 
@@ -225,6 +243,12 @@ public class IteratorBuilder
 
    }
 
+   /**
+    *
+    * @param subJoin Table created by JOIN
+    * @param rootIterator RAIterator object upon which the SubJoin's iterators will be added
+    * @return RAIterator object containing the SubJoin's iterators
+    */
    private RAIterator buildSubJoin(SubJoin subJoin,RAIterator rootIterator) throws Exception
    {
 
@@ -235,6 +259,12 @@ public class IteratorBuilder
 
    }
 
+   /**
+    *
+    * @param join JOIN part in a SQL statement
+    * @param rootIterator RAIterator object upon which the JoinIterator will be added
+    * @return RAIterator object containing the JoinIterator
+    */
    private RAIterator buildJoin(Join join,RAIterator rootIterator) throws Exception
    {
 
