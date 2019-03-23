@@ -4,8 +4,6 @@ import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,8 +13,6 @@ public class CommonLib
 {
 
    //region Variables
-
-   //private static final Logger logger = LogManager.getLogger();
 
    private Eval eval = new Eval()
    {
@@ -28,10 +24,9 @@ public class CommonLib
                if (column.getWholeColumnName().equals(value.getWholeColumnName()))
                   return value.getPrimitiveValue();
                else if (column.getTable().getName() == null && column.getTable().getAlias() == null && column.getWholeColumnName().equals(value.getColumnDefinition().getColumnName()))
-                  return value.getPrimitiveValue();
+                  return value.getPrimitiveValue(); // TODO: How is it different from above if clause?
             }
          }
-         //logger.error("No column with name: {}",column.getColumnName());
          throw new SQLException("No column with name: " + column.getColumnName() + ".");
       }
    };

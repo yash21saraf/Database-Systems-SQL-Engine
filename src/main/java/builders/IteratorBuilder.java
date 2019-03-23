@@ -12,8 +12,12 @@ import net.sf.jsqlparser.statement.select.*;
 import org.apache.logging.log4j.Logger;*/
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static helpers.CommonLib.castAs;
 
 public class IteratorBuilder
 {
@@ -84,7 +88,6 @@ public class IteratorBuilder
       }
 
       return rootIterator;
-
    }
 
 
@@ -202,8 +205,37 @@ public class IteratorBuilder
 
       if (plainSelect.getWhere() != null)
          rootIterator = new FilterIterator(rootIterator,plainSelect.getWhere());
-      rootIterator = new MapIterator(rootIterator,plainSelect.getSelectItems(),selectAlias);
+      rootIterator = new MapIterator(rootIterator,plainSelect.getSelectItems(),selectAlias, plainSelect.getGroupByColumnReferences());
 
+      // OrderBy processsing
+
+      List<OrderByElement> orderByElementsList = plainSelect.getOrderByElements();
+      if(orderByElementsList != null){
+         List<Integer> indexOfOrderByElements  = new ArrayList<Integer>();
+         List<Boolean> orderOfOrderByElements  = new ArrayList<Boolean>();
+         List<SelectExpressionItem> listOfSelectItems = new ArrayList<SelectExpressionItem>();
+
+         for(SelectItem selectItems : plainSelect.getSelectItems()){
+            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) commonLib.castAs(selectItems, SelectExpressionItem.class);
+            listOfSelectItems.add(selectExpressionItem);
+         }
+
+         for(OrderByElement orderByElement : orderByElementsList){
+            int index = 0;
+            for(SelectExpressionItem selectExpressionItem : listOfSelectItems){
+               if(selectExpressionItem.getExpression().equals(orderByElement.getExpression())) {
+                  indexOfOrderByElements.add(index);
+                  orderOfOrderByElements.add(orderByElement.isAsc());
+                  break;
+               }
+               index++;
+            }
+         }
+
+         rootIterator = new OrderByIterator(rootIterator, orderByElementsList, indexOfOrderByElements, orderOfOrderByElements, plainSelect.getLimit());
+
+         // OrderBy processsing ends here
+      }
       return rootIterator;
 
    }

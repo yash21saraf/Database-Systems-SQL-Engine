@@ -21,6 +21,8 @@ public class TableIterator implements RAIterator
 
    private static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
 
+//   private static final String TABLE_DIRECTORY = "data/";
+
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
    private String tableAlias;
@@ -42,6 +44,7 @@ public class TableIterator implements RAIterator
 
       try {
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
+
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
