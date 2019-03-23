@@ -232,9 +232,12 @@ public class IteratorBuilder
             }
          }
 
-         rootIterator = new OrderByIterator(rootIterator, orderByElementsList, indexOfOrderByElements, orderOfOrderByElements, plainSelect.getLimit());
+         rootIterator = new OrderByIterator(rootIterator, orderByElementsList, indexOfOrderByElements, orderOfOrderByElements);
 
          // OrderBy processsing ends here
+      }
+      if(plainSelect.getLimit()!= null){
+         rootIterator = new LimitIterator(rootIterator,plainSelect.getLimit());
       }
       return rootIterator;
 

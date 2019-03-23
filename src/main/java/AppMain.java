@@ -19,7 +19,7 @@ public class AppMain
 //        String q3 = "select a , sum(b+c), count(c), min(b) as d from R where a != 170 group by a";
 //        String q3 = "select R.a, R.b from R,S as TT where R.a = 11";
 //        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
-        String q3 = "select b,c,a from R order by b desc limit 2";
+        String q3 = "select a,max(c+a) as d from R group by a order by a asc  limit 2";
 
 
         String q[] = {q1,q2,q3};

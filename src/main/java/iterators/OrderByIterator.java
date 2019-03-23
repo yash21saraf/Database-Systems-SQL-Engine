@@ -1,10 +1,7 @@
 package iterators;
 
 import helpers.PrimitiveValueWrapper;
-import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.Union;
 
 import java.util.*;
 
@@ -18,19 +15,17 @@ public class OrderByIterator implements RAIterator {
     private List<List<PrimitiveValueWrapper>> sortedList = new ArrayList<List<PrimitiveValueWrapper>>();
     private List<Integer> indexOfOrderByElements;
     private List<Boolean> orderOfOrderByElements;
-    private Limit limit;
     private int currentIndex = 0;
     //endregion
 
     //region Constructor
 
-    public OrderByIterator(RAIterator rootIterator, List<OrderByElement> orderByElementsList, List<Integer> indexOfOrderByElements, List<Boolean> orderOfOrderByElements, Limit limit) {
+    public OrderByIterator(RAIterator rootIterator, List<OrderByElement> orderByElementsList, List<Integer> indexOfOrderByElements, List<Boolean> orderOfOrderByElements) {
 
         this.currentIterator = rootIterator;
         this.orderByElementsList = orderByElementsList;
         this.indexOfOrderByElements = indexOfOrderByElements;
         this.orderOfOrderByElements = orderOfOrderByElements;
-        this.limit = limit;
     }
 
     //endregion
@@ -40,20 +35,13 @@ public class OrderByIterator implements RAIterator {
     @Override
     public boolean hasNext() throws Exception {
 
-        if (limit == null) {
-            if (sorted)
-                if (sortedList.size() > currentIndex)
-                    return true;
-                else
-                    return false;
 
-        } else {
-            if (sorted)
-                if (sortedList.size() > currentIndex && limit.getRowCount() > currentIndex)
-                    return true;
-                else
-                    return false;
-        }
+        if (sorted)
+            if (sortedList.size() > currentIndex)
+                return true;
+            else
+                return false;
+
         return currentIterator.hasNext();
 
     }
