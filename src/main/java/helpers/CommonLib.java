@@ -24,7 +24,7 @@ public class CommonLib
                if (column.getWholeColumnName().equals(value.getWholeColumnName()))
                   return value.getPrimitiveValue();
                else if (column.getTable().getName() == null && column.getTable().getAlias() == null && column.getWholeColumnName().equals(value.getColumnDefinition().getColumnName()))
-                  return value.getPrimitiveValue(); // TODO: How is it different from above if clause?
+                  return value.getPrimitiveValue();
             }
          }
          throw new SQLException("No column with name: " + column.getColumnName() + ".");
@@ -119,7 +119,7 @@ public class CommonLib
          this.tuples.remove(tuple);
          return evaluatedExpression;
       } catch (SQLException e) {
-         //logger.error("Exception in eval() call.");
+         //e.printStackTrace();
          throw e;
       }
    }
