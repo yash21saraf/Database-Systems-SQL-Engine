@@ -18,12 +18,8 @@ import static helpers.CommonLib.castAs;
 public class GroupByIterator implements RAIterator {
     //region Variables
 
-    private static int counter = 0;
-    private static int sum = 0;
-    private static int min = Integer.MAX_VALUE;
-    private static int max = Integer.MIN_VALUE;
     boolean useGroupByOutput = false;
-    boolean getFromAggResults = false;
+
     boolean hasAvg = false;
 
     private CommonLib commonLib = CommonLib.getInstance();
@@ -120,7 +116,7 @@ public class GroupByIterator implements RAIterator {
 
             selectItems = getUnpackedSelectedItems(selectItems);
 
-            // selectItems = addGroupByColsToSelectItem(groupByColumnReferences, selectItems);
+            // selectItems = addGroupByColsToSelectItem(groupByColumnReferences, selectItems); // TODO: we might have to do this. Currently it's failing if same columns are used twice, (HashSet is the issue)
 
             List<String> aggTypeOfSelectItems = getAggTypeOfSelectItems(origSelectItems);
 
@@ -190,7 +186,7 @@ public class GroupByIterator implements RAIterator {
                 return primitiveValueWrappers;
             }
 
-        } else { // Process group by without Aggregates
+        } else { // TODO: Process group by without Aggregates ....... Use sorting logic
 
         }
 
@@ -270,7 +266,6 @@ public class GroupByIterator implements RAIterator {
     private List<SelectItem> addGroupByColsToSelectItem(List<Column> groupByColumnReferences, List<SelectItem> selectItems) {
         List<SelectItem> list = new ArrayList<SelectItem>();
         Set<String> groupByItemsSet = new HashSet<String>();
-
 
         for (Column column : groupByColumnReferences) {
             SelectExpressionItem selectExpressionItem = new SelectExpressionItem();

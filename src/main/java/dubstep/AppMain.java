@@ -23,8 +23,8 @@ public class AppMain
 //        String q3 = "select a , sum(b+c), count(c), min(b) as d from R where a != 170 group by a";
 //        String q3 = "select R.a, R.b from R,S as TT where R.a = 11";
 //        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
-        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c desc";
-
+//        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d having sum(a+b) <> 35 order by c desc";
+        String q3 = "select a, b from R order by b asc";
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){
                 inMem = true;

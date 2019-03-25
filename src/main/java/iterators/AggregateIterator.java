@@ -16,7 +16,7 @@ import java.util.*;
 
 import static helpers.CommonLib.castAs;
 
-public class aggregateIterator implements RAIterator {
+public class AggregateIterator implements RAIterator {
     //region Variables
 
     boolean getFromAggResults = false;
@@ -33,7 +33,7 @@ public class aggregateIterator implements RAIterator {
 
     //region Constructor
 
-    public aggregateIterator(RAIterator child, List<SelectItem> selectItems, String tableAlias) {
+    public AggregateIterator(RAIterator child, List<SelectItem> selectItems, String tableAlias) {
 
         this.child = child;
         this.selectItems = selectItems;

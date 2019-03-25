@@ -12,7 +12,6 @@ import net.sf.jsqlparser.statement.select.*;
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;*/
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -205,7 +204,7 @@ public class IteratorBuilder {
         if (groupByColumnsList != null) {
             rootIterator = new GroupByIterator(rootIterator, plainSelect.getSelectItems(), selectAlias, plainSelect.getGroupByColumnReferences());
         } else if (groupByColumnsList == null && isAggregateQuery(plainSelect.getSelectItems())){ // Aggregate Iterator
-            rootIterator = new aggregateIterator(rootIterator, plainSelect.getSelectItems(), selectAlias);
+            rootIterator = new AggregateIterator(rootIterator, plainSelect.getSelectItems(), selectAlias);
         }
 
 
@@ -244,6 +243,12 @@ public class IteratorBuilder {
         if (plainSelect.getLimit() != null) {
             rootIterator = new LimitIterator(rootIterator, plainSelect.getLimit());
         }
+
+        /*
+        if(plainSelect.getHaving() != null){
+            rootIterator = new HavingIterator(rootIterator, plainSelect.getSelectItems(), plainSelect.getHaving());
+        }*/
+
         return rootIterator;
 
     }

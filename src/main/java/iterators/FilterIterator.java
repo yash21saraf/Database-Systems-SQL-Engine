@@ -3,19 +3,13 @@ package iterators;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class FilterIterator implements RAIterator
 {
    //region Variables
 
-   //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
    private RAIterator child;
