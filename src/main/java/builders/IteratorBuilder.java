@@ -1,6 +1,7 @@
 package builders;
 
 import helpers.CommonLib;
+import helpers.Schema;
 import iterators.*;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.schema.Column;
@@ -28,6 +29,7 @@ public class IteratorBuilder {
     private CommonLib commonLib = CommonLib.getInstance();
 
     private Map<String, CreateTable> schemas = new HashMap();
+    public static Map<String, Schema[]> iteratorSchemas= new HashMap();
 
     //endregion
 

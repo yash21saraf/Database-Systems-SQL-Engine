@@ -1,5 +1,6 @@
 package iterators;
 
+import builders.IteratorBuilder;
 import com.sun.xml.internal.ws.api.server.SDDocument;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
@@ -45,7 +46,13 @@ public class TableIterator implements RAIterator
       this.columnDefinitions = columnDefinitions;
       this.tableName = tableName;
       this.tableAlias = tableAlias;
-      this.schema = createSchema(columnDefinitions, tableAlias);
+
+      if(tableAlias == null)
+         this.schema = createSchema(columnDefinitions, tableName);
+      else{
+         this.schema = createSchema(columnDefinitions,tableAlias);
+         addOriginalSchema(columnDefinitions, tableName);
+      }
 
       try {
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
@@ -54,6 +61,21 @@ public class TableIterator implements RAIterator
          //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
       }
+   }
+
+   private void addOriginalSchema(ColumnDefinition[] columnDefinitions, String tableName) throws Exception
+   {
+
+      Schema[] convertedTuple = new Schema[columnDefinitions.length];
+
+      for (int index = 0; index < columnDefinitions.length; index++) {
+         Schema convertedValue = new Schema();
+         convertedValue.setColumnDefinition(columnDefinitions[index]);
+         convertedValue.setTableName(tableName);
+         convertedTuple[index] = convertedValue;
+
+      }
+      IteratorBuilder.iteratorSchemas.put(tableName, convertedTuple) ;
    }
 
    private Schema[] createSchema(ColumnDefinition[] columnDefinitions, String tableName) throws Exception
@@ -71,6 +93,7 @@ public class TableIterator implements RAIterator
          convertedTuple[index] = convertedValue;
 
       }
+      IteratorBuilder.iteratorSchemas.put(tableName, convertedTuple);
       return convertedTuple;
    }
 

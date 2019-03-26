@@ -35,6 +35,7 @@ public class GroupByIterator implements RAIterator {
     private Map<String, String> aggColMap = new HashMap();
     private List<String> aggValues = new ArrayList<String>();
     private Map<String, List<String>> groupByMap = new HashMap<String, List<String>>();
+    private Schema[] schema;
 
     //endregion
 
@@ -46,6 +47,7 @@ public class GroupByIterator implements RAIterator {
         this.selectItems = selectItems;
         this.tableAlias = tableAlias;
         this.groupByColumnReferences = groupByColumnReferences;
+        this.schema = child.getSchema();
     }
 
     //endregion

@@ -29,6 +29,7 @@ public class aggregateIterator implements RAIterator {
     private List<Column> groupByColumnReferences;
     private Map<String, String> aggColMap = new HashMap();
     private List<String> aggValues = new ArrayList<String>();
+    private Schema[] schema;
 
     //endregion
 
@@ -39,6 +40,7 @@ public class aggregateIterator implements RAIterator {
         this.child = child;
         this.selectItems = selectItems;
         this.tableAlias = tableAlias;
+        this.schema = child.getSchema();
 
     }
 

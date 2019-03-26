@@ -1,8 +1,10 @@
 package iterators;
 
+import builders.IteratorBuilder;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -31,6 +33,7 @@ public class MapIterator implements RAIterator
     private List<SelectItem> selectItems;
     private String tableAlias;
     private Schema[] schema ;
+    private Schema[] childSchema ;
 
 
     //endregion
@@ -42,59 +45,60 @@ public class MapIterator implements RAIterator
         this.child = child;
         this.selectItems = selectItems;
         this.tableAlias = tableAlias;
+        this.childSchema = child.getSchema();
 
         if (isAggregateQuery(selectItems)) {
             this.selectItems = getUnpackedSelectedItems(selectItems);
         }
 
+        createSchema(selectItems, childSchema) ;
+    }
 
+    private void createSchema(List<SelectItem> selectItems, Schema[] childSchema) {
         SelectExpressionItem selectExpressionItem;
         AllTableColumns allTableColumns;
         AllColumns allColumns;
         Column column;
 
-
-        Schema[] childSchema = child.getSchema();
         ArrayList<Schema> projectedTuplenew = new ArrayList() ;
 
         for (int index = 0; index < selectItems.size(); index++) {
             if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
+                Expression expression = selectExpressionItem.getExpression() ;
 
-                ColumnDefinition evaluatedColumnDefinition = new ColumnDefinition();
-                evaluatedColumnDefinition.setColumnName(childSchema[index].getColumnDefinition().getColumnName());
-                evaluatedColumnDefinition.setColDataType(childSchema[index].getColumnDefinition().getColDataType());
-                evaluatedColumnDefinition.setColumnSpecStrings(childSchema[index].getColumnDefinition().getColumnSpecStrings());
-
-                evaluatedColumnDefinition.setColumnName(selectExpressionItem.getAlias());
-
-                Schema schema = new Schema();
-                schema.setColumnDefinition(evaluatedColumnDefinition);
-
-                if (tableAlias != null)
-                    schema.setTableName(tableAlias);
-
-                projectedTuplenew.add(schema);
-
-            } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
-                for (int secondIndex = 0; secondIndex < childSchema.length; secondIndex++) {
-                    if (childSchema[index].getColumnDefinition().getColumnName() == null)
-                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
-                    else if (childSchema[secondIndex].getTableName().equals(allTableColumns.getTable().getName())) {
-                        projectedTuplenew.add(childSchema[secondIndex]) ;
+                String alias = selectExpressionItem.getAlias();
+                if((expression = (Function) CommonLib.castAs(expression,Function.class)) != null){
+                    Schema newSchema = new Schema() ;
+                    newSchema.setColumnDefinition(null);
+                    newSchema.setTableName(alias);
+                    projectedTuplenew.add(newSchema) ;
+                }
+                else if((column = (Column) CommonLib.castAs(expression,Column.class)) != null){
+                    for(Schema schema : childSchema){
+                        if(schema.getColumnDefinition().getColumnName() == column.getColumnName() && schema.getTableName() == column.getTable().getName()){
+                            Schema newSchema = new Schema();
+                            newSchema.setColumnDefinition(schema.getColumnDefinition());
+                            if(alias != null){
+                                newSchema.setTableName(alias);
+                            }else{
+                                newSchema.setTableName(schema.getTableName());
+                            }
+                            projectedTuplenew.add(newSchema);
+                            break ;
+                        }
                     }
                 }
 
+            } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
+                projectedTuplenew.addAll(Arrays.asList(IteratorBuilder.iteratorSchemas.get(allTableColumns.getTable().getName())));
             } else if ((allColumns = (AllColumns) CommonLib.castAs(selectItems.get(index),AllColumns.class)) != null) {
-                for (int secondIndex = 0; secondIndex < childSchema.length; secondIndex++) {
-                    if (childSchema[secondIndex].getColumnDefinition().getColumnName() == null)
-                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
-                }
                 projectedTuplenew.addAll(Arrays.asList(childSchema));
             }
         }
-
         this.schema = projectedTuplenew.toArray(new Schema[projectedTuplenew.size()]) ;
+        IteratorBuilder.iteratorSchemas.put(this.tableAlias, this.schema);
     }
+
 
     //endregion
 
