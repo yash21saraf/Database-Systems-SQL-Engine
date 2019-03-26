@@ -103,7 +103,8 @@ public class MapIterator implements RAIterator
             }
         }
         this.schema = projectedTuplenew.toArray(new Schema[projectedTuplenew.size()]) ;
-        IteratorBuilder.iteratorSchemas.put(this.tableAlias, this.schema);
+        if(this.tableAlias != null)
+            IteratorBuilder.iteratorSchemas.put(this.tableAlias, this.schema);
     }
 
 
