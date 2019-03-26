@@ -14,7 +14,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Resources/evallib-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -23,13 +23,11 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Resources/jsqlparser-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="jsqlparser-1.0.0" level="project" />
-    <orderEntry type="library" name="evallib-1.0" level="project" />
   </component>
 </module>

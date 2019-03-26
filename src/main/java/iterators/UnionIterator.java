@@ -1,6 +1,8 @@
 package iterators;
 
 import helpers.PrimitiveValueWrapper;
+import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.Union;
 
 public class UnionIterator implements RAIterator
@@ -46,7 +48,7 @@ public class UnionIterator implements RAIterator
    }
 
    @Override
-   public PrimitiveValueWrapper[] next() throws Exception
+   public PrimitiveValue[] next() throws Exception
    {
 
       return currentIterator.next();
@@ -59,6 +61,45 @@ public class UnionIterator implements RAIterator
 
       currentIterator.reset();
 
+   }
+
+   @Override
+   public RAIterator getChild() {
+      return null;
+   }
+
+   @Override
+   public void setChild(RAIterator child) {
+   }
+
+   @Override
+   public ColumnDefinition[] getColumnDefinition() {
+      return new ColumnDefinition[0];
+   }
+
+   @Override
+   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+   }
+
+   @Override
+   public void setTableName(String tableName) {
+
+   }
+
+   @Override
+   public String getTableName() {
+      return null;
+   }
+
+   @Override
+   public void setTableAlias(String tableAlias) {
+
+   }
+
+   @Override
+   public String getTableAlias() {
+      return null;
    }
 
    //endregion

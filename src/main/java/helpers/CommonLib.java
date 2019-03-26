@@ -89,6 +89,55 @@ public class CommonLib
 
    }
 
+   public PrimitiveValueWrapper[] convertTuplePrimitiveValueToPrimitiveValueWrapperArray(PrimitiveValue[] tuple,ColumnDefinition[] columnDefinitions,String tableName) throws Exception
+   {
+
+      if (tuple == null)
+         return null;
+
+      PrimitiveValueWrapper[] convertedTuple = new PrimitiveValueWrapper[tuple.length];
+
+
+      for (int index = 0; index < tuple.length; index++) {
+         PrimitiveValueWrapper convertedValue = new PrimitiveValueWrapper();
+         convertedValue.setPrimitiveValue(tuple[index]);
+         if (convertedValue.getPrimitiveValue() != null) {
+            convertedValue.setColumnDefinition(columnDefinitions[index]);
+            convertedValue.setTableName(tableName);
+            convertedTuple[index] = convertedValue;
+         } else {
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
+            throw new Exception("Invalid columnType.");
+         }
+      }
+      return convertedTuple;
+
+   }
+
+   public PrimitiveValue[] covertTupleToPrimitiveValue(String tupleString,ColumnDefinition[] columnDefinitions,String tableName) throws Exception
+   {
+
+      if (tupleString == null)
+         return null;
+
+      String[] tupleArray = tupleString.split("\\|");
+      PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
+
+
+      for (int index = 0; index < tupleArray.length; index++) {
+         PrimitiveValue convertedValue ;
+         convertedValue = convertToPrimitiveValue(tupleArray[index],columnDefinitions[index].getColDataType().getDataType());
+         if (convertedValue != null) {
+            convertedTuple[index] = convertedValue;
+         } else {
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
+            throw new Exception("Invalid columnType.");
+         }
+      }
+      return convertedTuple;
+
+   }
+
    public PrimitiveValue convertToPrimitiveValue(String value,String dataType)
    {
       if (("STRING").equals(dataType.toUpperCase()))

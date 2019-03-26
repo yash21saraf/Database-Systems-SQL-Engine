@@ -2,6 +2,7 @@ package iterators;
 
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
+import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;*/
@@ -19,7 +20,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+   private static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
 
 //   private static final String TABLE_DIRECTORY = "data/";
 
@@ -27,8 +28,10 @@ public class TableIterator implements RAIterator
    private String tableName;
    private String tableAlias;
    private BufferedReader br;
-   private PrimitiveValueWrapper[] currentLine;
-   private PrimitiveValueWrapper[] nextLine;
+//   private PrimitiveValueWrapper[] currentLine;
+//   private PrimitiveValueWrapper[] nextLine;
+   private PrimitiveValue[] currentLine;
+   private PrimitiveValue[] nextLine;
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
 
@@ -58,10 +61,23 @@ public class TableIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
+//      try {
+//         if (!hasNextChecked) {
+//            hasNextChecked = true;
+//            if ((nextLine = commonLib.convertTupleStringToPrimitiveValueWrapperArray(br.readLine(),columnDefinitions,tableAlias)) != null) {
+//               hasNextValue = true;
+//               return true;
+//            }
+//            hasNextValue = false;
+//            return false;
+//         } else {
+//            return hasNextValue;
+//         }
+//      }
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
-            if ((nextLine = commonLib.convertTupleStringToPrimitiveValueWrapperArray(br.readLine(),columnDefinitions,tableAlias)) != null) {
+            if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions,tableAlias)) != null) {
                hasNextValue = true;
                return true;
             }
@@ -70,7 +86,8 @@ public class TableIterator implements RAIterator
          } else {
             return hasNextValue;
          }
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
          //logger.error("IOException in hasNext() of table: {}.", tableName);
          throw e;
       } catch (Exception e) {
@@ -80,7 +97,7 @@ public class TableIterator implements RAIterator
    }
 
    @Override
-   public PrimitiveValueWrapper[] next()
+   public PrimitiveValue[] next()
    {
       currentLine = nextLine;
       hasNextChecked = false;
@@ -95,7 +112,7 @@ public class TableIterator implements RAIterator
       try {
          br.close();
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
-         nextLine = commonLib.convertTupleStringToPrimitiveValueWrapperArray(br.readLine(),columnDefinitions,tableAlias);
+         nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions,tableAlias);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
@@ -105,6 +122,45 @@ public class TableIterator implements RAIterator
       } catch (Exception e) {
          throw e;
       }
+   }
+
+   @Override
+   public RAIterator getChild() {
+      return null;
+   }
+
+   @Override
+   public void setChild(RAIterator child) {
+   }
+
+   @Override
+   public ColumnDefinition[] getColumnDefinition() {
+      return this.columnDefinitions;
+   }
+
+   @Override
+   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+      this.columnDefinitions = columnDefinition ;
+   }
+
+   @Override
+   public void setTableName(String tableName) {
+      this.tableName = tableName;
+   }
+
+   @Override
+   public String getTableName() {
+      return this.tableName;
+   }
+
+   @Override
+   public void setTableAlias(String tableAlias) {
+      this.tableAlias = tableAlias ;
+   }
+
+   @Override
+   public String getTableAlias() {
+      return this.tableAlias;
    }
 
    //endregion

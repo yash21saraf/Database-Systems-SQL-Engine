@@ -55,12 +55,12 @@ public class aggregateIterator implements RAIterator {
     }
 
     @Override
-    public PrimitiveValueWrapper[] next() throws Exception {
+    public PrimitiveValue[] next() throws Exception {
 
         List<SelectItem> origSelectItems = selectItems;
         List<String> aggTypeOfSelectItems = getAggType(origSelectItems);
 
-        PrimitiveValueWrapper[] tuple = child.next();
+        PrimitiveValue[] tuple = child.next();
 
         if (tuple == null)
             return null;
@@ -73,7 +73,7 @@ public class aggregateIterator implements RAIterator {
                     continue;
             }
 
-            List<PrimitiveValueWrapper> projectedTuple = Arrays.asList(tuple);
+            List<PrimitiveValue> projectedTuple = Arrays.asList(tuple);
             aggAccumulator(projectedTuple, aggTypeOfSelectItems);
 
             getFromAggResults = true;
@@ -85,7 +85,7 @@ public class aggregateIterator implements RAIterator {
         if (aggValues.size() > 0) {
             String aggResult[] = aggValues.get(0).split("\\|");
 
-            PrimitiveValueWrapper primitiveValueWrapper[] = new PrimitiveValueWrapper[aggResult.length];
+            PrimitiveValue primitiveValueWrapper[] = new PrimitiveValue[aggResult.length];
 
             for (int index = 0; index < aggResult.length; index++) {
                 if (aggTypeOfSelectItems.get(index).equals("avg")) {
@@ -93,11 +93,9 @@ public class aggregateIterator implements RAIterator {
                     double sum = Double.parseDouble(avgResult[0]);
                     double cnt = Double.parseDouble(avgResult[1]);
                     double avg = sum / cnt;
-                    primitiveValueWrapper[index] = new PrimitiveValueWrapper();
-                    primitiveValueWrapper[index].setPrimitiveValue(new DoubleValue(avg));
+                    primitiveValueWrapper[index] = new DoubleValue(avg);
                 } else {
-                    primitiveValueWrapper[index] = new PrimitiveValueWrapper();
-                    primitiveValueWrapper[index].setPrimitiveValue(new StringValue(aggResult[index]));
+                    primitiveValueWrapper[index] = new StringValue(aggResult[index]);
                 }
             }
             return primitiveValueWrapper;
@@ -107,12 +105,12 @@ public class aggregateIterator implements RAIterator {
     }
 
 
-    private void aggAccumulator(List<PrimitiveValueWrapper> projectedTuple, List<String> aggTypeOfSelectItems) {
+    private void aggAccumulator(List<PrimitiveValue> projectedTuple, List<String> aggTypeOfSelectItems) {
 
         int index = 0;
         String newValues = "";
-        for (PrimitiveValueWrapper primitiveValueWrapper : projectedTuple) {
-            String pv = primitiveValueWrapper.getPrimitiveValue().toRawString();
+        for (PrimitiveValue primitiveValueWrapper : projectedTuple) {
+            String pv = primitiveValueWrapper.toRawString();
 
             if (aggValues.size() > 0) {
                 String oldValues[] = aggValues.get(0).split("\\|");
@@ -233,6 +231,46 @@ public class aggregateIterator implements RAIterator {
     @Override
     public void reset() throws Exception {
         child.reset();
+    }
+
+    @Override
+    public RAIterator getChild() {
+        return this.child;
+    }
+
+    @Override
+    public void setChild(RAIterator child) {
+        this.child = child ;
+    }
+
+    @Override
+    public ColumnDefinition[] getColumnDefinition() {
+        return new ColumnDefinition[0];
+    }
+
+    @Override
+    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+    }
+
+    @Override
+    public void setTableName(String tableName) {
+
+    }
+
+    @Override
+    public String getTableName() {
+        return null;
+    }
+
+    @Override
+    public void setTableAlias(String tableAlias) {
+
+    }
+
+    @Override
+    public String getTableAlias() {
+        return null;
     }
 
     //endregion

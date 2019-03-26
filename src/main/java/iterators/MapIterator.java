@@ -14,6 +14,7 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static helpers.CommonLib.castAs;
@@ -28,18 +29,71 @@ public class MapIterator implements RAIterator
     private RAIterator child;
     private List<SelectItem> selectItems;
     private String tableAlias;
+    private String tableName;
+    private ColumnDefinition[] columnDefinitions;
+
 
     //endregion
 
     //region Constructor
 
-    public MapIterator(RAIterator child,List<SelectItem> selectItems,String tableAlias)
-    {
+    public MapIterator(RAIterator child,List<SelectItem> selectItems,String tableAlias) throws Exception {
 
         this.child = child;
         this.selectItems = selectItems;
         this.tableAlias = tableAlias;
+        if (isAggregateQuery(selectItems)) {
+            this.selectItems = getUnpackedSelectedItems(selectItems);
+        }
 
+
+        SelectExpressionItem selectExpressionItem;
+        AllTableColumns allTableColumns;
+        AllColumns allColumns;
+        Column column;
+
+
+        ColumnDefinition[] childColumnDefinition = child.getColumnDefinition();
+        String childTableName = child.getTableName() ;
+        String childTableAlias = child.getTableAlias() ;
+        ArrayList<ColumnDefinition> projectedTuplenew = new ArrayList() ;
+        ArrayList<PrimitiveValueWrapper> projectedTuple = new ArrayList();
+
+        for (int index = 0; index < selectItems.size(); index++) {
+            if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
+//                PrimitiveValueWrapper evaluatedExpression = commonLib.eval(selectExpressionItem.getExpression(),tuple);
+
+                ColumnDefinition evaluatedColumnDefinition = new ColumnDefinition();
+                evaluatedColumnDefinition.setColumnName(childColumnDefinition[index].getColumnName());
+                evaluatedColumnDefinition.setColDataType(childColumnDefinition[index].getColDataType());
+                evaluatedColumnDefinition.setColumnSpecStrings(childColumnDefinition[index].getColumnSpecStrings());
+
+                evaluatedColumnDefinition.setColumnName(selectExpressionItem.getAlias());
+
+                if (tableAlias != null)
+                    this.tableName = tableAlias ;
+
+                projectedTuplenew.add(evaluatedColumnDefinition);
+
+            } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
+                for (int secondIndex = 0; secondIndex < childColumnDefinition.length; secondIndex++) {
+                    if (childColumnDefinition[secondIndex].getColumnName() == null)
+                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
+                    else if (childTableName.equals(allTableColumns.getTable().getName())) {
+                        projectedTuplenew.add(childColumnDefinition[secondIndex]) ;
+                    }
+                }
+
+            } else if ((allColumns = (AllColumns) CommonLib.castAs(selectItems.get(index),AllColumns.class)) != null) {
+                for (int secondIndex = 0; secondIndex < childColumnDefinition.length; secondIndex++) {
+                    if (childColumnDefinition[secondIndex].getColumnName() == null)
+                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
+                }
+                projectedTuplenew.addAll(Arrays.asList(childColumnDefinition));
+            }
+        }
+
+        this.columnDefinitions = projectedTuplenew.toArray(new ColumnDefinition[projectedTuplenew.size()]) ;
     }
 
     //endregion
@@ -53,60 +107,38 @@ public class MapIterator implements RAIterator
     }
 
     @Override
-    public PrimitiveValueWrapper[] next() throws Exception
+    public PrimitiveValue[] next() throws Exception
     {
-
-        if (isAggregateQuery(selectItems)) {
-            selectItems = getUnpackedSelectedItems(selectItems);
-        }
 
         SelectExpressionItem selectExpressionItem;
         AllTableColumns allTableColumns;
         AllColumns allColumns;
         Column column;
 
-        PrimitiveValueWrapper[] tuple = child.next();
-        ArrayList<PrimitiveValueWrapper> projectedTuple = new ArrayList();
+        PrimitiveValue[] tuple = child.next() ;
+//        PrimitiveValueWrapper[] tuple = child.next();
+        PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, child.getColumnDefinition(), child.getTableName());
+        ArrayList<PrimitiveValue> projectedTuple = new ArrayList();
 
         if (tuple == null)
             return null;
         for (int index = 0; index < selectItems.size(); index++) {
             if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
-                PrimitiveValueWrapper evaluatedExpression = commonLib.eval(selectExpressionItem.getExpression(),tuple);
-
-                ColumnDefinition evaluatedColumnDefinition = new ColumnDefinition();
-                evaluatedColumnDefinition.setColumnName(tuple[index].getColumnDefinition().getColumnName());
-                evaluatedColumnDefinition.setColDataType(tuple[index].getColumnDefinition().getColDataType());
-                evaluatedColumnDefinition.setColumnSpecStrings(tuple[index].getColumnDefinition().getColumnSpecStrings());
-                for (PrimitiveValueWrapper selectedValue : projectedTuple) {
-//                    if (selectExpressionItem.getAlias() != null) {
-//                        if (selectedValue.getColumnDefinition().getColumnName().equals(selectExpressionItem.getAlias()))
-//                            throw new Exception(selectExpressionItem.getAlias() + " is an ambiguous column name.");
-//                    } else if ((column = (Column) CommonLib.castAs(selectExpressionItem,Column.class)) != null)
-//                        if (selectedValue.getColumnDefinition().getColumnName().equals(column.getColumnName()))
-//                            throw new Exception(column.getColumnName() + " was specified multiple times.");
-
-                }
-                evaluatedColumnDefinition.setColumnName(selectExpressionItem.getAlias());
-                evaluatedExpression.setColumnDefinition(evaluatedColumnDefinition);
-
-                if (tableAlias != null)
-                    evaluatedExpression.setTableName(tableAlias);
-
-                projectedTuple.add(evaluatedExpression);
+                PrimitiveValueWrapper evaluatedExpression = commonLib.eval(selectExpressionItem.getExpression(),wrappedTuple);
+                projectedTuple.add(evaluatedExpression.getPrimitiveValue());
 
             } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
                 for (int secondIndex = 0; secondIndex < tuple.length; secondIndex++) {
-                    if (tuple[secondIndex].getColumnDefinition().getColumnName() == null)
+                    if (this.columnDefinitions[secondIndex].getColumnName() == null)
                         throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
-                    else if (tuple[secondIndex].getTableName().equals(allTableColumns.getTable().getName())) {
+                    else if (this.tableName.equals(allTableColumns.getTable().getName())) {
                         projectedTuple.add(tuple[secondIndex]);
                     }
                 }
 
             } else if ((allColumns = (AllColumns) CommonLib.castAs(selectItems.get(index),AllColumns.class)) != null) {
                 for (int secondIndex = 0; secondIndex < tuple.length; secondIndex++) {
-                    if (tuple[secondIndex].getColumnDefinition().getColumnName() == null)
+                    if (this.columnDefinitions[secondIndex].getColumnName() == null)
                         throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
                 }
                 return tuple;
@@ -114,14 +146,53 @@ public class MapIterator implements RAIterator
             }
         }
 
-        return projectedTuple.toArray(new PrimitiveValueWrapper[projectedTuple.size()]);
-
+        return projectedTuple.toArray(new PrimitiveValue[projectedTuple.size()]);
     }
 
     @Override
     public void reset() throws Exception
     {
         child.reset();
+    }
+
+    @Override
+    public RAIterator getChild() {
+        return this.child;
+    }
+
+    @Override
+    public void setChild(RAIterator child) {
+        this.child = child ;
+    }
+
+    @Override
+    public ColumnDefinition[] getColumnDefinition() {
+        return new ColumnDefinition[0];
+    }
+
+    @Override
+    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+    }
+
+    @Override
+    public void setTableName(String tableName) {
+
+    }
+
+    @Override
+    public String getTableName() {
+        return null;
+    }
+
+    @Override
+    public void setTableAlias(String tableAlias) {
+
+    }
+
+    @Override
+    public String getTableAlias() {
+        return null;
     }
 
 

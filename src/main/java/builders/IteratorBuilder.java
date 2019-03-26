@@ -113,6 +113,7 @@ public class IteratorBuilder {
     /**
      * Method to read in CREATE TABLE statement
      * Stores the associated List<ColumnDefinition> schema
+   }
      *
      * @param createTable CreateTable object containing the schema and relevant details
      *                    of the base table to be read from filesystem

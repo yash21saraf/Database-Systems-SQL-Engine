@@ -66,7 +66,7 @@ public class GroupByIterator implements RAIterator {
     }
 
     @Override
-    public PrimitiveValueWrapper[] next() throws Exception {
+    public PrimitiveValue[] next() throws Exception {
 
         List<SelectItem> origSelectItems = selectItems;
 
@@ -83,7 +83,7 @@ public class GroupByIterator implements RAIterator {
 
                 String[] primitiveValues = pv.split("\\|");
 
-                PrimitiveValueWrapper[] primitiveValueWrappers = new PrimitiveValueWrapper[origSelectItems.size()];
+                PrimitiveValue[] primitiveValueWrappers = new PrimitiveValue[origSelectItems.size()];
 
                 int primitiveValuesLength = primitiveValues.length;
 
@@ -97,11 +97,9 @@ public class GroupByIterator implements RAIterator {
 
                         double avg = sum / count;
 
-                        primitiveValueWrappers[i] = new PrimitiveValueWrapper();
-                        primitiveValueWrappers[i].setPrimitiveValue(new DoubleValue(avg));
+                        primitiveValueWrappers[i] = new DoubleValue(avg);
                     } else {
-                        primitiveValueWrappers[i] = new PrimitiveValueWrapper();
-                        primitiveValueWrappers[i].setPrimitiveValue(new StringValue(primitiveValues[i]));
+                        primitiveValueWrappers[i] = new StringValue(primitiveValues[i]);
                     }
                 }
 
@@ -111,7 +109,7 @@ public class GroupByIterator implements RAIterator {
             }
         }
 
-        PrimitiveValueWrapper[] tuple = child.next();
+        PrimitiveValue[] tuple = child.next();
 
         if (tuple == null)
             return null;
@@ -132,16 +130,16 @@ public class GroupByIterator implements RAIterator {
                         continue;
                 }
 
-                List<PrimitiveValueWrapper> projectedTuple = Arrays.asList(tuple);
+                List<PrimitiveValue> projectedTuple = Arrays.asList(tuple);
 
                 String groupByCols = "";
                 for (int index = 0; index < groupByColumnReferences.size(); index++)
-                    groupByCols = groupByCols + projectedTuple.get(index).getPrimitiveValue().toRawString() + "|";
+                    groupByCols = groupByCols + projectedTuple.get(index).toRawString() + "|";
 
                 List<String> aggPrimitiveValues = new ArrayList<String>();
 
                 for (int index = groupByColumnReferences.size(); index < projectedTuple.size(); index++)
-                    aggPrimitiveValues.add(projectedTuple.get(index).getPrimitiveValue().toRawString());
+                    aggPrimitiveValues.add(projectedTuple.get(index).toRawString());
 
 
                 groupByAccumulator(aggPrimitiveValues, aggTypeOfSelectItems, groupByCols);
@@ -163,7 +161,7 @@ public class GroupByIterator implements RAIterator {
 
                 String[] primitiveValues = pv.split("\\|");
 
-                PrimitiveValueWrapper[] primitiveValueWrappers = new PrimitiveValueWrapper[origSelectItems.size()];
+                PrimitiveValue[] primitiveValueWrappers = new PrimitiveValue[origSelectItems.size()];
 
                 int primitiveValuesLength = primitiveValues.length;
 
@@ -177,11 +175,9 @@ public class GroupByIterator implements RAIterator {
 
                         double avg = sum / count;
 
-                        primitiveValueWrappers[i] = new PrimitiveValueWrapper();
-                        primitiveValueWrappers[i].setPrimitiveValue(new DoubleValue(avg));
+                        primitiveValueWrappers[i] = new DoubleValue(avg);
                     } else {
-                        primitiveValueWrappers[i] = new PrimitiveValueWrapper();
-                        primitiveValueWrappers[i].setPrimitiveValue(new StringValue(primitiveValues[i]));
+                        primitiveValueWrappers[i] = new StringValue(primitiveValues[i]);
                     }
                 }
 
@@ -363,6 +359,46 @@ public class GroupByIterator implements RAIterator {
     @Override
     public void reset() throws Exception {
         child.reset();
+    }
+
+    @Override
+    public RAIterator getChild() {
+        return this.child;
+    }
+
+    @Override
+    public void setChild(RAIterator child) {
+        this.child = child ;
+    }
+
+    @Override
+    public ColumnDefinition[] getColumnDefinition() {
+        return new ColumnDefinition[0];
+    }
+
+    @Override
+    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+    }
+
+    @Override
+    public void setTableName(String tableName) {
+
+    }
+
+    @Override
+    public String getTableName() {
+        return null;
+    }
+
+    @Override
+    public void setTableAlias(String tableAlias) {
+
+    }
+
+    @Override
+    public String getTableAlias() {
+        return null;
     }
 
     //endregion

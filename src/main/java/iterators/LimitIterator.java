@@ -1,6 +1,8 @@
 package iterators;
 
 import helpers.PrimitiveValueWrapper;
+import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
@@ -10,7 +12,7 @@ public class LimitIterator implements RAIterator {
 
     //region Variables
 
-    private RAIterator currentIterator;
+    private RAIterator child;
     private Limit limit;
     private long currentIndex = 0;
     //endregion
@@ -19,7 +21,7 @@ public class LimitIterator implements RAIterator {
 
     public LimitIterator(RAIterator rootIterator, Limit limit) {
 
-        this.currentIterator = rootIterator;
+        this.child = rootIterator;
         this.limit = limit;
     }
 
@@ -30,14 +32,14 @@ public class LimitIterator implements RAIterator {
     @Override
     public boolean hasNext() throws Exception {
 
-        return currentIterator.hasNext() && currentIndex < limit.getRowCount();
+        return child.hasNext() && currentIndex < limit.getRowCount();
 
     }
 
     @Override
-    public PrimitiveValueWrapper[] next() throws Exception {
+    public PrimitiveValue[] next() throws Exception {
 
-        PrimitiveValueWrapper[] primitiveValueWrappers = currentIterator.next();
+        PrimitiveValue[] primitiveValueWrappers = child.next();
         currentIndex++;
         return primitiveValueWrappers;
 
@@ -45,7 +47,47 @@ public class LimitIterator implements RAIterator {
 
     @Override
     public void reset() throws Exception {
-        currentIterator.reset();
+        child.reset();
+    }
+
+    @Override
+    public RAIterator getChild() {
+        return null;
+    }
+
+    @Override
+    public void setChild(RAIterator child) {
+        this.child = child ;
+    }
+
+    @Override
+    public ColumnDefinition[] getColumnDefinition() {
+        return new ColumnDefinition[0];
+    }
+
+    @Override
+    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+    }
+
+    @Override
+    public void setTableName(String tableName) {
+
+    }
+
+    @Override
+    public String getTableName() {
+        return null;
+    }
+
+    @Override
+    public void setTableAlias(String tableAlias) {
+
+    }
+
+    @Override
+    public String getTableAlias() {
+        return null;
     }
 
     //endregion

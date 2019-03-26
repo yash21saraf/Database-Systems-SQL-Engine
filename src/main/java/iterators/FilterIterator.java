@@ -8,7 +8,6 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;*/
 
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class FilterIterator implements RAIterator
@@ -20,6 +19,9 @@ public class FilterIterator implements RAIterator
 
    private RAIterator child;
    private Expression expression;
+   private ColumnDefinition[] columnDefinitions;
+   private String tableName;
+   private String tableAlias;
 
    //endregion
 
@@ -30,6 +32,9 @@ public class FilterIterator implements RAIterator
 
       this.child = child;
       this.expression = expression;
+      this.columnDefinitions = child.getColumnDefinition() ;
+      this.tableAlias = child.getTableAlias() ;
+      this.tableName = child.getTableName() ;
 
    }
 
@@ -44,13 +49,14 @@ public class FilterIterator implements RAIterator
    }
 
    @Override
-   public PrimitiveValueWrapper[] next() throws Exception
+   public PrimitiveValue[] next() throws Exception
    {
-      PrimitiveValueWrapper[] tuple = child.next();
+      PrimitiveValue[] tuple = child.next();
       if (tuple == null)
          return null;
       try {
-         if (commonLib.eval(expression,tuple).getPrimitiveValue().toBool())
+         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.columnDefinitions, this.tableName);
+         if (commonLib.eval(expression,wrappedTuple).getPrimitiveValue().toBool())
             return tuple;
          return null;
       } catch (SQLException e) {
@@ -65,5 +71,44 @@ public class FilterIterator implements RAIterator
       child.reset();
    }
 
+   @Override
+   public RAIterator getChild() {
+      return this.child ;
+   }
+
+   @Override
+   public void setChild(RAIterator child) {
+      this.child = child ;
+   }
+
+   @Override
+   public ColumnDefinition[] getColumnDefinition() {
+      return this.columnDefinitions;
+   }
+
+   @Override
+   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+      this.columnDefinitions = columnDefinition ;
+   }
+
+   @Override
+   public void setTableName(String tableName) {
+      this.tableName = tableName;
+   }
+
+   @Override
+   public String getTableName() {
+      return this.tableName;
+   }
+
+   @Override
+   public void setTableAlias(String tableAlias) {
+      this.tableAlias = tableAlias ;
+   }
+
+   @Override
+   public String getTableAlias() {
+      return this.tableAlias;
+   }
    //endregion
 }

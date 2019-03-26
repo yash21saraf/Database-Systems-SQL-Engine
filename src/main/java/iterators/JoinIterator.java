@@ -4,6 +4,7 @@ import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;*/
 
@@ -22,8 +23,11 @@ public class JoinIterator implements RAIterator
    private RAIterator rightChild;
    private Expression onExpression;
 
-   private PrimitiveValueWrapper[] leftTuple;
-   private PrimitiveValueWrapper[] rightTuple;
+
+//   private PrimitiveValueWrapper[] leftTuple;
+//   private PrimitiveValueWrapper[] rightTuple;
+   private PrimitiveValue[] leftTuple;
+   private PrimitiveValue[] rightTuple;
 
    //endregion
 
@@ -57,7 +61,7 @@ public class JoinIterator implements RAIterator
    }
 
    @Override
-   public PrimitiveValueWrapper[] next() throws Exception
+   public PrimitiveValue[] next() throws Exception
    {
       try {
          if (leftTuple == null)
@@ -69,7 +73,9 @@ public class JoinIterator implements RAIterator
          }
          rightTuple = rightChild.next();
          if (onExpression != null) {
-            if (commonLib.eval(onExpression,rightTuple,leftTuple).getPrimitiveValue().toBool()) {
+            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getColumnDefinition(), leftChild.getTableName());
+            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getColumnDefinition(), rightChild.getTableName());
+            if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
                return CommonLib.concatArrays(leftTuple,rightTuple);
             }
          } else {
@@ -87,6 +93,54 @@ public class JoinIterator implements RAIterator
    {
       leftChild.reset();
       rightChild.reset();
+   }
+
+   @Override
+   public RAIterator getChild() {
+      return leftChild;
+   }
+
+   @Override
+   public void setChild(RAIterator child) {
+      this.leftChild = child ;
+   }
+
+   @Override
+   public ColumnDefinition[] getColumnDefinition() {
+      return new ColumnDefinition[0];
+   }
+
+   @Override
+   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+
+   }
+
+   @Override
+   public void setTableName(String tableName) {
+
+   }
+
+   @Override
+   public String getTableName() {
+      return null;
+   }
+
+   @Override
+   public void setTableAlias(String tableAlias) {
+
+   }
+
+   @Override
+   public String getTableAlias() {
+      return null;
+   }
+
+   public void setRightChild(RAIterator rightChild) {
+      this.rightChild = rightChild;
+   }
+
+   public RAIterator getRightChild() {
+      return this.rightChild;
    }
 
    //endregion
