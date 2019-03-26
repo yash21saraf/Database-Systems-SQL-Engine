@@ -65,20 +65,24 @@ public class MapIterator implements RAIterator
         ArrayList<Schema> projectedTuplenew = new ArrayList() ;
 
         for (int index = 0; index < selectItems.size(); index++) {
+
             if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
                 Expression expression = selectExpressionItem.getExpression() ;
-
                 String alias = selectExpressionItem.getAlias();
-                if((expression = (Function) CommonLib.castAs(expression,Function.class)) != null){
+                if(expression instanceof Function){
                     this.isAggquery = true ;
                     Schema newSchema = new Schema() ;
                     newSchema.setColumnDefinition(null); //TODO: How to get columnDefinition for functions, for now set null
                     newSchema.setTableName(alias);
                     projectedTuplenew.add(newSchema) ;
                 }
-                else if((column = (Column) CommonLib.castAs(expression,Column.class)) != null){
+
+                else if(expression instanceof Column){
+                    column = (Column) CommonLib.castAs(expression,Column.class) ;
                     for(Schema schema : childSchema){
-                        if(schema.getColumnDefinition().getColumnName() == column.getColumnName() && schema.getTableName() == column.getTable().getName()){
+                        if(schema.getColumnDefinition().getColumnName().equals(column.getColumnName())){
+                            //TODO:  && schema.getTableName() == column.getTable().getName()
+                            // Since column is typecasted it has no TableName
                             Schema newSchema = new Schema();
                             newSchema.setColumnDefinition(schema.getColumnDefinition());
                             if(alias != null){

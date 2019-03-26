@@ -88,7 +88,7 @@ public class JoinIterator implements RAIterator
             if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
                return CommonLib.concatArrays(leftTuple,rightTuple);
             }
-         } else {
+         } else if(rightTuple != null && leftTuple != null){
             return CommonLib.concatArrays(leftTuple,rightTuple);
          }
          return null;
