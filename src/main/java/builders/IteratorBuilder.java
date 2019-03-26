@@ -317,7 +317,7 @@ public class IteratorBuilder {
 
         for (int index = 0; index < selectItems.size(); index++) {
 
-            if ((function = (Function) castAs(((SelectExpressionItem) selectItems.get(index)).getExpression(), Function.class)) != null) {
+            if (selectItems.get(index) instanceof Function) {
                 return true;
             }
         }

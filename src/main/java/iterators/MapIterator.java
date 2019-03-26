@@ -34,6 +34,7 @@ public class MapIterator implements RAIterator
     private String tableAlias;
     private Schema[] schema ;
     private Schema[] childSchema ;
+    private boolean isAggquery = false ;
 
 
     //endregion
@@ -47,11 +48,12 @@ public class MapIterator implements RAIterator
         this.tableAlias = tableAlias;
         this.childSchema = child.getSchema();
 
-        if (isAggregateQuery(selectItems)) {
+        createSchema(selectItems, childSchema) ;
+        if (this.isAggquery) {
             this.selectItems = getUnpackedSelectedItems(selectItems);
         }
 
-        createSchema(selectItems, childSchema) ;
+
     }
 
     private void createSchema(List<SelectItem> selectItems, Schema[] childSchema) {
@@ -68,8 +70,9 @@ public class MapIterator implements RAIterator
 
                 String alias = selectExpressionItem.getAlias();
                 if((expression = (Function) CommonLib.castAs(expression,Function.class)) != null){
+                    this.isAggquery = true ;
                     Schema newSchema = new Schema() ;
-                    newSchema.setColumnDefinition(null);
+                    newSchema.setColumnDefinition(null); //TODO: How to get columnDefinition for functions, for now set null
                     newSchema.setTableName(alias);
                     projectedTuplenew.add(newSchema) ;
                 }
@@ -144,8 +147,7 @@ public class MapIterator implements RAIterator
                     if (this.schema[secondIndex].getColumnDefinition().getColumnName() == null)
                         throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
                 }
-                return tuple;
-
+                projectedTuple.addAll(Arrays.asList(tuple)) ;
             }
         }
 
@@ -178,18 +180,6 @@ public class MapIterator implements RAIterator
         this.schema = schema ;
     }
 
-
-    private boolean isAggregateQuery(List<SelectItem> selectItems) {
-        Function function;
-
-        for (int index = 0; index < selectItems.size(); index++) {
-
-            if ((function = (Function) castAs(((SelectExpressionItem) selectItems.get(index)).getExpression(), Function.class)) != null) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private List<SelectItem> getUnpackedSelectedItems(List<SelectItem> selectItems) {
 
