@@ -21,17 +21,18 @@ public class AppMain
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
-        String q3 = "select * from R UNION ALL select a from R";
+//        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
 //        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
 //        String q3 = "select R.a, R.b "|"from R,S as TT where R.a = 11";
 //        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
 //        String q3 = "select a,b,* from R";
-//        String q3 = "select c, d, sum(a+b), from R, S where c != 78 group by c, d order by c, d desc";
+//        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
 //        String q3 = "select c, d, sum(a+b) from R, S where c != 9 group by c, d having sum(a+b) <> 35 order by c desc";
 //        String q3 = "select a, a+b from R,S" ;
 //        String q3 = "select * from r where a in (select a from s where c>5)" ; //TODO: Manage in expressions
    //     String q3 = "select a from r, (select d from s where e>7)";
+        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) tt";
 
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){

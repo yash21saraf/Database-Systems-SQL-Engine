@@ -248,12 +248,12 @@ public class aggregateIterator implements RAIterator {
 
     @Override
     public Schema[] getSchema() {
-        return new Schema[0];
+        return this.schema ;
     }
 
     @Override
     public void setSchema(Schema[] schema) {
-
+        this.schema = schema ;
     }
 
 

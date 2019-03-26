@@ -67,7 +67,10 @@ public class OrderByIterator implements RAIterator {
             }
 
             while (child.hasNext()) {
-                sortedList.add(Arrays.asList(child.next()));
+                PrimitiveValue[] tuple = child.next() ;
+                if(tuple == null)
+                    continue ;
+                sortedList.add(Arrays.asList(tuple));
             }
 
             Collections.sort(sortedList, new Comparator<List<PrimitiveValue>>() {
@@ -118,7 +121,10 @@ public class OrderByIterator implements RAIterator {
             }
 
             while (child.hasNext()) {
-                sortedList.add(Arrays.asList(child.next()));
+                PrimitiveValue[] tuple = child.next() ;
+                if(tuple == null)
+                    continue ;
+                sortedList.add(Arrays.asList(tuple));
             }
 
             Collections.sort(sortedList, new Comparator<List<PrimitiveValue>>() {
@@ -180,12 +186,12 @@ public class OrderByIterator implements RAIterator {
 
     @Override
     public Schema[] getSchema() {
-        return new Schema[0];
+        return this.schema ;
     }
 
     @Override
     public void setSchema(Schema[] schema) {
-
+        this.schema = schema ;
     }
 
 

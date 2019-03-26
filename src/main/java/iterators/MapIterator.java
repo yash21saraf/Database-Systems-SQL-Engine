@@ -81,8 +81,7 @@ public class MapIterator implements RAIterator
                     column = (Column) CommonLib.castAs(expression,Column.class) ;
                     for(Schema schema : childSchema){
                         if(schema.getColumnDefinition().getColumnName().equals(column.getColumnName())){
-                            //TODO:  && schema.getTableName() == column.getTable().getName()
-                            // Since column is typecasted it has no TableName
+
                             Schema newSchema = new Schema();
                             newSchema.setColumnDefinition(schema.getColumnDefinition());
                             if(alias != null){
