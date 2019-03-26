@@ -2,6 +2,7 @@ package iterators;
 
 import dubstep.AppMain;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.OrderByElement;
@@ -22,16 +23,18 @@ public class OrderByIterator implements RAIterator {
     private List<Integer> indexOfOrderByElements;
     private List<Boolean> orderOfOrderByElements; // asc : true, desc : false
     private int currentIndex = 0;
+    private Schema[] schema ;
     //endregion
 
     //region Constructor
 
-    public OrderByIterator(RAIterator rootIterator, List<OrderByElement> orderByElementsList, List<Integer> indexOfOrderByElements, List<Boolean> orderOfOrderByElements) {
+    public OrderByIterator(RAIterator child, List<OrderByElement> orderByElementsList, List<Integer> indexOfOrderByElements, List<Boolean> orderOfOrderByElements) {
 
-        this.child = rootIterator;
+        this.child = child;
         this.orderByElementsList = orderByElementsList;
         this.indexOfOrderByElements = indexOfOrderByElements;
         this.orderOfOrderByElements = orderOfOrderByElements;
+        this.schema = child.getSchema() ;
     }
 
     //endregion
@@ -176,34 +179,15 @@ public class OrderByIterator implements RAIterator {
     }
 
     @Override
-    public ColumnDefinition[] getColumnDefinition() {
-        return new ColumnDefinition[0];
+    public Schema[] getSchema() {
+        return new Schema[0];
     }
 
     @Override
-    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+    public void setSchema(Schema[] schema) {
 
     }
 
-    @Override
-    public void setTableName(String tableName) {
-
-    }
-
-    @Override
-    public String getTableName() {
-        return null;
-    }
-
-    @Override
-    public void setTableAlias(String tableAlias) {
-
-    }
-
-    @Override
-    public String getTableAlias() {
-        return null;
-    }
 
     //endregion
 }

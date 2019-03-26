@@ -1,6 +1,7 @@
 package iterators;
 
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
@@ -21,15 +22,7 @@ public interface RAIterator
 
    public void setChild(RAIterator child);
 
-   public ColumnDefinition[] getColumnDefinition();
+   public Schema[] getSchema() ;
 
-   public void setColumnDefinition(ColumnDefinition[] columnDefinition);
-
-   public void setTableName(String tableName);
-
-   public String getTableName();
-
-   public void setTableAlias(String tableAlias);
-
-   public String getTableAlias() ;
+   public void setSchema(Schema[] schema) ;
 }

@@ -1,6 +1,7 @@
 package iterators;
 
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.Limit;
@@ -15,6 +16,7 @@ public class LimitIterator implements RAIterator {
     private RAIterator child;
     private Limit limit;
     private long currentIndex = 0;
+    private Schema[] schema ;
     //endregion
 
     //region Constructor
@@ -23,6 +25,7 @@ public class LimitIterator implements RAIterator {
 
         this.child = rootIterator;
         this.limit = limit;
+        this.schema = child.getSchema() ;
     }
 
     //endregion
@@ -61,34 +64,15 @@ public class LimitIterator implements RAIterator {
     }
 
     @Override
-    public ColumnDefinition[] getColumnDefinition() {
-        return new ColumnDefinition[0];
+    public Schema[] getSchema() {
+        return this.schema ;
     }
 
     @Override
-    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
-
+    public void setSchema(Schema[] schema) {
+        this.schema = schema ;
     }
 
-    @Override
-    public void setTableName(String tableName) {
-
-    }
-
-    @Override
-    public String getTableName() {
-        return null;
-    }
-
-    @Override
-    public void setTableAlias(String tableAlias) {
-
-    }
-
-    @Override
-    public String getTableAlias() {
-        return null;
-    }
 
     //endregion
 }

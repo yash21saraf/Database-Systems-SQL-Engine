@@ -2,6 +2,7 @@ package iterators;
 
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -19,9 +20,7 @@ public class FilterIterator implements RAIterator
 
    private RAIterator child;
    private Expression expression;
-   private ColumnDefinition[] columnDefinitions;
-   private String tableName;
-   private String tableAlias;
+   private Schema[] schema ;
 
    //endregion
 
@@ -32,9 +31,7 @@ public class FilterIterator implements RAIterator
 
       this.child = child;
       this.expression = expression;
-      this.columnDefinitions = child.getColumnDefinition() ;
-      this.tableAlias = child.getTableAlias() ;
-      this.tableName = child.getTableName() ;
+      this.schema = child.getSchema();
 
    }
 
@@ -55,7 +52,7 @@ public class FilterIterator implements RAIterator
       if (tuple == null)
          return null;
       try {
-         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.columnDefinitions, this.tableName);
+         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
          if (commonLib.eval(expression,wrappedTuple).getPrimitiveValue().toBool())
             return tuple;
          return null;
@@ -81,34 +78,15 @@ public class FilterIterator implements RAIterator
       this.child = child ;
    }
 
+
    @Override
-   public ColumnDefinition[] getColumnDefinition() {
-      return this.columnDefinitions;
+   public Schema[] getSchema() {
+      return this.schema;
    }
 
    @Override
-   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
-      this.columnDefinitions = columnDefinition ;
-   }
-
-   @Override
-   public void setTableName(String tableName) {
-      this.tableName = tableName;
-   }
-
-   @Override
-   public String getTableName() {
-      return this.tableName;
-   }
-
-   @Override
-   public void setTableAlias(String tableAlias) {
-      this.tableAlias = tableAlias ;
-   }
-
-   @Override
-   public String getTableAlias() {
-      return this.tableAlias;
+   public void setSchema(Schema[] schema) {
+      this.schema = schema ;
    }
    //endregion
 }

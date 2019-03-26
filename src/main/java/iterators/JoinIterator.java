@@ -2,6 +2,7 @@ package iterators;
 
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -23,11 +24,13 @@ public class JoinIterator implements RAIterator
    private RAIterator rightChild;
    private Expression onExpression;
 
+   private ColumnDefinition[] columnDefinitions;
 
-//   private PrimitiveValueWrapper[] leftTuple;
-//   private PrimitiveValueWrapper[] rightTuple;
    private PrimitiveValue[] leftTuple;
    private PrimitiveValue[] rightTuple;
+   private Schema[] leftSchema ;
+   private Schema[] rightSchema ;
+   private Schema[] schema ;
 
    //endregion
 
@@ -39,8 +42,15 @@ public class JoinIterator implements RAIterator
       this.leftChild = leftChild;
       this.rightChild = rightChild;
       this.onExpression = onExpression;
-
+      this.leftSchema = leftChild.getSchema();
+      this.rightSchema = rightChild.getSchema() ;
+      this.schema = createSchema(this.leftSchema, this.rightSchema) ;
    }
+
+   private Schema[] createSchema(Schema[] leftSchema, Schema[] rightSchema) {
+      return CommonLib.concatArrays(leftSchema, rightSchema) ;
+   }
+
 
    //endregion
 
@@ -73,8 +83,8 @@ public class JoinIterator implements RAIterator
          }
          rightTuple = rightChild.next();
          if (onExpression != null) {
-            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getColumnDefinition(), leftChild.getTableName());
-            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getColumnDefinition(), rightChild.getTableName());
+            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
+            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
             if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
                return CommonLib.concatArrays(leftTuple,rightTuple);
             }
@@ -106,33 +116,13 @@ public class JoinIterator implements RAIterator
    }
 
    @Override
-   public ColumnDefinition[] getColumnDefinition() {
-      return new ColumnDefinition[0];
+   public Schema[] getSchema() {
+      return this.schema ;
    }
 
    @Override
-   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
-
-   }
-
-   @Override
-   public void setTableName(String tableName) {
-
-   }
-
-   @Override
-   public String getTableName() {
-      return null;
-   }
-
-   @Override
-   public void setTableAlias(String tableAlias) {
-
-   }
-
-   @Override
-   public String getTableAlias() {
-      return null;
+   public void setSchema(Schema[] schema) {
+      this.schema = schema ;
    }
 
    public void setRightChild(RAIterator rightChild) {

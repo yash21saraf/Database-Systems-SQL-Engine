@@ -2,6 +2,7 @@ package iterators;
 
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
@@ -244,34 +245,15 @@ public class aggregateIterator implements RAIterator {
     }
 
     @Override
-    public ColumnDefinition[] getColumnDefinition() {
-        return new ColumnDefinition[0];
+    public Schema[] getSchema() {
+        return new Schema[0];
     }
 
     @Override
-    public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
+    public void setSchema(Schema[] schema) {
 
     }
 
-    @Override
-    public void setTableName(String tableName) {
-
-    }
-
-    @Override
-    public String getTableName() {
-        return null;
-    }
-
-    @Override
-    public void setTableAlias(String tableAlias) {
-
-    }
-
-    @Override
-    public String getTableAlias() {
-        return null;
-    }
 
     //endregion
 }

@@ -1,8 +1,11 @@
 package iterators;
 
+import com.sun.xml.internal.ws.api.server.SDDocument;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 /*import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;*/
@@ -22,16 +25,14 @@ public class TableIterator implements RAIterator
 
    private static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
 
-//   private static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
    private String tableAlias;
    private BufferedReader br;
-//   private PrimitiveValueWrapper[] currentLine;
-//   private PrimitiveValueWrapper[] nextLine;
    private PrimitiveValue[] currentLine;
    private PrimitiveValue[] nextLine;
+   private Schema[] schema ;
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
 
@@ -44,6 +45,7 @@ public class TableIterator implements RAIterator
       this.columnDefinitions = columnDefinitions;
       this.tableName = tableName;
       this.tableAlias = tableAlias;
+      this.schema = createSchema(columnDefinitions, tableAlias);
 
       try {
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
@@ -54,6 +56,25 @@ public class TableIterator implements RAIterator
       }
    }
 
+   private Schema[] createSchema(ColumnDefinition[] columnDefinitions, String tableName) throws Exception
+   {
+
+      if (columnDefinitions == null)
+         return null;
+
+      Schema[] convertedTuple = new Schema[columnDefinitions.length];
+
+      for (int index = 0; index < columnDefinitions.length; index++) {
+         Schema convertedValue = new Schema();
+         convertedValue.setColumnDefinition(columnDefinitions[index]);
+         convertedValue.setTableName(tableName);
+         convertedTuple[index] = convertedValue;
+
+      }
+      return convertedTuple;
+   }
+
+
    //endregion
 
    //region Iterator methods
@@ -61,23 +82,10 @@ public class TableIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
-//      try {
-//         if (!hasNextChecked) {
-//            hasNextChecked = true;
-//            if ((nextLine = commonLib.convertTupleStringToPrimitiveValueWrapperArray(br.readLine(),columnDefinitions,tableAlias)) != null) {
-//               hasNextValue = true;
-//               return true;
-//            }
-//            hasNextValue = false;
-//            return false;
-//         } else {
-//            return hasNextValue;
-//         }
-//      }
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
-            if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions,tableAlias)) != null) {
+            if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions)) != null) {
                hasNextValue = true;
                return true;
             }
@@ -112,7 +120,7 @@ public class TableIterator implements RAIterator
       try {
          br.close();
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
-         nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions,tableAlias);
+         nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
@@ -134,34 +142,15 @@ public class TableIterator implements RAIterator
    }
 
    @Override
-   public ColumnDefinition[] getColumnDefinition() {
-      return this.columnDefinitions;
+   public Schema[] getSchema() {
+      return this.schema;
    }
 
    @Override
-   public void setColumnDefinition(ColumnDefinition[] columnDefinition) {
-      this.columnDefinitions = columnDefinition ;
+   public void setSchema(Schema[] schema) {
+      this.schema = schema;
    }
 
-   @Override
-   public void setTableName(String tableName) {
-      this.tableName = tableName;
-   }
-
-   @Override
-   public String getTableName() {
-      return this.tableName;
-   }
-
-   @Override
-   public void setTableAlias(String tableAlias) {
-      this.tableAlias = tableAlias ;
-   }
-
-   @Override
-   public String getTableAlias() {
-      return this.tableAlias;
-   }
 
    //endregion
 

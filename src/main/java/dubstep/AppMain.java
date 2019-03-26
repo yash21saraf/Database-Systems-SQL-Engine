@@ -2,6 +2,7 @@ package dubstep;
 
 import builders.IteratorBuilder;
 import helpers.PrimitiveValueWrapper;
+import helpers.Schema;
 import iterators.RAIterator;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
@@ -25,8 +26,8 @@ public class AppMain
 //        String q3 = "select R.a, R.b "|"from R,S as TT where R.a = 11";
 //        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
 //        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
-//        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
-        String q3 = "select c,a+b from R" ;
+        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d having sum(a+b) <> 35 order by c desc";
+//        String q3 = "select a, a+b from R,S" ;
 
 
         for(int j = 0; j < args.length; j++){
