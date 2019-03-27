@@ -33,7 +33,6 @@ public class MapIterator implements RAIterator
     private List<SelectItem> selectItems;
     private String tableAlias;
     private Schema[] schema ;
-    private Schema[] childSchema ;
     private boolean isAggquery = false ;
 
 
@@ -46,9 +45,8 @@ public class MapIterator implements RAIterator
         this.child = child;
         this.selectItems = selectItems;
         this.tableAlias = tableAlias;
-        this.childSchema = child.getSchema();
 
-        createSchema(selectItems, childSchema) ;
+        createSchema(selectItems, child.getSchema()) ;
         if (this.isAggquery) {
             this.selectItems = getUnpackedSelectedItems(selectItems);
         }
@@ -70,10 +68,11 @@ public class MapIterator implements RAIterator
                 Expression expression = selectExpressionItem.getExpression() ;
                 String alias = selectExpressionItem.getAlias();
                 if(expression instanceof Function){
+                    Function function = (Function) CommonLib.castAs(expression, Function.class) ;
                     this.isAggquery = true ;
                     Schema newSchema = new Schema() ;
-                    newSchema.setColumnDefinition(null); //TODO: How to get columnDefinition for functions, for now set null
-                    newSchema.setTableName(alias);
+                    newSchema.setColumnDefinition(alias, null, null); //TODO: How to get columnDefinition for functions, for now set null
+                    newSchema.setTableName(null);
                     projectedTuplenew.add(newSchema) ;
                 }
 
@@ -83,12 +82,11 @@ public class MapIterator implements RAIterator
                         if(schema.getColumnDefinition().getColumnName().equals(column.getColumnName())){
 
                             Schema newSchema = new Schema();
-                            newSchema.setColumnDefinition(schema.getColumnDefinition());
-                            if(alias != null){
-                                newSchema.setTableName(alias);
-                            }else{
-                                newSchema.setTableName(schema.getTableName());
-                            }
+                            if(alias == null)
+                                newSchema.setColumnDefinition(schema.getColumnDefinition());
+                            else
+                                newSchema.setColumnDefinition(alias, schema.getColumnDefinition().getColDataType(), schema.getColumnDefinition().getColumnSpecStrings());
+                            newSchema.setTableName(schema.getTableName());
                             projectedTuplenew.add(newSchema);
                             break ;
                         }
@@ -102,8 +100,12 @@ public class MapIterator implements RAIterator
             }
         }
         this.schema = projectedTuplenew.toArray(new Schema[projectedTuplenew.size()]) ;
-        if(this.tableAlias != null)
+        if(this.tableAlias != null){
+            for(Schema schema : projectedTuplenew){
+                schema.setTableName(this.tableAlias) ;
+            }
             IteratorBuilder.iteratorSchemas.put(this.tableAlias, this.schema);
+        }
     }
 
 

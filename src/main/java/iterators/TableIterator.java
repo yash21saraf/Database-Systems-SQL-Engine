@@ -47,10 +47,10 @@ public class TableIterator implements RAIterator
       this.tableName = tableName;
       this.tableAlias = tableAlias;
 
-      if(tableAlias == null)
+      if(this.tableAlias == null)
          this.schema = createSchema(columnDefinitions, tableName);
       else{
-         this.schema = createSchema(columnDefinitions,tableAlias);
+         this.schema = createSchema(columnDefinitions,this.tableAlias);
          addOriginalSchema(columnDefinitions, tableName);
       }
 

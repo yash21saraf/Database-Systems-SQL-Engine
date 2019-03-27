@@ -1,6 +1,9 @@
 package helpers;
 
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+
+import java.util.List;
 
 public class Schema
 {
@@ -22,6 +25,15 @@ public class Schema
     public void setColumnDefinition(ColumnDefinition columnDefinition)
     {
         this.columnDefinition = columnDefinition;
+    }
+
+    public void setColumnDefinition(String columnName, ColDataType colDataType, List<String> columnSpecStrings)
+    {
+        ColumnDefinition columnDefinitionTemp = new ColumnDefinition();
+        columnDefinitionTemp.setColumnName(columnName);
+        columnDefinitionTemp.setColDataType(colDataType);
+        columnDefinitionTemp.setColumnSpecStrings(columnSpecStrings);
+        this.columnDefinition = columnDefinitionTemp ;
     }
 
     public String getTableName()

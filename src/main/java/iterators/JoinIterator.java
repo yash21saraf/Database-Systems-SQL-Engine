@@ -28,8 +28,6 @@ public class JoinIterator implements RAIterator
 
    private PrimitiveValue[] leftTuple;
    private PrimitiveValue[] rightTuple;
-   private Schema[] leftSchema ;
-   private Schema[] rightSchema ;
    private Schema[] schema ;
 
    //endregion
@@ -42,9 +40,7 @@ public class JoinIterator implements RAIterator
       this.leftChild = leftChild;
       this.rightChild = rightChild;
       this.onExpression = onExpression;
-      this.leftSchema = leftChild.getSchema();
-      this.rightSchema = rightChild.getSchema() ;
-      this.schema = createSchema(this.leftSchema, this.rightSchema) ;
+      this.schema = createSchema(leftChild.getSchema(), rightChild.getSchema()) ;
    }
 
    private Schema[] createSchema(Schema[] leftSchema, Schema[] rightSchema) {
