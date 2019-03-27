@@ -11,6 +11,8 @@ import java.util.*;
 
 import dubstep.AppMain.*;
 
+import static jdk.nashorn.internal.runtime.JSType.isNumber;
+
 
 public class OrderByIterator implements RAIterator {
 
@@ -83,20 +85,49 @@ public class OrderByIterator implements RAIterator {
                         String primitiveValue1 = first.get(index).toRawString();
                         String primitiveValue2 = second.get(index).toRawString();
 
-                        if (orderOfOrderByElements.get(i++)) {
+                        if(isNumber(primitiveValue1)){
 
-                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                return primitiveValue1.compareTo(primitiveValue2);
-                            else {
-                                continue;
+                            double pv1 = Double.parseDouble(primitiveValue1);
+                            double pv2 = Double.parseDouble(primitiveValue2);
+
+                            if (orderOfOrderByElements.get(i++)) {
+
+                                if (pv1 < pv2)
+                                    return 1;
+                                else if (pv1 > pv2)
+                                    return -1;
+                                else {
+                                    continue;
+                                }
+
+                            } else {
+
+                                if (pv1 < pv2)
+                                    return -1;
+                                else if (pv1 > pv2)
+                                    return 1;
+                                else {
+                                    continue;
+                                }
                             }
 
                         } else {
 
-                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                return -1 * primitiveValue1.compareTo(primitiveValue2);
-                            else {
-                                continue;
+                            if (orderOfOrderByElements.get(i++)) {
+
+                                if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                    return primitiveValue1.compareTo(primitiveValue2);
+                                else {
+                                    continue;
+                                }
+
+                            } else {
+
+                                if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                    return -1 * primitiveValue1.compareTo(primitiveValue2);
+                                else {
+                                    continue;
+                                }
                             }
                         }
 
@@ -137,20 +168,49 @@ public class OrderByIterator implements RAIterator {
                         String primitiveValue1 = first.get(index).toRawString();
                         String primitiveValue2 = second.get(index).toRawString();
 
-                        if (orderOfOrderByElements.get(i++)) {
+                        if(isNumber(primitiveValue1)){
 
-                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                return primitiveValue1.compareTo(primitiveValue2);
-                            else {
-                                continue;
+                            double pv1 = Double.parseDouble(primitiveValue1);
+                            double pv2 = Double.parseDouble(primitiveValue2);
+
+                            if (orderOfOrderByElements.get(i++)) {
+
+                                if (pv1 < pv2)
+                                    return 1;
+                                else if (pv1 > pv2)
+                                    return -1;
+                                else {
+                                    continue;
+                                }
+
+                            } else {
+
+                                if (pv1 < pv2)
+                                    return -1;
+                                else if (pv1 > pv2)
+                                    return 1;
+                                else {
+                                    continue;
+                                }
                             }
 
                         } else {
 
-                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                return -1 * primitiveValue1.compareTo(primitiveValue2);
-                            else {
-                                continue;
+                            if (orderOfOrderByElements.get(i++)) {
+
+                                if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                    return primitiveValue1.compareTo(primitiveValue2);
+                                else {
+                                    continue;
+                                }
+
+                            } else {
+
+                                if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                    return -1 * primitiveValue1.compareTo(primitiveValue2);
+                                else {
+                                    continue;
+                                }
                             }
                         }
 
@@ -194,6 +254,14 @@ public class OrderByIterator implements RAIterator {
         this.schema = schema ;
     }
 
+    public static boolean isNumber(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
+    }
 
     //endregion
 }

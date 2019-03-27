@@ -24,8 +24,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
-
+   private static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
