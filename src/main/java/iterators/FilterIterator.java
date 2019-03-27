@@ -28,16 +28,23 @@ public class FilterIterator implements RAIterator
 
    public FilterIterator(RAIterator child,Expression expression)
    {
-
       this.child = child;
       this.expression = expression;
       this.schema = child.getSchema();
-
    }
 
    //endregion
 
    //region Iterator methods
+
+
+   public Expression getExpression() {
+      return expression;
+   }
+
+   public void setExpression(Expression expression){
+      this.expression = expression;
+   }
 
    @Override
    public boolean hasNext() throws Exception

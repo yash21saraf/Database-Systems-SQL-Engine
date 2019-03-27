@@ -14,7 +14,7 @@ import java.io.StringReader;
 public class AppMain
 {
 
-    public static boolean inMem = false;
+    public static boolean inMem = true;
 
     public static void main(String[] args) throws Exception
     {
@@ -32,7 +32,10 @@ public class AppMain
 //        String q3 = "select a, a+b from R,S" ;
 //        String q3 = "select * from r where a in (select a from s where c>5)" ; //TODO: Manage in expressions
    //     String q3 = "select a from r, (select d from s where e>7)";
-        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) tt";
+//        String q3 ="select a from (select a, b from R, (select d from S where e < 5) order by b desc) tt";
+//        String q3 = "select R.*, S.* from R, S";
+
+        String q3 = "select a, sum(b+c) from R group by a having sum(b+c) > 100";
 
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){
