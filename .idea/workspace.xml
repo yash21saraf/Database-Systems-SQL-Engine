@@ -2,23 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/helpers/BasicEval.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sqlparse.iml" beforeDir="false" afterPath="$PROJECT_DIR$/sqlparse.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/GroupByIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/GroupByIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/MapIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/MapIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/aggregateIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/aggregateIterator.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -87,8 +71,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="52" column="54" lean-forward="true" selection-start-line="52" selection-start-column="54" selection-end-line="52" selection-end-column="54" />
+            <state relative-caret-position="1239">
+              <caret line="180" column="62" lean-forward="true" selection-start-line="180" selection-start-column="62" selection-end-line="180" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#findIndex#0;class#HavingIterator#0" />
@@ -277,7 +261,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553654371176" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553654865326" />
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/Database-Systems-master" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -345,7 +329,14 @@
       <option name="project" value="LOCAL" />
       <updated>1553626070029</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="MapIterator changes and null check in JoinIterator">
+      <created>1553654390441</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1553654390441</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -735,8 +726,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="52" column="54" lean-forward="true" selection-start-line="52" selection-start-column="54" selection-end-line="52" selection-end-column="54" />
+        <state relative-caret-position="1239">
+          <caret line="180" column="62" lean-forward="true" selection-start-line="180" selection-start-column="62" selection-end-line="180" selection-end-column="62" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#findIndex#0;class#HavingIterator#0" />
