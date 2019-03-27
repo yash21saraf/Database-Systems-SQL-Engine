@@ -122,18 +122,18 @@ public class aggregateIterator implements RAIterator {
                     int cnt = Integer.parseInt(oldValues[index]) + 1;
                     newValues = newValues + "|" + cnt;
                 } else if (aggTypeOfSelectItems.get(index).equals("sum")) {
-                    int sum = Integer.parseInt(oldValues[index]) + Integer.parseInt(pv);
+                    double sum = Double.parseDouble(oldValues[index]) + Double.parseDouble(pv);
                     newValues = newValues + "|" + sum;
                 } else if (aggTypeOfSelectItems.get(index).equals("min")) {
-                    int min = Math.min(Integer.parseInt(oldValues[index]), Integer.parseInt(pv));
+                    double min = Math.min(Double.parseDouble(oldValues[index]), Double.parseDouble(pv));
                     newValues = newValues + "|" + min;
                 } else if (aggTypeOfSelectItems.get(index).equals("max")) {
-                    int max = Math.max(Integer.parseInt(oldValues[index]), Integer.parseInt(pv));
+                    double max = Math.max(Double.parseDouble(oldValues[index]), Double.parseDouble(pv));
                     newValues = newValues + "|" + max;
                 } else if (aggTypeOfSelectItems.get(index).equals("avg")) {
                     String avgVal[] = oldValues[index].split(" ");
                     int cnt = Integer.parseInt(avgVal[1]) + 1;
-                    int sum = Integer.parseInt(avgVal[0]) + Integer.parseInt(pv);
+                    double sum = Double.parseDouble(avgVal[0]) + Double.parseDouble(pv);
                     newValues = newValues + "|" + sum + " " + cnt; // Using "/" as separator for avg
                 }
             } else {

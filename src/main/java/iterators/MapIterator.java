@@ -51,7 +51,6 @@ public class MapIterator implements RAIterator
             this.selectItems = getUnpackedSelectedItems(selectItems);
         }
 
-
     }
 
     private void createSchema(List<SelectItem> selectItems, Schema[] childSchema) {

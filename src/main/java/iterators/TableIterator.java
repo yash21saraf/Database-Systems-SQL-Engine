@@ -1,15 +1,10 @@
 package iterators;
 
 import builders.IteratorBuilder;
-import com.sun.xml.internal.ws.api.server.SDDocument;
 import helpers.CommonLib;
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -24,7 +19,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
