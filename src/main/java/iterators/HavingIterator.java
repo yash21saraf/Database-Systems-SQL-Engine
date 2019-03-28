@@ -74,6 +74,8 @@ public class HavingIterator implements RAIterator {
     public PrimitiveValue[] next() throws Exception {
 
         PrimitiveValue[] primitiveValueWrappers = currentIterator.next();
+        if(primitiveValueWrappers == null)
+            return null;
 
         if (evaluateHavingExpression(having, primitiveValueWrappers[indexOfHavingExpression].toRawString()))
             return primitiveValueWrappers;
@@ -81,6 +83,9 @@ public class HavingIterator implements RAIterator {
         else {
             while (currentIterator.hasNext()) {
                 primitiveValueWrappers = currentIterator.next();
+                if(primitiveValueWrappers == null)
+                    return null;
+
 
                 indexOfHavingExpression = findIndex(origHavingExp, selectItems);
 

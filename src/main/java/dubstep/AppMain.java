@@ -35,8 +35,8 @@ public class AppMain
 //        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
 //        String q3 = "select a,b,sum(a+b) from r group by a,b having sum(a+b)>3 order by b asc, a asc" ;
-        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
-//        String q3 = "select a, b, c from R order by a asc";
+//        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
+        String q3 = "select a, sum(a+c) from R group by a having sum(a+c) > 100 order by a asc";
 
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){
@@ -74,10 +74,10 @@ public class AppMain
                         System.out.print("\n");
                     }
                 }
-                long endTime   = System.nanoTime();
+              /*  long endTime   = System.nanoTime();
                 System.out.println(endTime - startTime);
                 long freemem = Runtime.getRuntime().freeMemory();
-                System.out.println(freemem);
+                System.out.println(freemem);*/
             }
             i++;
         }
