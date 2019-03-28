@@ -153,9 +153,7 @@ public class MapIterator implements RAIterator
 
             } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
                 for (int secondIndex = 0; secondIndex < tuple.length; secondIndex++) {
-                    if (this.schema[secondIndex].getColumnDefinition().getColumnName() == null)
-                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
-                    else if (this.schema[secondIndex].getTableName().equals(allTableColumns.getTable().getName())) {
+                    if (this.schema[secondIndex].getTableName().equals(allTableColumns.getTable().getName())) {
                         projectedTuple.add(tuple[secondIndex]);
                     }
                 }
@@ -186,7 +184,10 @@ public class MapIterator implements RAIterator
 
     @Override
     public Schema[] getSchema() {
-        return this.schema ;
+        if(this.tableAlias != null){
+            return IteratorBuilder.iteratorSchemas.get(this.tableAlias) ;
+        }
+        else return this.schema ;
     }
 
     @Override
@@ -250,7 +251,6 @@ public class MapIterator implements RAIterator
 
         return finalList;
     }
-
 
     //endregion
 

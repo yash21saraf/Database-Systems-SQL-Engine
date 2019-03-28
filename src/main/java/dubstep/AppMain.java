@@ -36,7 +36,7 @@ public class AppMain
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
 //        String q3 = "select a,b,sum(a+b) from r group by a,b having sum(a+b)>3 order by b asc, a asc" ;
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
-        String q3 = "select a, sum(a+c) from R group by a having sum(a+c) > 881 order by a asc";
+        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
 
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){

@@ -5,9 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/HavingIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/HavingIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +23,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="38" column="78" selection-start-line="38" selection-start-column="78" selection-end-line="38" selection-end-column="78" />
+            <state relative-caret-position="249">
+              <caret line="34" column="114" lean-forward="true" selection-start-line="34" selection-start-column="114" selection-end-line="34" selection-end-column="114" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -43,11 +41,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1228">
-              <caret line="229" column="17" selection-start-line="229" selection-start-column="17" selection-end-line="229" selection-end-column="17" />
+            <state relative-caret-position="388">
+              <caret line="45" column="72" selection-start-line="45" selection-start-column="72" selection-end-line="45" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#3988#3989#0" expanded="true" />
@@ -90,10 +88,16 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="35" column="25" selection-start-line="35" selection-start-column="20" selection-end-line="35" selection-end-column="25" />
+            <state relative-caret-position="438">
+              <caret line="256" column="1" selection-start-line="256" selection-start-column="1" selection-end-line="256" selection-end-column="1" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#7200#7201#0" expanded="true" />
+                <element signature="e#7233#7234#0" expanded="true" />
+                <element signature="e#7293#7294#0" expanded="true" />
+                <element signature="e#7328#7329#0" expanded="true" />
+                <element signature="e#7598#7599#0" expanded="true" />
+                <element signature="e#7635#7636#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -154,11 +158,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="291" column="20" selection-start-line="291" selection-start-column="20" selection-end-line="291" selection-end-column="20" />
+            <state relative-caret-position="288">
+              <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="151" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1281#1289#0" expanded="true" />
@@ -202,8 +206,9 @@
       <find>vm</find>
       <find>wrapper</find>
       <find>is</find>
-      <find>isAgg</find>
       <find>system</find>
+      <find>isAgg</find>
+      <find>group</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -233,11 +238,11 @@
         <option value="$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" />
         <option value="$APPLICATION_CONFIG_DIR$/idea64.vmoptions" />
-        <option value="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" />
-        <option value="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
       </list>
     </option>
   </component>
@@ -333,7 +338,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553790973042" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553793057012" />
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/Database-Systems-master" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
@@ -432,7 +437,7 @@
     <frame x="0" y="23" width="1440" height="833" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.18680556" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18680556" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -441,7 +446,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4986165" visible="true" weight="0.22988506" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4986165" visible="true" weight="0.22988506" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4997233" weight="0.32822478" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -461,7 +466,7 @@
       <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.32982844" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18680556" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.18680556" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -503,18 +508,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java</url>
-          <line>159</line>
-          <properties />
-          <option name="timeStamp" value="159" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java</url>
-          <line>157</line>
-          <properties />
-          <option name="timeStamp" value="161" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java</url>
           <line>171</line>
@@ -714,31 +707,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="291" column="20" selection-start-line="291" selection-start-column="20" selection-end-line="291" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1281#1289#0" expanded="true" />
-            <element signature="e#14615#14616#0" expanded="true" />
-            <element signature="e#14650#14651#0" expanded="true" />
-            <element signature="e#14710#14711#0" expanded="true" />
-            <element signature="e#14747#14748#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="35" column="25" selection-start-line="35" selection-start-column="20" selection-end-line="35" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
@@ -805,20 +773,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="38" column="78" selection-start-line="38" selection-start-column="78" selection-end-line="38" selection-end-column="78" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1228">
-          <caret line="229" column="17" selection-start-line="229" selection-start-column="17" selection-end-line="229" selection-end-column="17" />
+        <state relative-caret-position="388">
+          <caret line="45" column="72" selection-start-line="45" selection-start-column="72" selection-end-line="45" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#3988#3989#0" expanded="true" />
@@ -829,6 +787,47 @@
             <element signature="e#4213#4214#0" expanded="true" />
             <element signature="e#4273#4274#0" expanded="true" />
             <element signature="e#4309#4310#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="438">
+          <caret line="256" column="1" selection-start-line="256" selection-start-column="1" selection-end-line="256" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7200#7201#0" expanded="true" />
+            <element signature="e#7233#7234#0" expanded="true" />
+            <element signature="e#7293#7294#0" expanded="true" />
+            <element signature="e#7328#7329#0" expanded="true" />
+            <element signature="e#7598#7599#0" expanded="true" />
+            <element signature="e#7635#7636#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="34" column="114" lean-forward="true" selection-start-line="34" selection-start-column="114" selection-end-line="34" selection-end-column="114" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="151" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1281#1289#0" expanded="true" />
+            <element signature="e#14615#14616#0" expanded="true" />
+            <element signature="e#14650#14651#0" expanded="true" />
+            <element signature="e#14710#14711#0" expanded="true" />
+            <element signature="e#14747#14748#0" expanded="true" />
           </folding>
         </state>
       </provider>

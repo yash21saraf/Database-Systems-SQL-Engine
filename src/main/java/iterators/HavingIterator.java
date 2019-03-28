@@ -40,10 +40,10 @@ public class HavingIterator implements RAIterator {
         this.currentIterator = rootIterator;
         this.selectItems = selectItems;
         this.having = having;
+        this.schema = rootIterator.getSchema();
 
         this.origHavingExp = having;
         indexOfHavingExpression = findIndex(origHavingExp, selectItems);
-
 
         if(having instanceof GreaterThan) {
             exp = new GreaterThan();
