@@ -61,7 +61,7 @@ public class AppMain
                 e.printStackTrace();
             }
             if (rootIterator != null) {
-
+                rootIterator = rootIterator.optimize(rootIterator);
                 while (rootIterator.hasNext()) {
                     PrimitiveValue[] tuple = rootIterator.next();
                     if (tuple != null) {

@@ -168,6 +168,11 @@ public class TableIterator implements RAIterator
       this.schema = schema;
    }
 
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      return iterator;
+   }
 
    //endregion
 

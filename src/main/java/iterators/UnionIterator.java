@@ -85,6 +85,11 @@ public class UnionIterator implements RAIterator
       this.schema = schema ;
    }
 
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      return iterator;
+   }
 
    //endregion
 }

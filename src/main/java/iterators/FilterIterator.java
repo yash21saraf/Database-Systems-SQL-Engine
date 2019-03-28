@@ -88,5 +88,20 @@ public class FilterIterator implements RAIterator
    public void setSchema(Schema[] schema) {
       this.schema = schema ;
    }
+
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      FilterIterator filterIterator;
+      MapIterator mapIterator;
+
+      if ((filterIterator = (FilterIterator) CommonLib.castAs(iterator, FilterIterator.class)) != null) {
+         if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.child, MapIterator.class)) != null) {
+
+         }
+      }
+      return iterator;
+   }
+
    //endregion
 }

@@ -25,4 +25,6 @@ public interface RAIterator
    public Schema[] getSchema() ;
 
    public void setSchema(Schema[] schema) ;
+
+   public RAIterator optimize(RAIterator iterator);
 }

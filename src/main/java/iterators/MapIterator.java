@@ -242,6 +242,11 @@ public class MapIterator implements RAIterator
         return finalList;
     }
 
+    @Override
+    public RAIterator optimize(RAIterator iterator)
+    {
+        return iterator;
+    }
 
     //endregion
 

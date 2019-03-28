@@ -233,5 +233,11 @@ public class HavingIterator implements RAIterator {
         return cond[0];
     }
 
+    @Override
+    public RAIterator optimize(RAIterator iterator)
+    {
+        return iterator;
+    }
+
     //endregion
 }

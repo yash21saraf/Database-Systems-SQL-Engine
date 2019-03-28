@@ -129,5 +129,11 @@ public class JoinIterator implements RAIterator
       return this.rightChild;
    }
 
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      return iterator;
+   }
+
    //endregion
 }
