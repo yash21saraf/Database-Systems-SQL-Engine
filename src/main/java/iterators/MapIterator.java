@@ -63,7 +63,8 @@ public class MapIterator implements RAIterator
 
         for (int index = 0; index < selectItems.size(); index++) {
 
-            if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
+            if (selectItems.get(index) instanceof SelectExpressionItem) {
+                selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class) ;
                 Expression expression = selectExpressionItem.getExpression() ;
                 String alias = selectExpressionItem.getAlias();
                 if(expression instanceof Function){
@@ -92,6 +93,13 @@ public class MapIterator implements RAIterator
                     }
                 }
 
+                else{
+                    Schema newSchema = new Schema() ;
+                    newSchema.setColumnDefinition(alias, null, null); //TODO: How to get columnDefinition for functions, for now set null
+                    newSchema.setTableName(null);
+                    projectedTuplenew.add(newSchema) ;
+                }
+
             } else if ((allTableColumns = (AllTableColumns) CommonLib.castAs(selectItems.get(index),AllTableColumns.class)) != null) {
                 projectedTuplenew.addAll(Arrays.asList(IteratorBuilder.iteratorSchemas.get(allTableColumns.getTable().getName())));
             } else if ((allColumns = (AllColumns) CommonLib.castAs(selectItems.get(index),AllColumns.class)) != null) {
@@ -99,11 +107,16 @@ public class MapIterator implements RAIterator
             }
         }
         this.schema = projectedTuplenew.toArray(new Schema[projectedTuplenew.size()]) ;
+        Schema[] newSchema = new Schema[projectedTuplenew.size()] ;
+
         if(this.tableAlias != null){
-            for(Schema schema : projectedTuplenew){
-                schema.setTableName(this.tableAlias) ;
+            for(int i = 0 ; i < projectedTuplenew.size() ; i++){
+                Schema temp = new Schema() ;
+                temp.setColumnDefinition(this.schema[i].getColumnDefinition());
+                temp.setTableName(this.tableAlias) ;
+                newSchema[i] = temp ;
             }
-            IteratorBuilder.iteratorSchemas.put(this.tableAlias, this.schema);
+            IteratorBuilder.iteratorSchemas.put(this.tableAlias, newSchema);
         }
     }
 
@@ -148,10 +161,6 @@ public class MapIterator implements RAIterator
                 }
 
             } else if ((allColumns = (AllColumns) CommonLib.castAs(selectItems.get(index),AllColumns.class)) != null) {
-                for (int secondIndex = 0; secondIndex < tuple.length; secondIndex++) {
-                    if (this.schema[secondIndex].getColumnDefinition().getColumnName() == null)
-                        throw new Exception("No column name specified for column at index " + index + " for " + tableAlias);
-                }
                 projectedTuple.addAll(Arrays.asList(tuple)) ;
             }
         }

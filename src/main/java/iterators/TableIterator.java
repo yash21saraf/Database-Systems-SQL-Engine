@@ -6,10 +6,7 @@ import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class TableIterator implements RAIterator
 {
@@ -19,7 +16,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
@@ -49,7 +46,10 @@ public class TableIterator implements RAIterator
       }
 
       try {
+         File file = new File(TABLE_DIRECTORY + tableName + ".csv") ;
+         System.out.println(file.length());
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
+
 
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);

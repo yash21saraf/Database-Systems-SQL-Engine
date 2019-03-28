@@ -20,7 +20,7 @@ public class AppMain
     {
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
-        String q2 = "CREATE TABLE T(d int NOT NULL, e int, f int)";
+        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
 //        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
 //        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
@@ -35,8 +35,8 @@ public class AppMain
 //        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
 //        String q3 = "select a,b,sum(a+b) from r group by a,b having sum(a+b)>3 order by b asc, a asc" ;
-//        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from S" ;
-        String q3 = "select a, b, c from R order by a asc";
+        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
+//        String q3 = "select a, b, c from R order by a asc";
 
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){
@@ -61,6 +61,8 @@ public class AppMain
                 e.printStackTrace();
             }
             if (rootIterator != null) {
+                long startTime = System.nanoTime();
+
                 rootIterator = rootIterator.optimize(rootIterator);
                 while (rootIterator.hasNext()) {
                     PrimitiveValue[] tuple = rootIterator.next();
@@ -73,8 +75,11 @@ public class AppMain
                         System.out.print("\n");
                     }
                 }
+                long endTime   = System.nanoTime();
+                System.out.println(endTime - startTime);
+                long freemem = Runtime.getRuntime().freeMemory();
+                System.out.println(freemem);
             }
-
             i++;
         }
 

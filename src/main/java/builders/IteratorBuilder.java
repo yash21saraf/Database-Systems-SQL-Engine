@@ -316,8 +316,13 @@ public class IteratorBuilder {
         Function function;
 
         for (int index = 0; index < selectItems.size(); index++) {
-
-            if (((SelectExpressionItem) selectItems.get(index)).getExpression() instanceof Function) {
+            if (selectItems.get(index) instanceof AllColumns) {
+                continue;
+            }
+            else if (selectItems.get(index) instanceof AllTableColumns) {
+                continue;
+            }
+            else if (((SelectExpressionItem) selectItems.get(index)).getExpression() instanceof Function) {
                 return true;
             }
         }
