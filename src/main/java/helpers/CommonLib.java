@@ -8,6 +8,7 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class CommonLib
 {
@@ -211,6 +212,16 @@ public class CommonLib
          // logger.error("Exception in eval() call.");
          throw e;
       }
+   }
+
+   public List<Expression> getExpressionList(Expression expression) {
+
+      List<Expression> expressionList = new ArrayList<Expression>();
+
+
+
+      return expressionList;
+
    }
 
    //endregion

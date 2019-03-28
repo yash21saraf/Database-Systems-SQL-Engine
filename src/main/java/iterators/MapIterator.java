@@ -19,6 +19,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static helpers.CommonLib.castAs;
 
@@ -251,9 +252,22 @@ public class MapIterator implements RAIterator
         return finalList;
     }
 
+    public List<SelectItem> getSelectItems()
+    {
+        return selectItems;
+    }
+
+    public String getTableAlias()
+    {
+        return tableAlias;
+    }
+
     @Override
     public RAIterator optimize(RAIterator iterator)
     {
+        RAIterator child = iterator.getChild();
+        child = child.optimize(child);
+        iterator.setChild(child);
         return iterator;
     }
 
