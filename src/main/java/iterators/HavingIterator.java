@@ -28,6 +28,7 @@ public class HavingIterator implements RAIterator {
     private Schema[] schema;
 
     Expression exp;
+    SelectExpressionItem selectItemHaving = new SelectExpressionItem();
 
 
     //endregion
@@ -161,73 +162,79 @@ public class HavingIterator implements RAIterator {
         hv[0] = new DoubleValue(out);
 
         BasicEval basicEval = new BasicEval(hv);
-
-        Expression backup = havingExpression;
         Function func;
         BinaryExpression binaryExpression;
 
-        SelectExpressionItem selectItemHaving = new SelectExpressionItem();
         selectItemHaving.setExpression(havingExpression);
 
-        SelectExpressionItem backupHaving = new SelectExpressionItem();
-        backupHaving.setExpression(havingExpression);
         Expression value = null;
-
-//        final BinaryExpression bex = (BinaryExpression) havingExpression;
-//
-//        BinaryExpression newBex = new BinaryExpression(bex.getLeftExpression(), bex.getRightExpression()) {
-//            @Override
-//            public void accept(ExpressionVisitor expressionVisitor) {
-//
-//            }
-//
-//            @Override
-//            public String getStringExpression() {
-//                return bex.getStringExpression().toString();
-//            }
-//        };
-
-
-
 
         if ((binaryExpression = (BinaryExpression) castAs(selectItemHaving.getExpression(), Expression.class)) != null) {
             if ((func = (Function) castAs(binaryExpression.getLeftExpression(), Function.class)) != null) {
-                //newBex.setLeftExpression(new DoubleValue(out));
-                ((GreaterThan) exp).setLeftExpression(new DoubleValue(out));
-                value = binaryExpression.getRightExpression();
-                ((GreaterThan) exp).setRightExpression(value);
+
+                if(having instanceof GreaterThan) {
+                    ((GreaterThan) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((GreaterThan) exp).setRightExpression(value);
+                } else if(having instanceof GreaterThanEquals) {
+                    ((GreaterThanEquals) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((GreaterThanEquals) exp).setRightExpression(value);
+                } else if(having instanceof MinorThan) {
+                    ((MinorThan) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((MinorThan) exp).setRightExpression(value);
+                } else if(having instanceof MinorThanEquals) {
+                    ((MinorThanEquals) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((MinorThanEquals) exp).setRightExpression(value);
+                } else if(having instanceof EqualsTo) {
+                    ((EqualsTo) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((EqualsTo) exp).setRightExpression(value);
+                } else if(having instanceof NotEqualsTo) {
+                    ((NotEqualsTo) exp).setLeftExpression(new DoubleValue(out));
+                    value = binaryExpression.getRightExpression();
+                    ((NotEqualsTo) exp).setRightExpression(value);
+                }
+
             } else if ((func = (Function) castAs(binaryExpression.getRightExpression(), Function.class)) != null) {
-                //newBex.setRightExpression(new DoubleValue(out));
-                ((GreaterThan) exp).setRightExpression(new DoubleValue(out));
-                value = binaryExpression.getLeftExpression();
-                ((GreaterThan) exp).setLeftExpression(value);
+
+                if(having instanceof GreaterThan) {
+                    ((GreaterThan) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((GreaterThan) exp).setLeftExpression(value);
+                } else if(having instanceof GreaterThanEquals) {
+                    ((GreaterThanEquals) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((GreaterThanEquals) exp).setLeftExpression(value);
+                } else if(having instanceof MinorThan) {
+                    ((MinorThan) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((MinorThan) exp).setLeftExpression(value);
+                } else if(having instanceof MinorThanEquals) {
+                    ((MinorThanEquals) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((MinorThanEquals) exp).setLeftExpression(value);
+                } else if(having instanceof EqualsTo) {
+                    ((EqualsTo) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((EqualsTo) exp).setLeftExpression(value);
+                } else if(having instanceof NotEqualsTo) {
+                    ((NotEqualsTo) exp).setRightExpression(new DoubleValue(out));
+                    value = binaryExpression.getLeftExpression();
+                    ((NotEqualsTo) exp).setLeftExpression(value);
+                }
             }
 
             try {
-                //SelectExpressionItem evalExp =  new SelectExpressionItem();
-                //evalExp.setExpression(newBex);
-                //Expression e = (Expression) evalExp.getExpression();
-
-
-
                 if (basicEval.eval.eval(exp).toBool()) {
-
-                    Function newFunc = new Function();
-
-                    String condition = getCondition(binaryExpression); // TODO: Brute Forced -.-
-
-                    String val = (value).toString();
-                    newFunc.setName(func.getName() + func.getParameters().toString() + " " + condition + " " + val);
-                    selectItemHaving.setExpression(newFunc);
-
-                    //having = bex;
                     return true;
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        having = backup;
         return false;
     }
 

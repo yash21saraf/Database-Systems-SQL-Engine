@@ -47,7 +47,6 @@ public class TableIterator implements RAIterator
 
       try {
          File file = new File(TABLE_DIRECTORY + tableName + ".csv") ;
-         System.out.println(file.length());
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
 
 
