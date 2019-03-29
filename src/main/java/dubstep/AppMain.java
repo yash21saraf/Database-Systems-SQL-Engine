@@ -67,14 +67,14 @@ public class AppMain
             }
             if (rootIterator != null) {
                 long startTime = System.nanoTime();
-
+                //rootIterator = rootIterator.optimize(rootIterator);
                 setDataType(rootIterator);
 
                 while (rootIterator.hasNext()) {
                     PrimitiveValue[] tuple = rootIterator.next();
                     if (tuple != null) {
                         for (int index = 0; index < tuple.length; index++) {
-                            System.out.println(commonLib.convertToPrimitiveValue(tuple[index].toRawString(), colDataTypes[index].getDataType()));
+                            printResult(tuple, index);
                             //System.out.print(tuple[index].toRawString());
                             if (index != (tuple.length - 1))
                                 System.out.print("|");
@@ -85,7 +85,17 @@ public class AppMain
             }
             i++;
         }
+    }
 
+    private static void printResult(PrimitiveValue[] tuple, int index) {
+
+        String value = tuple[index].toRawString();
+        String datatype = colDataTypes[index].getDataType();
+
+        if(datatype.equals("int")){
+           value = value.substring(0, value.indexOf("."));
+        }
+        System.out.print(value);
     }
 
     private static void setDataType(RAIterator rootIterator) {
@@ -96,6 +106,8 @@ public class AppMain
         for(int i = 0; i < schemas.length; i++){
             colDataTypes[i] = schemas[i].getColumnDefinition().getColDataType();
         }
+
+
     }
 
 }
