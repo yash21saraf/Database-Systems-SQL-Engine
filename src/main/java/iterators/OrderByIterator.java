@@ -5,10 +5,7 @@ import helpers.CommonLib;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.*;
 
 import java.io.*;
 import java.util.*;
@@ -18,9 +15,9 @@ public class OrderByIterator implements RAIterator {
 
     //region Variables
 
-    boolean sorted = false;
+    public boolean sorted = false;
 
-    int blockSize = 4;
+
     String path = TableIterator.TABLE_DIRECTORY;
     private RAIterator child;
     private List<OrderByElement> orderByElementsList;
@@ -30,7 +27,7 @@ public class OrderByIterator implements RAIterator {
     private int currentIndex = 0;
     private Schema[] schema;
     // On disk variables
-    private boolean onDiskSorted = false;
+    public boolean onDiskSorted = false;
     private List<String> onDiskSortedList = new ArrayList<String>();
     private boolean noDataFound = false;
     private int onDiscRowToReturn = 0;
@@ -41,7 +38,12 @@ public class OrderByIterator implements RAIterator {
     private String leftData;
     private String rightData;
 
+    private Limit limit;
+    private boolean limitReached = false;
+    private long totalRowCounter = 0;
+
     private CommonLib commonLib = CommonLib.getInstance();
+    long blockSize = commonLib.blockSize;
     // On disk variables ends here
 
     //endregion
@@ -53,6 +55,8 @@ public class OrderByIterator implements RAIterator {
         this.child = child;
         this.orderByElementsList = orderByElementsList;
         this.schema = child.getSchema();
+
+        limit = plainSelect.getLimit();
 
         initializeVars(plainSelect);
     }
@@ -204,6 +208,21 @@ public class OrderByIterator implements RAIterator {
         } else {
             if (onDiskSorted) {
 
+                if(limit!=null){
+                    if(onDiscRowToReturn == onDiskSortedList.size()) {
+                        noDataFound = true;
+                        return null;
+                    }
+                    String row[] = onDiskSortedList.get(onDiscRowToReturn).split("\\|");
+                    PrimitiveValue[] primitiveValue = new PrimitiveValue[row.length];
+                    for (int i = 0; i < row.length; i++) {
+                        primitiveValue[i] = new StringValue(row[i]);
+                    }
+                    onDiscRowToReturn++;
+
+                    return primitiveValue;
+                }
+
                 if (onDiscRowToReturn >= blockSize) {
                     sortWithoutMerge();
                     onDiscRowToReturn = 0;
@@ -297,7 +316,7 @@ public class OrderByIterator implements RAIterator {
                         }
                     });
 
-                    String file = "SORTED_FILE_" + Main.getsortFileSeqNumber();
+                    String file = "SORTED_FILE_" + commonLib.getsortFileSeqNumber();
                     writeDataDisk(file);
                     listOfSortedFiles.add(file);
                     sortedList.clear();
@@ -315,7 +334,7 @@ public class OrderByIterator implements RAIterator {
                     listOfSortedFiles.remove(1);
                     listOfSortedFiles.remove(0);
 
-                    String filename = "MERGED_FILE_" + Main.getmergeFileSeqNumber();
+                    String filename = "MERGED_FILE_" + commonLib.getmergeFileSeqNumber();
                     merge(firstFile, secondFile, filename);
                     mergedFileLists.add(filename);
 
@@ -389,14 +408,41 @@ public class OrderByIterator implements RAIterator {
                         onDiskSortedList.add(leftData);
                         leftData = getLeftData();
                         cnt++;
+                        // Limit check
+                        totalRowCounter++;
+                        if(limit!=null){
+                            if(totalRowCounter >= limit.getRowCount()){
+                                limitReached = true;
+                                sortList(onDiskSortedList);
+                                return;
+                            }
+                        }
                     } else if (!isLeftGreater(leftData, rightData)) {
                         onDiskSortedList.add(rightData);
                         rightData = getRightData();
                         cnt++;
+                        // Limit check
+                        totalRowCounter++;
+                        if(limit!=null){
+                            if(totalRowCounter >= limit.getRowCount()){
+                                limitReached = true;
+                                sortList(onDiskSortedList);
+                                return;
+                            }
+                        }
                     } else { // TODO: Handle for Equality.
                         onDiskSortedList.add(leftData);
                         onDiskSortedList.add(rightData);
                         cnt += 2;
+                        // Limit check
+                        totalRowCounter+=2;
+                        if(limit!=null){
+                            if(totalRowCounter >= limit.getRowCount()){
+                                limitReached = true;
+                                sortList(onDiskSortedList);
+                                return;
+                            }
+                        }
                     }
 
                     if (cnt >= blockSize) {
@@ -411,6 +457,15 @@ public class OrderByIterator implements RAIterator {
                         onDiskSortedList.add(leftData);
                         leftData = getLeftData();
                         cnt++;
+                        // Limit check
+                        totalRowCounter++;
+                        if(limit!=null){
+                            if(totalRowCounter >= limit.getRowCount()){
+                                limitReached = true;
+                                sortList(onDiskSortedList);
+                                return;
+                            }
+                        }
                         if (cnt >= blockSize) {
                             sortList(onDiskSortedList);
                             return;
@@ -425,6 +480,15 @@ public class OrderByIterator implements RAIterator {
                         onDiskSortedList.add(rightData);
                         rightData = getRightData();
                         cnt++;
+                        // Limit check
+                        totalRowCounter++;
+                        if(limit!=null){
+                            if(totalRowCounter >= limit.getRowCount()){
+                                limitReached = true;
+                                sortList(onDiskSortedList);
+                                return;
+                            }
+                        }
                         if (cnt >= blockSize) {
                             sortList(onDiskSortedList);
                             return;

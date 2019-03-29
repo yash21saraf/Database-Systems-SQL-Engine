@@ -20,6 +20,20 @@ import java.util.List;
 public class CommonLib
 {
 
+
+    public static volatile int sortFileSeqNumber = 1000;
+    public static volatile int mergeFileSeqNumber = 10000;
+    private static CommonLib commonLib = CommonLib.getInstance();
+    public static long blockSize = 100000;
+
+    public synchronized static int getsortFileSeqNumber() {
+        return sortFileSeqNumber++;
+    }
+
+    public synchronized static int getmergeFileSeqNumber() {
+        return mergeFileSeqNumber++;
+    }
+
    //region Variables
 
    private Eval eval = new Eval()

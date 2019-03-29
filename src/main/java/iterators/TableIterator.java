@@ -17,6 +17,7 @@ public class TableIterator implements RAIterator
    private CommonLib commonLib = CommonLib.getInstance();
 
    public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+//   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;

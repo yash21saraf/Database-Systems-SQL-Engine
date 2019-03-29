@@ -15,23 +15,12 @@ import java.io.StringReader;
 
 public class Main {
 
-    public static boolean inMem = true;
     public static ColDataType colDataTypes[];
-    public static volatile int sortFileSeqNumber = 1000;
-    public static volatile int mergeFileSeqNumber = 10000;
-    private static CommonLib commonLib = CommonLib.getInstance();
-
-    public synchronized static int getsortFileSeqNumber() {
-        return sortFileSeqNumber++;
-    }
-
-    public synchronized static int getmergeFileSeqNumber() {
-        return mergeFileSeqNumber++;
-    }
+    public static boolean inMem = false;
 
     public static void main(String[] args) throws Exception {
 
-        String q1 = "CREATE TABLE RR(a int NOT NULL, b int, c int)";
+        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
 //        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
@@ -50,11 +39,11 @@ public class Main {
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
 //        String q3 = "select p.a, s.d from (select a,b,sum(a+b) as q from r group by a,b having sum(a+b)>3 order by b asc, a asc) as p ,s where p.a > 0" ;
-        String q3 = "select a, rrr.cc from (select a, count(*) as cc, max(b), count(*) from RR group by a) as rrr limit 2";
+        String q3 = "select a, b from R order by a limit 2";
 
         for (int j = 0; j < args.length; j++) {
-            if (args[j].equals("--in-mem")) {
-                inMem = true;
+            if (args[j].equals("--on-disk")) {
+                //inMem = false;
                 break;
             }
         }
