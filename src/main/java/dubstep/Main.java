@@ -41,7 +41,7 @@ public class Main {
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, c from R order by a asc";
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
-        String q3 = "select a from (select a,b,sum(b+c) as q from R group by a,b) where a < 5";
+        String q3 = "select a from (select a,b,sum(b+c) as q from R group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
