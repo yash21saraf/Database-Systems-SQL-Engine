@@ -245,5 +245,14 @@ public class HavingIterator implements RAIterator {
         return cond[0];
     }
 
+    @Override
+    public RAIterator optimize(RAIterator iterator)
+    {
+        RAIterator child = iterator.getChild();
+        child = child.optimize(child);
+        iterator.setChild(child);
+        return iterator;
+    }
+
     //endregion
 }

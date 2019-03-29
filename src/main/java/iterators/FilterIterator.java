@@ -33,6 +33,8 @@ public class FilterIterator implements RAIterator
       this.expression = expression;
       this.schema = child.getSchema();
 
+      commonLib.getExpressionList(expression);
+      commonLib.getColumnList(expression);
    }
 
    //endregion
@@ -88,5 +90,38 @@ public class FilterIterator implements RAIterator
    public void setSchema(Schema[] schema) {
       this.schema = schema ;
    }
+
+   public Expression getExpression()
+   {
+      return expression;
+   }
+
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      FilterIterator filterIterator;
+      MapIterator mapIterator;
+      JoinIterator joinIterator;
+
+      if ((filterIterator = (FilterIterator) CommonLib.castAs(iterator, FilterIterator.class)) != null) {
+         if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.child, MapIterator.class)) != null) {
+            try {
+               iterator = new MapIterator(new FilterIterator(mapIterator.getChild(),filterIterator.getExpression()),mapIterator.getSelectItems(),mapIterator.getTableAlias());
+               System.out.println("Selection pushed into projection successfully.");
+            } catch (Exception e) {
+               System.out.println("Error pushing selection into projection. Stacktrace: ");
+               e.printStackTrace();
+            }
+         }
+         if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.child,JoinIterator.class)) != null) {
+
+         }
+      }
+      RAIterator child = iterator.getChild();
+      child = child.optimize(child);
+      iterator.setChild(child);
+      return iterator;
+   }
+
    //endregion
 }

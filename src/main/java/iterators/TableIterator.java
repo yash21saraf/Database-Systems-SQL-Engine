@@ -16,7 +16,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+   public static final String TABLE_DIRECTORY = "D:/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
@@ -47,6 +47,7 @@ public class TableIterator implements RAIterator
 
       try {
          File file = new File(TABLE_DIRECTORY + tableName + ".csv") ;
+//         System.out.println("FILE LENGTH: " + file.length());
          br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
 
 
@@ -167,6 +168,11 @@ public class TableIterator implements RAIterator
       this.schema = schema;
    }
 
+   @Override
+   public RAIterator optimize(RAIterator iterator)
+   {
+      return iterator;
+   }
 
    //endregion
 

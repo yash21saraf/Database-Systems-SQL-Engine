@@ -10,6 +10,7 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
@@ -19,6 +20,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static helpers.CommonLib.castAs;
 
@@ -69,11 +71,28 @@ public class MapIterator implements RAIterator
                 String alias = selectExpressionItem.getAlias();
                 if(expression instanceof Function){
                     Function function = (Function) CommonLib.castAs(expression, Function.class) ;
+                    if(function.isAllColumns()){
+                        Schema newSchema = new Schema();
+                        ColDataType colDataType = new ColDataType();
+                        colDataType.setDataType("int");
+                        newSchema.setColumnDefinition(alias, colDataType, null);
+                        newSchema.setTableName(childSchema[0].getTableName());
+                        projectedTuplenew.add(newSchema);
+                    }else {
+                        Expression expp = function.getParameters().getExpressions().get(0);
+                        Column tempCol = commonLib.getColumnList(expp).get(0);
+                        for (Schema schema : childSchema) {
+                            if (schema.getColumnDefinition().getColumnName().equals(tempCol.getColumnName())) {
+
+                                Schema newSchema = new Schema();
+                                newSchema.setColumnDefinition(alias,schema.getColumnDefinition().getColDataType(),null);
+                                newSchema.setTableName(schema.getTableName());
+                                projectedTuplenew.add(newSchema);
+                                break;
+                            }
+                        }
+                    }
                     this.isAggquery = true ;
-                    Schema newSchema = new Schema() ;
-                    newSchema.setColumnDefinition(alias, null, null); //TODO: How to get columnDefinition for functions, for now set null
-                    newSchema.setTableName(null);
-                    projectedTuplenew.add(newSchema) ;
                 }
 
                 else if(expression instanceof Column){
@@ -250,6 +269,25 @@ public class MapIterator implements RAIterator
             return selectItems;
 
         return finalList;
+    }
+
+    public List<SelectItem> getSelectItems()
+    {
+        return selectItems;
+    }
+
+    public String getTableAlias()
+    {
+        return tableAlias;
+    }
+
+    @Override
+    public RAIterator optimize(RAIterator iterator)
+    {
+        RAIterator child = iterator.getChild();
+        child = child.optimize(child);
+        iterator.setChild(child);
+        return iterator;
     }
 
     //endregion

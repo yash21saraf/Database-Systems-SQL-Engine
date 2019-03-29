@@ -384,6 +384,14 @@ public class GroupByIterator implements RAIterator {
         this.schema = schema ;
     }
 
+    @Override
+    public RAIterator optimize(RAIterator iterator)
+    {
+        RAIterator child = iterator.getChild();
+        child = child.optimize(child);
+        iterator.setChild(child);
+        return iterator;
+    }
 
     //endregion
 }
