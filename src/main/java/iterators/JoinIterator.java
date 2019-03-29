@@ -129,12 +129,27 @@ public class JoinIterator implements RAIterator
       return this.rightChild;
    }
 
+   public Expression getOnExpression() {
+      return this.onExpression;
+   }
+
+   public void setOnExpression(Expression onExpression) {
+      this.onExpression = onExpression;
+   }
+
    @Override
    public RAIterator optimize(RAIterator iterator)
    {
-      RAIterator child = iterator.getChild();
-      child = child.optimize(child);
-      iterator.setChild(child);
+      JoinIterator joinIterator;
+
+      if ((joinIterator = (JoinIterator) CommonLib.castAs(iterator,JoinIterator.class)) != null) {
+         RAIterator leftChild = joinIterator.getChild();
+         RAIterator rightChild = joinIterator.getRightChild();
+         leftChild = leftChild.optimize(leftChild);
+         rightChild = rightChild.optimize(rightChild);
+         iterator = new JoinIterator(leftChild,rightChild,joinIterator.getOnExpression());
+      }
+
       return iterator;
    }
 

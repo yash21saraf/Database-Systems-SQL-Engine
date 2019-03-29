@@ -17,8 +17,10 @@ public class Main {
 
     public static ColDataType colDataTypes[];
     public static boolean inMem = false;
+    static boolean debugEnabled = false;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
@@ -35,11 +37,10 @@ public class Main {
 //        String q3 = "select a from r, (select d from s where e>7)";
 //        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
-//        String q3 = "select a,b,sum(a+b) from r group by a,b having sum(a+b)>3 order by b asc, a asc" ;
+        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
-//        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
-//        String q3 = "select p.a, s.d from (select a,b,sum(a+b) as q from r group by a,b having sum(a+b)>3 order by b asc, a asc) as p ,s where p.a > 0" ;
-        String q3 = "select a, b from R order by a limit 2";
+//        String q3 = "select a, b, c from R order by a asc";
+//        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
@@ -79,6 +80,12 @@ public class Main {
                         }
                         System.out.print("\n");
                     }
+                }
+                if (debugEnabled) {
+                    long endTime = System.nanoTime();
+                    System.out.println(endTime - startTime);
+                    long freemem = Runtime.getRuntime().freeMemory();
+                    System.out.println(freemem);
                 }
             }
             i++;
