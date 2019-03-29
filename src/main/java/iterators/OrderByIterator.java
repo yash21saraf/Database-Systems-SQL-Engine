@@ -1,10 +1,14 @@
 package iterators;
 
-import dubstep.AppMain;
+import dubstep.Main;
+import helpers.CommonLib;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.io.*;
 import java.util.*;
@@ -15,8 +19,7 @@ public class OrderByIterator implements RAIterator {
     //region Variables
 
     boolean sorted = false;
-    volatile int fileNumber = 1000;
-    volatile int mergedSeqNumber = 10000;
+
     int blockSize = 4;
     String path = TableIterator.TABLE_DIRECTORY;
     private RAIterator child;
@@ -38,19 +41,43 @@ public class OrderByIterator implements RAIterator {
     private String leftData;
     private String rightData;
 
+    private CommonLib commonLib = CommonLib.getInstance();
     // On disk variables ends here
 
     //endregion
 
     //region Constructor
 
-    public OrderByIterator(RAIterator child, List<OrderByElement> orderByElementsList, List<Integer> indexOfOrderByElements, List<Boolean> orderOfOrderByElements) {
+    public OrderByIterator(RAIterator child, List<OrderByElement> orderByElementsList, PlainSelect plainSelect) {
 
         this.child = child;
         this.orderByElementsList = orderByElementsList;
-        this.indexOfOrderByElements = indexOfOrderByElements;
-        this.orderOfOrderByElements = orderOfOrderByElements;
         this.schema = child.getSchema();
+
+        initializeVars(plainSelect);
+    }
+
+    private void initializeVars(PlainSelect plainSelect) {
+        indexOfOrderByElements = new ArrayList<Integer>();
+        orderOfOrderByElements = new ArrayList<Boolean>();
+        List<SelectExpressionItem> listOfSelectItems = new ArrayList<SelectExpressionItem>();
+
+        for (SelectItem selectItems : plainSelect.getSelectItems()) {
+            SelectExpressionItem selectExpressionItem = (SelectExpressionItem) commonLib.castAs(selectItems, SelectExpressionItem.class);
+            listOfSelectItems.add(selectExpressionItem);
+        }
+
+        for (OrderByElement orderByElement : orderByElementsList) {
+            int index = 0;
+            for (SelectExpressionItem selectExpressionItem : listOfSelectItems) {
+                if (selectExpressionItem.getExpression().equals(orderByElement.getExpression())) {
+                    indexOfOrderByElements.add(index);
+                    orderOfOrderByElements.add(orderByElement.isAsc());
+                    break;
+                }
+                index++;
+            }
+        }
     }
 
     //endregion
@@ -69,8 +96,7 @@ public class OrderByIterator implements RAIterator {
     @Override
     public boolean hasNext() throws Exception {
 
-
-        if (!AppMain.inMem) {
+        if (!Main.inMem) {
             if (onDiskSorted) {
                 if (noDataFound)
                     return false;
@@ -78,11 +104,12 @@ public class OrderByIterator implements RAIterator {
                     return true;
             }
         } else {
-            if (sorted)
+            if (sorted) {
                 if (sortedList.size() > currentIndex)
                     return true;
                 else
                     return false;
+            }
         }
         return child.hasNext();
 
@@ -91,7 +118,7 @@ public class OrderByIterator implements RAIterator {
     @Override
     public PrimitiveValue[] next() throws Exception {
 
-        if (AppMain.inMem) {
+        if (Main.inMem) {
 
             if (sorted) {
                 PrimitiveValue[] primitiveValueWrappers = sortedList.get(currentIndex).toArray(new PrimitiveValue[sortedList.get(0).size()]);
@@ -270,7 +297,7 @@ public class OrderByIterator implements RAIterator {
                         }
                     });
 
-                    String file = "SORTED_FILE_" + fileNumber++;
+                    String file = "SORTED_FILE_" + Main.getsortFileSeqNumber();
                     writeDataDisk(file);
                     listOfSortedFiles.add(file);
                     sortedList.clear();
@@ -288,7 +315,7 @@ public class OrderByIterator implements RAIterator {
                     listOfSortedFiles.remove(1);
                     listOfSortedFiles.remove(0);
 
-                    String filename = "MERGED_FILE_" + mergedSeqNumber++;
+                    String filename = "MERGED_FILE_" + Main.getmergeFileSeqNumber();
                     merge(firstFile, secondFile, filename);
                     mergedFileLists.add(filename);
 

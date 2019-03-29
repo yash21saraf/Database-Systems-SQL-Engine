@@ -199,51 +199,19 @@ public class IteratorBuilder {
 
         if (plainSelect.getWhere() != null)
             rootIterator = new FilterIterator(rootIterator, plainSelect.getWhere());
+
         rootIterator = new MapIterator(rootIterator, plainSelect.getSelectItems(), selectAlias);
 
-        // Group By Iterator
-
-        List<Column> groupByColumnsList = plainSelect.getGroupByColumnReferences();
-
-        if (groupByColumnsList != null) {
+        if (plainSelect.getGroupByColumnReferences() != null) {
             rootIterator = new GroupByIterator(rootIterator, plainSelect.getSelectItems(), selectAlias, plainSelect.getGroupByColumnReferences());
-        } else if (groupByColumnsList == null && isAggregateQuery(plainSelect.getSelectItems())){ // Aggregate Iterator
+        } else if (plainSelect.getGroupByColumnReferences() == null && isAggregateQuery(plainSelect.getSelectItems())){ // Aggregate Iterator
             rootIterator = new aggregateIterator(rootIterator, plainSelect.getSelectItems(), selectAlias);
         }
 
-
-        // Group By Iterator Ends here
-
-
-        // OrderBy processsing
-
-        List<OrderByElement> orderByElementsList = plainSelect.getOrderByElements();
-        if (orderByElementsList != null) {
-            List<Integer> indexOfOrderByElements = new ArrayList<Integer>();
-            List<Boolean> orderOfOrderByElements = new ArrayList<Boolean>();
-            List<SelectExpressionItem> listOfSelectItems = new ArrayList<SelectExpressionItem>();
-
-            for (SelectItem selectItems : plainSelect.getSelectItems()) {
-                SelectExpressionItem selectExpressionItem = (SelectExpressionItem) commonLib.castAs(selectItems, SelectExpressionItem.class);
-                listOfSelectItems.add(selectExpressionItem);
-            }
-
-            for (OrderByElement orderByElement : orderByElementsList) {
-                int index = 0;
-                for (SelectExpressionItem selectExpressionItem : listOfSelectItems) {
-                    if (selectExpressionItem.getExpression().equals(orderByElement.getExpression())) {
-                        indexOfOrderByElements.add(index);
-                        orderOfOrderByElements.add(orderByElement.isAsc());
-                        break;
-                    }
-                    index++;
-                }
-            }
-
-            rootIterator = new OrderByIterator(rootIterator, orderByElementsList, indexOfOrderByElements, orderOfOrderByElements);
-
-            // OrderBy processsing ends here
+        if (plainSelect.getOrderByElements() != null) {
+            rootIterator = new OrderByIterator(rootIterator, plainSelect.getOrderByElements(), plainSelect);
         }
+
         if (plainSelect.getLimit() != null) {
             rootIterator = new LimitIterator(rootIterator, plainSelect.getLimit());
         }

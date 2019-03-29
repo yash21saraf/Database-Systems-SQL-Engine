@@ -13,17 +13,25 @@ import net.sf.jsqlparser.statement.create.table.ColDataType;
 
 import java.io.StringReader;
 
-public class AppMain
-{
+public class Main {
 
     public static boolean inMem = true;
     public static ColDataType colDataTypes[];
+    public static volatile int sortFileSeqNumber = 1000;
+    public static volatile int mergeFileSeqNumber = 10000;
     private static CommonLib commonLib = CommonLib.getInstance();
 
-    public static void main(String[] args) throws Exception
-    {
+    public synchronized static int getsortFileSeqNumber() {
+        return sortFileSeqNumber++;
+    }
 
-        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
+    public synchronized static int getmergeFileSeqNumber() {
+        return mergeFileSeqNumber++;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        String q1 = "CREATE TABLE RR(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
 //        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
@@ -42,15 +50,16 @@ public class AppMain
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
 //        String q3 = "select p.a, s.d from (select a,b,sum(a+b) as q from r group by a,b having sum(a+b)>3 order by b asc, a asc) as p ,s where p.a > 0" ;
-        String q3 = "select a, count(*) from R group by a order by a desc";
-        for(int j = 0; j < args.length; j++){
-            if(args[j].equals("--in-mem")){
+        String q3 = "select a, rrr.cc from (select a, count(*) as cc, max(b), count(*) from RR group by a) as rrr limit 2";
+
+        for (int j = 0; j < args.length; j++) {
+            if (args[j].equals("--in-mem")) {
                 inMem = true;
                 break;
             }
         }
 
-        String q[] = {q1,q2,q3};
+        String q[] = {q1, q2, q3};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
@@ -91,11 +100,15 @@ public class AppMain
 
         String value = tuple[index].toRawString();
         String datatype = colDataTypes[index].getDataType();
-
-        if(datatype.equals("int")){
-           value = value.substring(0, value.indexOf("."));
+        String val = "";
+        if (datatype.equals("int")) {
+            try {
+                val = value.substring(0, value.indexOf("."));
+            } catch (Exception e) {
+                val = value;
+            }
         }
-        System.out.print(value);
+        System.out.print(val);
     }
 
     private static void setDataType(RAIterator rootIterator) {
@@ -103,11 +116,9 @@ public class AppMain
         Schema[] schemas = rootIterator.getSchema();
         colDataTypes = new ColDataType[schemas.length];
 
-        for(int i = 0; i < schemas.length; i++){
+        for (int i = 0; i < schemas.length; i++) {
             colDataTypes[i] = schemas[i].getColumnDefinition().getColDataType();
         }
-
-
     }
 
 }

@@ -1,14 +1,10 @@
 package iterators;
 
 import helpers.CommonLib;
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-import net.sf.jsqlparser.statement.select.AllColumns;
-import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
@@ -136,12 +132,13 @@ public class GroupByIterator implements RAIterator {
                 String groupByCols = "";
                 for (int index = 0; index < groupByColumnReferences.size(); index++)
                     groupByCols = groupByCols + projectedTuple.get(index).toRawString() + "|";
+                    //groupByCols = groupByCols + projectedTuple.get(index);
+
 
                 List<String> aggPrimitiveValues = new ArrayList<String>();
 
                 for (int index = groupByColumnReferences.size(); index < projectedTuple.size(); index++)
                     aggPrimitiveValues.add(projectedTuple.get(index).toRawString());
-
 
                 groupByAccumulator(aggPrimitiveValues, aggTypeOfSelectItems, groupByCols);
 
