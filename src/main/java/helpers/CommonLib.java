@@ -316,9 +316,25 @@ public class CommonLib
 
    }
 
-   /*public Boolean validateExpression(Expression expression, Schema[] schemas) {
+   public Boolean validateExpressionAgainstSchema(Expression expression, Schema[] schemas) {
 
-   }*/
+      boolean flag = false;
+      for (Column column : getColumnList(expression)) {
+         for (Schema schema : schemas) {
+            if (schema.getWholeColumnName().equals(column.getWholeColumnName())) {
+               flag = true;
+            } else if (schema.getColumnDefinition().getColumnName().equals(column.getWholeColumnName())) {
+               flag = true;
+            }
+         }
+         if (!flag) {
+            return false;
+         }
+         flag = false;
+      }
+      return true;
+
+   }
 
    //endregion
 

@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/target/classes/helpers/PrimitiveValueWrapper.class" />
+    <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="Default Changelist">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" afterPath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" afterPath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
-      <change beforePath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" afterPath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" afterPath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/helpers/CommonLib$1.class" afterPath="$PROJECT_DIR$/target/classes/helpers/CommonLib$1.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/helpers/CommonLib.class" afterPath="$PROJECT_DIR$/target/classes/helpers/CommonLib.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/GroupByIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/GroupByIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/HavingIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/HavingIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/JoinIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/JoinIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/LimitIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/LimitIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/MapIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/MapIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/RAIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/RAIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/UnionIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/UnionIterator.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/aggregateIterator.class" afterPath="$PROJECT_DIR$/target/classes/iterators/aggregateIterator.class" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="AppMain.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AppMain.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="918">
-              <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+            <state relative-caret-position="745">
+              <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -53,11 +37,63 @@
       <file leaf-file-name="FilterIterator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-536">
-              <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+            <state relative-caret-position="366">
+              <caret line="162" column="0" lean-forward="false" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2001#2002#0" expanded="true" />
+                <element signature="e#2032#2033#0" expanded="true" />
+                <element signature="e#2336#2337#0" expanded="true" />
+                <element signature="e#2366#2367#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BinaryExpression.class" pinned="false" current-in-tab="false">
+        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+              <folding>
+                <element signature="e#583#584#0" expanded="true" />
+                <element signature="e#628#629#0" expanded="true" />
+                <element signature="e#668#669#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AndExpression.class" pinned="false" current-in-tab="false">
+        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/operators/conditional/AndExpression.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+              <folding>
+                <element signature="e#497#498#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TableIterator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/TableIterator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="372">
+              <caret line="173" column="0" lean-forward="false" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
+              <folding>
+                <element signature="e#4935#4936#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JoinIterator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="400">
+              <caret line="152" column="22" lean-forward="true" selection-start-line="152" selection-start-column="22" selection-end-line="152" selection-end-column="22" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -65,8 +101,8 @@
       <file leaf-file-name="CommonLib.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="314" column="0" lean-forward="false" selection-start-line="314" selection-start-column="0" selection-end-line="314" selection-end-column="0" />
+            <state relative-caret-position="337">
+              <caret line="334" column="0" lean-forward="false" selection-start-line="334" selection-start-column="0" selection-end-line="334" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#8258#8270#0" expanded="true" />
@@ -76,35 +112,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BinaryExpression.class" pinned="false" current-in-tab="false">
-        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
+      <file leaf-file-name="Schema.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+            <state relative-caret-position="88">
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding>
-                <element signature="e#544#545#0" expanded="true" />
-                <element signature="e#583#584#0" expanded="true" />
-                <element signature="e#668#669#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#436#437#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Eval.class" pinned="false" current-in-tab="false">
-        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="972">
-              <caret line="468" column="34" lean-forward="true" selection-start-line="468" selection-start-column="34" selection-end-line="468" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MapIterator.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MapIterator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="292">
-              <caret line="73" column="48" lean-forward="true" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
+            <state relative-caret-position="389">
+              <caret line="289" column="0" lean-forward="false" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#8255#8256#0" expanded="true" />
@@ -117,40 +142,6 @@
                 <element signature="e#11787#11788#0" expanded="true" />
                 <element signature="e#11828#11829#0" expanded="true" />
                 <element signature="e#11861#11862#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ColDataType.class" pinned="false" current-in-tab="false">
-        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/create/table/ColDataType.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="14" column="10" lean-forward="false" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExpressionList.class" pinned="false" current-in-tab="false">
-        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/operators/relational/ExpressionList.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-              <folding>
-                <element signature="e#602#603#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Function.class" pinned="false" current-in-tab="false">
-        <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/Function.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-              <folding>
-                <element signature="e#1066#1067#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -216,7 +207,6 @@
         <option value="$PROJECT_DIR$/src/main/java/iterators/LimitIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/UnionIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java" />
-        <option value="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/helpers/BasicEval.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" />
@@ -225,10 +215,11 @@
         <option value="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/helpers/Schema.java" />
+        <option value="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
+        <option value="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" />
-        <option value="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
-        <option value="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
       </list>
     </option>
   </component>
@@ -249,10 +240,10 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1096" />
+    <option name="x" value="1951" />
+    <option name="y" value="-11" />
+    <option name="width" value="1440" />
+    <option name="height" value="833" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -344,7 +335,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="configurable.group.language" />
-    <property name="SearchEverywhereHistoryKey" value="Fil&#9;FILE&#9;file://D:/Work/Projects/sqlparse/sqlparse/src/main/java/iterators/FilterIterator.java&#10;Function&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/Function.class&#10;Eval&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class&#10;Column&#9;PSI&#9;JAVA://net.sf.jsqlparser.schema.Column" />
+    <property name="SearchEverywhereHistoryKey" value="Common&#9;FILE&#9;file://D:/Work/Projects/sqlparse/sqlparse/src/main/java/helpers/CommonLib.java&#10;Fil&#9;FILE&#9;file://D:/Work/Projects/sqlparse/sqlparse/src/main/java/iterators/FilterIterator.java&#10;Function&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/Function.class&#10;Eval&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class&#10;Column&#9;PSI&#9;JAVA://net.sf.jsqlparser.schema.Column" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -444,11 +435,18 @@
       <option name="project" value="LOCAL" />
       <updated>1553821546039</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Default Changelist">
+      <created>1553822265145</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1553822265145</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
+    <frame x="1912" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -469,7 +467,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24958494" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3723296" sideWeight="0.4997233" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3886063" sideWeight="0.4997233" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Maven" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32982844" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -530,7 +528,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java</url>
-          <line>57</line>
+          <line>60</line>
           <properties />
           <option name="timeStamp" value="9" />
         </line-breakpoint>
@@ -542,23 +540,63 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java</url>
-          <line>64</line>
+          <line>68</line>
           <properties />
-          <option name="timeStamp" value="12" />
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java</url>
+          <line>67</line>
+          <properties />
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java</url>
+          <line>155</line>
+          <properties />
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java</url>
+          <line>144</line>
+          <properties />
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java</url>
+          <line>320</line>
+          <properties />
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="14" />
+      <option name="time" value="21" />
     </breakpoint-manager>
-    <watches-manager />
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="schema.getWholeColumnName()" language="JAVA" />
+        <watch expression="column.getWholeColumnName()" language="JAVA" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
     <option name="FILTER_TARGETS" value="false" />
   </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>column.getWholeColumnName()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>schema.getWholeColumnName()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/optimizers/optimizer.java" />
-    <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/parser/CCJSqlParser.class" />
-    <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/schema/Column.class" />
     <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/create/table/ColDataType.class" />
     <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/LongValue.class" />
     <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/create/table/ColumnDefinition.class" />
@@ -641,34 +679,10 @@
     </entry>
     <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/PrimitiveValue.class" />
     <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/select/PlainSelect.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/UnionIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="750">
-          <caret line="54" column="4" lean-forward="false" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-293">
           <caret line="741" column="76" lean-forward="false" selection-start-line="741" selection-start-column="76" selection-end-line="741" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/BasicEval.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="23" lean-forward="false" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#253#397#0" expanded="true" />
-            <element signature="e#396#397#0" expanded="true" />
-            <element signature="e#455#456#0" expanded="true" />
-            <element signature="e#496#497#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -698,47 +712,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2091">
-          <caret line="138" column="20" lean-forward="false" selection-start-line="138" selection-start-column="20" selection-end-line="138" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4301">
-          <caret line="253" column="8" lean-forward="false" selection-start-line="253" selection-start-column="8" selection-end-line="253" selection-end-column="8" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#8108#8117#0" expanded="false" />
-            <element signature="e#8185#8194#0" expanded="false" />
-            <element signature="e#8270#8292#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="71" column="11" lean-forward="false" selection-start-line="71" selection-start-column="11" selection-end-line="71" selection-end-column="11" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/PrimitiveValueWrapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/create/table/ColumnDefinition.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -751,24 +724,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-102">
           <caret line="10" column="13" lean-forward="false" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="46" column="5" lean-forward="false" selection-start-line="46" selection-start-column="5" selection-end-line="46" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/TableIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-245">
-          <caret line="56" column="4" lean-forward="false" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -786,18 +741,18 @@
         <state relative-caret-position="-53">
           <caret line="76" column="57" lean-forward="false" selection-start-line="76" selection-start-column="57" selection-end-line="76" selection-end-column="57" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1281#1289#0" expanded="true" />
-            <element signature="e#1355#1377#0" expanded="true" />
-            <element signature="e#4574#4582#0" expanded="true" />
-            <element signature="e#6879#6887#0" expanded="true" />
-            <element signature="e#9509#9517#0" expanded="true" />
-            <element signature="e#10061#10073#0" expanded="true" />
-            <element signature="e#10126#10134#0" expanded="true" />
-            <element signature="e#14615#14616#0" expanded="true" />
-            <element signature="e#14650#14651#0" expanded="true" />
-            <element signature="e#14710#14711#0" expanded="true" />
-            <element signature="e#14747#14748#0" expanded="true" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#1281#1289#0" expanded="false" />
+            <element signature="e#1355#1377#0" expanded="false" />
+            <element signature="e#4574#4582#0" expanded="false" />
+            <element signature="e#6879#6887#0" expanded="false" />
+            <element signature="e#9509#9517#0" expanded="false" />
+            <element signature="e#10061#10073#0" expanded="false" />
+            <element signature="e#10126#10134#0" expanded="false" />
+            <element signature="e#14615#14616#0" expanded="false" />
+            <element signature="e#14650#14651#0" expanded="false" />
+            <element signature="e#14710#14711#0" expanded="false" />
+            <element signature="e#14747#14748#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -830,41 +785,133 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding>
-            <element signature="e#602#603#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-          <folding>
-            <element signature="e#544#545#0" expanded="true" />
-            <element signature="e#583#584#0" expanded="true" />
-            <element signature="e#668#669#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="314" column="0" lean-forward="false" selection-start-line="314" selection-start-column="0" selection-end-line="314" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#8258#8270#0" expanded="true" />
-            <element signature="e#8789#8797#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="972">
-          <caret line="468" column="34" lean-forward="true" selection-start-line="468" selection-start-column="34" selection-end-line="468" selection-end-column="34" />
-          <folding />
+          <caret line="468" column="34" lean-forward="false" selection-start-line="468" selection-start-column="34" selection-end-line="468" selection-end-column="34" />
+          <folding>
+            <marker date="1549730813005" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1549730813005" expanded="false" signature="146:2996" ph="..." />
+            <marker date="1549730813005" expanded="true" signature="3044:3050" ph="{}" />
+            <marker date="1549730813005" expanded="true" signature="3131:3362" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="3462:3755" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="3826:3913" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="3979:7362" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="7443:8028" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="8118:8893" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="8979:10155" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="10243:10577" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="10641:10870" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="10689:10863" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="10730:10745" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="10758:10769" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="10816:10831" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="10844:10855" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="10934:11163" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="10982:11156" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="11023:11038" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11051:11062" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="11109:11124" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11137:11148" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="11233:11462" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="11281:11455" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="11322:11337" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11350:11361" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="11408:11423" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11436:11447" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="11529:11758" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="11577:11751" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="11618:11633" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11646:11657" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="11704:11719" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="11732:11743" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="11827:11978" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="11855:11938" ph="op(a, b) → { " />
+            <marker date="1549730813005" expanded="false" signature="11952:11971" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="12046:12197" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="12074:12157" ph="op(a, b) → { " />
+            <marker date="1549730813005" expanded="false" signature="12171:12190" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="12261:12549" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="12616:12904" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="12971:13272" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="13015:13265" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="13059:13074" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13087:13098" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13146:13161" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13174:13185" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13220:13235" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13246:13257" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="13345:13649" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="13389:13642" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="13433:13448" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13462:13473" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13521:13536" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13550:13561" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13596:13611" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13623:13634" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="13714:14015" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="13758:14008" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="13802:13817" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13830:13841" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13889:13904" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13917:13928" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="13963:13978" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="13989:14000" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="14086:14390" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="14130:14383" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="14174:14189" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14203:14214" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14262:14277" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14291:14302" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14337:14352" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14364:14375" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14434:14443" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14452:14457" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14503:14512" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14521:14526" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14570:14579" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14588:14593" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14639:14648" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14657:14662" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14711:14720" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14729:14734" ph=" }" />
+            <marker date="1549730813005" expanded="false" signature="14778:14787" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="14796:14801" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="14871:15916" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16065:16127" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16208:16268" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16349:16409" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16486:16539" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16608:16657" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="16726:16943" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17016:17268" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17337:17381" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17447:17494" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17559:17605" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17671:17718" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17780:17823" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="17894:18337" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="18416:18470" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="18547:18590" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="18671:18721" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="18794:18840" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="18901:19668" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="19384:19463" ph="eval(c) → { " />
+            <marker date="1549730813005" expanded="false" signature="19488:19513" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="19729:19806" ph="{...}" />
+            <marker date="1549730813005" expanded="false" signature="19770:19782" ph=" { " />
+            <marker date="1549730813005" expanded="false" signature="19793:19801" ph=" }" />
+            <marker date="1549730813005" expanded="true" signature="19847:19948" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="19871:19880" ph="{}" />
+            <marker date="1549730813005" expanded="true" signature="19988:20143" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="20011:20020" ph="{}" />
+            <marker date="1549730813005" expanded="true" signature="20185:20338" ph="{...}" />
+            <marker date="1549730813005" expanded="true" signature="20210:20219" ph="{}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -873,7 +920,31 @@
         <state relative-caret-position="330">
           <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
           <folding>
-            <element signature="e#1066#1067#0" expanded="true" />
+            <marker date="1549030783186" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1549030783186" expanded="true" signature="463:469" ph="{}" />
+            <marker date="1549030783186" expanded="false" signature="529:538" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="568:573" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="601:610" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="627:632" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="671:680" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="699:704" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="738:747" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="770:775" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="816:825" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="845:850" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="882:891" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="912:917" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="956:965" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="983:988" ph=" }" />
+            <marker date="1549030783186" expanded="true" signature="1030:1039" ph=" { " />
+            <marker date="1549030783186" expanded="true" signature="1062:1067" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="1118:1127" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="1150:1155" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="1186:1195" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="1217:1222" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="1268:1277" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="1304:1309" ph=" }" />
+            <marker date="1549030783186" expanded="true" signature="1339:1771" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -882,34 +953,170 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="14" column="10" lean-forward="false" selection-start-line="14" selection-start-column="10" selection-end-line="14" selection-end-column="10" />
+          <folding>
+            <marker date="1549030783186" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1549030783186" expanded="false" signature="164:234" ph="..." />
+            <marker date="1549030783186" expanded="true" signature="361:367" ph="{}" />
+            <marker date="1549030783186" expanded="false" signature="416:425" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="457:462" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="494:503" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="524:529" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="587:596" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="628:633" ph=" }" />
+            <marker date="1549030783186" expanded="false" signature="676:685" ph=" { " />
+            <marker date="1549030783186" expanded="false" signature="708:713" ph=" }" />
+            <marker date="1549030783186" expanded="true" signature="743:891" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_172/src.zip!/java/lang/Long.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="629" column="23" lean-forward="false" selection-start-line="629" selection-start-column="23" selection-end-line="629" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
+    <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/LongValue.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
-          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+        <state relative-caret-position="272">
+          <caret line="22" column="26" lean-forward="false" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="774">
+          <caret line="253" column="8" lean-forward="false" selection-start-line="253" selection-start-column="8" selection-end-line="253" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/BasicEval.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="23" lean-forward="false" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#253#397#0" expanded="false" />
+            <element signature="e#396#397#0" expanded="false" />
+            <element signature="e#455#456#0" expanded="false" />
+            <element signature="e#496#497#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/PrimitiveValueWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="122">
+          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="774">
+          <caret line="138" column="20" lean-forward="false" selection-start-line="138" selection-start-column="20" selection-end-line="138" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/UnionIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="37">
+          <caret line="54" column="4" lean-forward="false" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="4" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding>
+            <element signature="e#583#584#0" expanded="true" />
+            <element signature="e#628#629#0" expanded="true" />
+            <element signature="e#668#669#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/operators/conditional/AndExpression.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+          <folding>
+            <element signature="e#497#498#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="152" column="22" lean-forward="true" selection-start-line="152" selection-start-column="22" selection-end-line="152" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#436#437#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="334" column="0" lean-forward="false" selection-start-line="334" selection-start-column="0" selection-end-line="334" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#8258#8270#0" expanded="true" />
+            <element signature="e#8789#8797#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/TableIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="372">
+          <caret line="173" column="0" lean-forward="false" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
+          <folding>
+            <element signature="e#4935#4936#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-536">
-          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+        <state relative-caret-position="366">
+          <caret line="162" column="0" lean-forward="false" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#2001#2002#0" expanded="true" />
+            <element signature="e#2032#2033#0" expanded="true" />
+            <element signature="e#2336#2337#0" expanded="true" />
+            <element signature="e#2366#2367#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="73" column="48" lean-forward="true" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
+        <state relative-caret-position="389">
+          <caret line="289" column="0" lean-forward="false" selection-start-line="289" selection-start-column="0" selection-end-line="289" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#8255#8256#0" expanded="true" />
@@ -922,6 +1129,16 @@
             <element signature="e#11787#11788#0" expanded="true" />
             <element signature="e#11828#11829#0" expanded="true" />
             <element signature="e#11861#11862#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="745">
+          <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
