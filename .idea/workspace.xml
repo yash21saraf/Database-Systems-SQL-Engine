@@ -4,13 +4,10 @@
     <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="">
       <change beforePath="" afterPath="$PROJECT_DIR$/target/classes/helpers/PrimitiveValueWrapper.class" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" afterPath="$PROJECT_DIR$/src/main/java/dubstep/AppMain.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" afterPath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" afterPath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" />
-      <change beforePath="$PROJECT_DIR$/target/classes/META-INF/sqlparse.kotlin_module" afterPath="" />
       <change beforePath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" afterPath="$PROJECT_DIR$/target/classes/builders/IteratorBuilder.class" />
       <change beforePath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" afterPath="$PROJECT_DIR$/target/classes/dubstep/AppMain.class" />
       <change beforePath="$PROJECT_DIR$/target/classes/helpers/CommonLib$1.class" afterPath="$PROJECT_DIR$/target/classes/helpers/CommonLib$1.class" />
@@ -41,10 +38,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="AppMain.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AppMain.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1122">
+            <state relative-caret-position="918">
               <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -56,7 +53,7 @@
       <file leaf-file-name="FilterIterator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
+            <state relative-caret-position="-536">
               <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -103,11 +100,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MapIterator.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MapIterator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-82">
-              <caret line="67" column="73" lean-forward="true" selection-start-line="67" selection-start-column="73" selection-end-line="67" selection-end-column="73" />
+            <state relative-caret-position="292">
+              <caret line="73" column="48" lean-forward="true" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#8255#8256#0" expanded="true" />
@@ -440,7 +437,14 @@
       <option name="project" value="LOCAL" />
       <updated>1553652395026</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Default Changelist">
+      <created>1553821546039</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1553821546039</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -518,7 +522,8 @@
     <MESSAGE value="Schema added" />
     <MESSAGE value="Minor fixes" />
     <MESSAGE value="MapIterator fix if agg in subquery" />
-    <option name="LAST_COMMIT_MESSAGE" value="MapIterator fix if agg in subquery" />
+    <MESSAGE value="Default Changelist" />
+    <option name="LAST_COMMIT_MESSAGE" value="Default Changelist" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -855,16 +860,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="972">
@@ -891,10 +886,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="918">
+          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-536">
+          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/MapIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-82">
-          <caret line="67" column="73" lean-forward="true" selection-start-line="67" selection-start-column="73" selection-end-line="67" selection-end-column="73" />
+        <state relative-caret-position="292">
+          <caret line="73" column="48" lean-forward="true" selection-start-line="73" selection-start-column="48" selection-end-line="73" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#8255#8256#0" expanded="true" />
@@ -907,16 +922,6 @@
             <element signature="e#11787#11788#0" expanded="true" />
             <element signature="e#11828#11829#0" expanded="true" />
             <element signature="e#11861#11862#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/AppMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1122">
-          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

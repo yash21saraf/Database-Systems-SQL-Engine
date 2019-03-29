@@ -34,7 +34,7 @@ public class FilterIterator implements RAIterator
       this.schema = child.getSchema();
 
       commonLib.getExpressionList(expression);
-
+      commonLib.getColumnList(expression);
    }
 
    //endregion
