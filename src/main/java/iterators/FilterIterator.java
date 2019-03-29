@@ -107,6 +107,7 @@ public class FilterIterator implements RAIterator
       MapIterator mapIterator;
       JoinIterator joinIterator;
       EqualsTo equalsTo;
+      OrderByIterator orderByIterator;
 
       if ((filterIterator = (FilterIterator) CommonLib.castAs(iterator, FilterIterator.class)) != null) {
          if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.getChild(), MapIterator.class)) != null) {
@@ -155,6 +156,15 @@ public class FilterIterator implements RAIterator
          } else if ((childFilterIterator = (FilterIterator) CommonLib.castAs(filterIterator.getChild(),FilterIterator.class)) != null) {
             iterator = new FilterIterator(childFilterIterator.getChild(),new AndExpression(filterIterator.getExpression(),childFilterIterator.getExpression()));
             iterator = iterator.optimize(iterator);
+         } else if ((orderByIterator = (OrderByIterator) CommonLib.castAs(filterIterator.getChild(),OrderByIterator.class)) != null) {
+            iterator = new OrderByIterator(
+                  new FilterIterator(
+                        orderByIterator.getChild(),
+                        filterIterator.getExpression()
+                  ),
+                  orderByIterator.getOrderByElementsList(),
+                  orderByIterator.getPlainSelect()
+            );
          }
       }
       RAIterator child = iterator.getChild();

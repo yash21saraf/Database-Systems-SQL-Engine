@@ -26,6 +26,7 @@ public class OrderByIterator implements RAIterator {
     private List<Boolean> orderOfOrderByElements; // asc : true, desc : false
     private int currentIndex = 0;
     private Schema[] schema;
+    private PlainSelect plainSelect;
     // On disk variables
     public boolean onDiskSorted = false;
     private List<String> onDiskSortedList = new ArrayList<String>();
@@ -55,6 +56,7 @@ public class OrderByIterator implements RAIterator {
         this.child = child;
         this.orderByElementsList = orderByElementsList;
         this.schema = child.getSchema();
+        this.plainSelect = plainSelect;
 
         limit = plainSelect.getLimit();
 
@@ -806,6 +808,16 @@ public class OrderByIterator implements RAIterator {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<OrderByElement> getOrderByElementsList()
+    {
+        return orderByElementsList;
+    }
+
+    public PlainSelect getPlainSelect()
+    {
+        return plainSelect;
     }
 
     @Override
