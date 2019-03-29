@@ -275,53 +275,53 @@ public class CommonLib
       if ((column = (Column) castAs(expression,Column.class)) != null) {
          columnList.add(column);
       }
-      if ((andExpression = (AndExpression) castAs(expression,AndExpression.class)) != null) {
+      else if ((andExpression = (AndExpression) castAs(expression,AndExpression.class)) != null) {
          expressionList = getExpressionList(expression);
          for (Expression expressionItem : expressionList) {
             columnList.addAll(getColumnList(expressionItem));
          }
       }
-      if ((orExpression = (OrExpression) castAs(expression,OrExpression.class)) != null) {
+      else if ((orExpression = (OrExpression) castAs(expression,OrExpression.class)) != null) {
          columnList.addAll(getColumnList(orExpression.getLeftExpression()));
          columnList.addAll(getColumnList(orExpression.getRightExpression()));
       }
-      if ((equalsTo = (EqualsTo) castAs(expression,EqualsTo.class)) != null) {
+      else if ((equalsTo = (EqualsTo) castAs(expression,EqualsTo.class)) != null) {
          columnList.addAll(getColumnList(equalsTo.getLeftExpression()));
          columnList.addAll(getColumnList(equalsTo.getRightExpression()));
       }
-      if ((notEqualsTo = (NotEqualsTo) castAs(expression,NotEqualsTo.class)) != null) {
+      else if ((notEqualsTo = (NotEqualsTo) castAs(expression,NotEqualsTo.class)) != null) {
          columnList.addAll(getColumnList(notEqualsTo.getLeftExpression()));
          columnList.addAll(getColumnList(notEqualsTo.getRightExpression()));
       }
-      if ((greaterThan = (GreaterThan) castAs(expression,GreaterThan.class)) != null) {
+      else if ((greaterThan = (GreaterThan) castAs(expression,GreaterThan.class)) != null) {
          columnList.addAll(getColumnList(greaterThan.getLeftExpression()));
          columnList.addAll(getColumnList(greaterThan.getRightExpression()));
       }
-      if ((greaterThanEquals = (GreaterThanEquals) castAs(expression,GreaterThanEquals.class)) != null) {
+      else if ((greaterThanEquals = (GreaterThanEquals) castAs(expression,GreaterThanEquals.class)) != null) {
          columnList.addAll(getColumnList(greaterThanEquals.getLeftExpression()));
          columnList.addAll(getColumnList(greaterThanEquals.getRightExpression()));
       }
-      if ((minorThan = (MinorThan) castAs(expression,MinorThan.class)) != null) {
+      else if ((minorThan = (MinorThan) castAs(expression,MinorThan.class)) != null) {
          columnList.addAll(getColumnList(minorThan.getLeftExpression()));
          columnList.addAll(getColumnList(minorThan.getRightExpression()));
       }
-      if ((minorThanEquals = (MinorThanEquals) castAs(expression,MinorThanEquals.class)) != null) {
+      else if ((minorThanEquals = (MinorThanEquals) castAs(expression,MinorThanEquals.class)) != null) {
          columnList.addAll(getColumnList(minorThanEquals.getLeftExpression()));
          columnList.addAll(getColumnList(minorThanEquals.getRightExpression()));
       }
-      if ((addition = (Addition) castAs(expression,Addition.class)) != null) {
+      else if ((addition = (Addition) castAs(expression,Addition.class)) != null) {
          columnList.addAll(getColumnList(addition.getLeftExpression()));
          columnList.addAll(getColumnList(addition.getRightExpression()));
       }
-      if ((subtraction = (Subtraction) castAs(expression,Subtraction.class)) != null) {
+      else if ((subtraction = (Subtraction) castAs(expression,Subtraction.class)) != null) {
          columnList.addAll(getColumnList(subtraction.getLeftExpression()));
          columnList.addAll(getColumnList(subtraction.getRightExpression()));
       }
-      if ((multiplication = (Multiplication) castAs(expression,Multiplication.class)) != null) {
+      else if ((multiplication = (Multiplication) castAs(expression,Multiplication.class)) != null) {
          columnList.addAll(getColumnList(multiplication.getLeftExpression()));
          columnList.addAll(getColumnList(multiplication.getRightExpression()));
       }
-      if ((division = (Division) castAs(expression,Division.class)) != null) {
+      else if ((division = (Division) castAs(expression,Division.class)) != null) {
          columnList.addAll(getColumnList(division.getLeftExpression()));
          columnList.addAll(getColumnList(division.getRightExpression()));
       }

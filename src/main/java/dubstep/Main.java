@@ -11,6 +11,7 @@ import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 
+import java.io.File;
 import java.io.StringReader;
 
 public class Main {
@@ -21,6 +22,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
+/*
+         Stream<String> lines = Files.lines(Paths.get("file.txt"));
+            String line32 = lines.skip(31).findFirst().get();
+
+*/
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
@@ -41,7 +47,7 @@ public class Main {
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, c from R order by a asc";
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
-        String q3 = "select a from (select a,b,sum(b+c) as q from R group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
+        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {

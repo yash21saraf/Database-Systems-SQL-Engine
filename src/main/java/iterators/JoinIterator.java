@@ -78,6 +78,9 @@ public class JoinIterator implements RAIterator
             leftTuple = leftChild.next();
          }
          rightTuple = rightChild.next();
+         if(rightTuple == null || leftTuple == null){
+            return null ;
+         }
          if (onExpression != null) {
             PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
             PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
