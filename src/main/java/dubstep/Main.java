@@ -16,7 +16,7 @@ import java.io.StringReader;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false;
+    public static boolean inMem = true;
     static boolean debugEnabled = false;
 
     public static void main(String[] args) throws Exception
@@ -37,10 +37,11 @@ public class Main {
 //        String q3 = "select a from r, (select d from s where e>7)";
 //        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
-        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
+//        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, c from R order by a asc";
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
+        String q3 = "select a from (select a,b,sum(b+c) as q from R group by a,b) where a < 5";
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
@@ -66,7 +67,7 @@ public class Main {
             }
             if (rootIterator != null) {
                 long startTime = System.nanoTime();
-                //rootIterator = rootIterator.optimize(rootIterator);
+                rootIterator = rootIterator.optimize(rootIterator);
                 setDataType(rootIterator);
 
                 while (rootIterator.hasNext()) {

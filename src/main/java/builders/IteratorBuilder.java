@@ -212,14 +212,14 @@ public class IteratorBuilder {
             rootIterator = new OrderByIterator(rootIterator, plainSelect.getOrderByElements(), plainSelect);
         }
 
+        if(plainSelect.getHaving() != null) {
+            rootIterator = new HavingIterator(rootIterator, plainSelect.getSelectItems(), plainSelect.getHaving());
+        }
+
         if (plainSelect.getLimit() != null) {
             rootIterator = new LimitIterator(rootIterator, plainSelect.getLimit());
         }
 
-        if(plainSelect.getHaving() != null) {
-            rootIterator = new HavingIterator(rootIterator, plainSelect.getSelectItems(), plainSelect.getHaving());
-        }
-        
         return rootIterator;
 
     }
