@@ -146,7 +146,7 @@ public class aggregateIterator implements RAIterator {
 
             index++;
         }
-        newValues = newValues.substring(1); // Removing last "|"
+        newValues = newValues.substring(1); // Removing first "|"
 
         aggValues.clear();
         aggValues.add(newValues);

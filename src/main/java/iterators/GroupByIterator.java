@@ -19,10 +19,6 @@ import static helpers.CommonLib.castAs;
 public class GroupByIterator implements RAIterator {
     //region Variables
 
-    private static int counter = 0;
-    private static int sum = 0;
-    private static int min = Integer.MAX_VALUE;
-    private static int max = Integer.MIN_VALUE;
     boolean useGroupByOutput = false;
     boolean getFromAggResults = false;
     boolean hasAvg = false;
@@ -37,6 +33,7 @@ public class GroupByIterator implements RAIterator {
     private Map<String, List<String>> groupByMap = new HashMap<String, List<String>>();
     private Schema[] schema;
 
+    private CommonLib commonLibInstance = CommonLib.getInstance();
     //endregion
 
     //region Constructor
@@ -100,9 +97,10 @@ public class GroupByIterator implements RAIterator {
 
                         double avg = sum / count;
 
-                        primitiveValueWrappers[i] = new DoubleValue(avg);
+                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(avg+"", "DECIMAL");
+
                     } else {
-                        primitiveValueWrappers[i] = new StringValue(primitiveValues[i]);
+                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(primitiveValues[i], "DECIMAL");
                     }
                 }
 
@@ -178,9 +176,11 @@ public class GroupByIterator implements RAIterator {
 
                         double avg = sum / count;
 
-                        primitiveValueWrappers[i] = new DoubleValue(avg);
+                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(avg+"", "DECIMAL");
                     } else {
-                        primitiveValueWrappers[i] = new StringValue(primitiveValues[i]);
+
+                        primitiveValueWrappers[i] =
+                                commonLibInstance.convertToPrimitiveValue(primitiveValues[i], "DECIMAL");
                     }
                 }
 
@@ -210,18 +210,18 @@ public class GroupByIterator implements RAIterator {
 
                 String temp = "";
                 if (aggType.get(index).equals("count")) {
-                    temp = Integer.parseInt(currentValues.get(index)) + 1 + ""; //aggPrimitiveValues.get(index);
+                    temp = Double.parseDouble(currentValues.get(index)) + 1 + ""; //aggPrimitiveValues.get(index);
                 } else if (aggType.get(index).equals("sum")) {
-                    temp = Integer.parseInt(currentValues.get(index)) + Integer.parseInt(aggPrimitiveValues.get(index)) + "";
+                    temp = Double.parseDouble(currentValues.get(index)) + Double.parseDouble(aggPrimitiveValues.get(index)) + "";
                 } else if (aggType.get(index).equals("min")) {
-                    temp = Math.min(Integer.parseInt(currentValues.get(index)), Integer.parseInt(aggPrimitiveValues.get(index))) + "";
+                    temp = Math.min(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
                 } else if (aggType.get(index).equals("max")) {
-                    temp = Math.max(Integer.parseInt(currentValues.get(index)), Integer.parseInt(aggPrimitiveValues.get(index))) + "";
+                    temp = Math.max(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
                 } else if (aggType.get(index).equals("avg")) {
                     hasAvg = true;
                     String[] tmp = currentValues.get(index).split("\\|");
                     int count = Integer.parseInt(tmp[1]) + 1;
-                    int sum = Integer.parseInt(tmp[0]) + Integer.parseInt(aggPrimitiveValues.get(index));
+                    double sum = Double.parseDouble(tmp[0]) + Double.parseDouble(aggPrimitiveValues.get(index));
                     temp = sum + "|" + count;
                 }
 

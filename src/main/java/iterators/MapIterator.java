@@ -33,7 +33,7 @@ public class MapIterator implements RAIterator
     private List<SelectItem> selectItems;
     private String tableAlias;
     private Schema[] schema ;
-    private boolean isAggquery = false ;
+    private boolean isAggquery = false;
 
 
     //endregion

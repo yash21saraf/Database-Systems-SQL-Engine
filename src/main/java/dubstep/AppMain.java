@@ -1,6 +1,7 @@
 package dubstep;
 
 import builders.IteratorBuilder;
+import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import iterators.RAIterator;
@@ -8,6 +9,7 @@ import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.ColDataType;
 
 import java.io.StringReader;
 
@@ -15,6 +17,8 @@ public class AppMain
 {
 
     public static boolean inMem = true;
+    public static ColDataType colDataTypes[];
+    private static CommonLib commonLib = CommonLib.getInstance();
 
     public static void main(String[] args) throws Exception
     {
@@ -36,8 +40,9 @@ public class AppMain
 //        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
 //        String q3 = "select a,b,sum(a+b) from r group by a,b having sum(a+b)>3 order by b asc, a asc" ;
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
-        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
-
+//        String q3 = "select a, b, sum(a+c) from R group by a, b having sum(a+c) < 100 order by b asc, a desc";
+//        String q3 = "select p.a, s.d from (select a,b,sum(a+b) as q from r group by a,b having sum(a+b)>3 order by b asc, a asc) as p ,s where p.a > 0" ;
+        String q3 = "select a, count(*) from R group by a order by a desc";
         for(int j = 0; j < args.length; j++){
             if(args[j].equals("--in-mem")){
                 inMem = true;
@@ -63,25 +68,34 @@ public class AppMain
             if (rootIterator != null) {
                 long startTime = System.nanoTime();
 
+                setDataType(rootIterator);
+
                 while (rootIterator.hasNext()) {
                     PrimitiveValue[] tuple = rootIterator.next();
                     if (tuple != null) {
                         for (int index = 0; index < tuple.length; index++) {
-                            System.out.print(tuple[index].toRawString());
+                            System.out.println(commonLib.convertToPrimitiveValue(tuple[index].toRawString(), colDataTypes[index].getDataType()));
+                            //System.out.print(tuple[index].toRawString());
                             if (index != (tuple.length - 1))
                                 System.out.print("|");
                         }
                         System.out.print("\n");
                     }
                 }
-              /*  long endTime   = System.nanoTime();
-                System.out.println(endTime - startTime);
-                long freemem = Runtime.getRuntime().freeMemory();
-                System.out.println(freemem);*/
             }
             i++;
         }
 
+    }
+
+    private static void setDataType(RAIterator rootIterator) {
+
+        Schema[] schemas = rootIterator.getSchema();
+        colDataTypes = new ColDataType[schemas.length];
+
+        for(int i = 0; i < schemas.length; i++){
+            colDataTypes[i] = schemas[i].getColumnDefinition().getColDataType();
+        }
     }
 
 }
