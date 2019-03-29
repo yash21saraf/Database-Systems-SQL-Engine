@@ -247,6 +247,11 @@ public class IteratorBuilder {
         if (plainSelect.getLimit() != null) {
             rootIterator = new LimitIterator(rootIterator, plainSelect.getLimit());
         }
+
+        if(plainSelect.getHaving() != null) {
+            rootIterator = new HavingIterator(rootIterator, plainSelect.getSelectItems(), plainSelect.getHaving());
+        }
+        
         return rootIterator;
 
     }
