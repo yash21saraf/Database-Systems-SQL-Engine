@@ -160,11 +160,12 @@ public class MapIterator implements RAIterator
         Column column;
 
         PrimitiveValue[] tuple = child.next() ;
+        if (tuple == null)
+            return null;
         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, child.getSchema());
         ArrayList<PrimitiveValue> projectedTuple = new ArrayList();
 
-        if (tuple == null)
-            return null;
+
         for (int index = 0; index < selectItems.size(); index++) {
             if ((selectExpressionItem = (SelectExpressionItem) CommonLib.castAs(selectItems.get(index),SelectExpressionItem.class)) != null) {
                 PrimitiveValueWrapper evaluatedExpression = commonLib.eval(selectExpressionItem.getExpression(),wrappedTuple);

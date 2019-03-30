@@ -3,6 +3,7 @@ package iterators;
 import dubstep.Main;
 import helpers.CommonLib;
 import helpers.Schema;
+import helpers.Sort;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.statement.select.*;
@@ -45,6 +46,9 @@ public class OrderByIterator implements RAIterator {
 
     private CommonLib commonLib = CommonLib.getInstance();
     long blockSize = commonLib.blockSize;
+
+    Sort sort;
+
     // On disk variables ends here
 
     //endregion
@@ -250,8 +254,12 @@ public class OrderByIterator implements RAIterator {
             int rowCount = 0;
             List<String> listOfSortedFiles = new ArrayList<String>();
             while (child.hasNext()) {
-                sortedList.add(Arrays.asList(child.next()));
-                rowCount++;
+
+                PrimitiveValue[] tupleCheck = child.next() ;
+                if(tupleCheck != null ) {
+                    sortedList.add(Arrays.asList(tupleCheck));
+                    rowCount++;
+                }
 
                 if (rowCount >= blockSize || !child.hasNext()) {
 
@@ -384,7 +392,6 @@ public class OrderByIterator implements RAIterator {
         PrimitiveValue[] primitiveValue = new PrimitiveValue[row.length];
         for (int i = 0; i < row.length; i++) {
             primitiveValue[i] = new StringValue(row[i]);
-
         }
         onDiscRowToReturn++;
 
