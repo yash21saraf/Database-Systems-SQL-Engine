@@ -75,66 +75,77 @@ public class JoinIterator implements RAIterator
    public boolean hasNext() throws Exception
    {
 
-      if(this.first){
-         defineHashColumns();
+      if(onExpression != null){
+         if(this.first){
+            defineHashColumns();
+         }
+         return hashHasNext() ;
       }
-      return hashHasNext() ;
-//       region NLJ
-//      try {
-//         if (!rightChild.hasNext())
-//            return leftChild.hasNext();
-//         return true;
-//      } catch (Exception e) {
-//         //logger.error("Error in reading from right table of join.");
-//         throw e;
-//      }
-      // endregion
+
+      else{
+         try {
+            if (!rightChild.hasNext())
+               return leftChild.hasNext();
+            return true;
+         } catch (Exception e) {
+            //logger.error("Error in reading from right table of join.");
+            throw e;
+         }
+      }
+
    }
 
    @Override
    public PrimitiveValue[] next() throws Exception
    {
-      return hashNext() ;
-      // region NLJ
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//      try {
-//          if (this.first){
-//              this.first = false ;
-//              if (leftChild.hasNext())
-//                  leftTuple = leftChild.next();
-//          }
-//              if (!rightChild.hasNext()) {
-//              rightChild.reset();
-//              leftTuple = leftChild.next();
-//          }
-//
-//          rightTuple = rightChild.next();
-//
-//          if(rightTuple == null || leftTuple == null) {
-//              return null;
-//          }
-//
-//          if (onExpression != null) {
-//            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
-//            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
-//            if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
-//               return CommonLib.concatArrays(leftTuple,rightTuple);
-//            }
-//         } else if(rightTuple != null && leftTuple != null){
-//            return CommonLib.concatArrays(leftTuple,rightTuple);
-//         }
-//         return null;
-//      } catch (Exception e) {
-//         //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
-//         throw e;
-//      }
+      if(onExpression != null){
+         return hashNext() ;
+      }
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // endregion
+      else{
+         // region NLJ
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      try {
+          if (this.first){
+              this.first = false ;
+              if (leftChild.hasNext())
+                  leftTuple = leftChild.next();
+          }
+              if (!rightChild.hasNext()) {
+              rightChild.reset();
+              leftTuple = leftChild.next();
+          }
+
+          rightTuple = rightChild.next();
+
+          if(rightTuple == null || leftTuple == null) {
+              return null;
+          }
+
+          if (onExpression != null) {
+            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
+            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
+            if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
+               return CommonLib.concatArrays(leftTuple,rightTuple);
+            }
+         } else if(rightTuple != null && leftTuple != null){
+            return CommonLib.concatArrays(leftTuple,rightTuple);
+         }
+         return null;
+      } catch (Exception e) {
+         //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
+         throw e;
+      }
+
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         // endregion
+      }
+
+
    }
    // region overridden methods
    @Override
@@ -299,7 +310,7 @@ public class JoinIterator implements RAIterator
          else {
             String rightKey = "" ;
             for(int i = 0 ; i < this.rightColIndexes.size() ; i++){
-               rightKey = currentRightTuple[rightColIndexes.get(i)].toRawString() + "|" ;
+               rightKey = rightKey + "|" + currentRightTuple[rightColIndexes.get(i)].toRawString() ;
             }
             if(leftBucket.containsKey(rightKey)){
                if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
@@ -334,7 +345,7 @@ public class JoinIterator implements RAIterator
 
       String rightKey = "" ;
       for(int i = 0 ; i < this.rightColIndexes.size() ; i++){
-         rightKey = currentRightTuple[rightColIndexes.get(i)].toRawString() + "|" ;
+         rightKey = rightKey + "|" + currentRightTuple[rightColIndexes.get(i)].toRawString() ;
       }
       if(leftBucket.containsKey(rightKey)){
          if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
@@ -367,7 +378,7 @@ public class JoinIterator implements RAIterator
                      String leftKey = "" ;
 
                      for(int i = 0 ; i < this.leftColIndexes.size() ; i++){
-                        leftKey = leftTuple[leftColIndexes.get(i)].toRawString() + "|" ;
+                        leftKey = leftKey + "|" + leftTuple[leftColIndexes.get(i)].toRawString() ;
                      }
 
                      List<PrimitiveValue[]> updatedList ;
