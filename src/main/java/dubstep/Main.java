@@ -18,7 +18,7 @@ public class Main {
 
     public static ColDataType colDataTypes[];
     public static boolean inMem = true;
-    static boolean debugEnabled = true;
+    static boolean debugEnabled = false;
 
     public static void main(String[] args) throws Exception
     {
@@ -145,7 +145,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q10};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();

@@ -1,10 +1,12 @@
 package iterators;
 
 import helpers.CommonLib;
+import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
@@ -18,7 +20,9 @@ public class GroupByIterator implements RAIterator {
     boolean useGroupByOutput = false;
     boolean getFromAggResults = false;
     boolean hasAvg = false;
-
+    List<Integer> indexOfGroupByCols;
+    List<Integer> indexOfNonGroupByCols;
+    List<String> aggTypeOfSelectItems;
     private CommonLib commonLib = CommonLib.getInstance();
     private RAIterator child;
     private List<SelectItem> selectItems;
@@ -26,10 +30,10 @@ public class GroupByIterator implements RAIterator {
     private List<Column> groupByColumnReferences;
     private Map<String, String> aggColMap = new HashMap();
     private List<String> aggValues = new ArrayList<String>();
-    private Map<String, List<String>> groupByMap = new HashMap<String, List<String>>();
+    private Map<String, List<PrimitiveValue>> groupByMap = new HashMap<String, List<PrimitiveValue>>();
     private Schema[] schema;
-
     private CommonLib commonLibInstance = CommonLib.getInstance();
+    private ColumnDefinition[] keyColDef;
     //endregion
 
     //region Constructor
@@ -41,6 +45,54 @@ public class GroupByIterator implements RAIterator {
         this.tableAlias = tableAlias;
         this.groupByColumnReferences = groupByColumnReferences;
         this.schema = child.getSchema();
+
+
+        indexOfGroupByCols = getIndexOfGroupByCols(selectItems, "groupby");
+
+        indexOfNonGroupByCols = getIndexOfGroupByCols(selectItems, "nongroupby");
+
+        aggTypeOfSelectItems = getAggTypeOfSelectItems(selectItems);
+
+        keyColDef = getKeyColDef(indexOfNonGroupByCols);
+
+    }
+
+    private ColumnDefinition[] getKeyColDef(List<Integer> indexOfGroupByCols) {
+        ColumnDefinition[] columnDefinitions = new ColumnDefinition[indexOfGroupByCols.size()];
+
+        for (int index = 0; index < indexOfGroupByCols.size(); index++) {
+//            for (int i = 0; i < schema.length; i++) {
+//                if(groupByColumnReferences.get(i).getColumnName().equals(schema[i].getColumnDefinition().getColumnName())){
+            columnDefinitions[index] = new ColumnDefinition();
+            columnDefinitions[index].setColDataType(schema[indexOfGroupByCols.get(index)].getColumnDefinition().getColDataType());
+        }
+
+
+        return columnDefinitions;
+    }
+
+
+    private List<Integer> getIndexOfGroupByCols(List<SelectItem> selectItems, String groupby) {
+
+        List<Integer> list = new ArrayList<Integer>();
+        Function function = null;
+        if (groupby.equals("groupby")) {
+
+            for (int i = 0; i < selectItems.size(); i++) {
+                if ((function = (Function) CommonLib.castAs(((SelectExpressionItem) selectItems.get(i)).getExpression(), Function.class)) != null) {
+                    list.add(i);
+                }
+            }
+
+
+        } else {
+            for (int i = 0; i < selectItems.size(); i++) {
+                if ((function = (Function) CommonLib.castAs(((SelectExpressionItem) selectItems.get(i)).getExpression(), Function.class)) == null) {
+                    list.add(i);
+                }
+            }
+        }
+        return list;
     }
 
     //endregion
@@ -67,42 +119,22 @@ public class GroupByIterator implements RAIterator {
         List<SelectItem> origSelectItems = selectItems;
 
         if (useGroupByOutput) {
-            for (Map.Entry<String, List<String>> entry : groupByMap.entrySet()) {
+            for (Map.Entry<String, List<PrimitiveValue>> entry : groupByMap.entrySet()) {
                 String pv = entry.getKey();
 
-                for (String aggVal : entry.getValue())
-                    pv = pv + aggVal + "|";
+                PrimitiveValue key[] = commonLib.covertTupleToPrimitiveValue(pv.substring(0, pv.length()-1), keyColDef);
+                PrimitiveValue[] value = new PrimitiveValue[entry.getValue().size()] ;
 
-                pv = pv.substring(0, pv.length() - 1);
-
-                String key = entry.getKey();
-
-                String[] primitiveValues = pv.split("\\|");
-
-                PrimitiveValue[] primitiveValueWrappers = new PrimitiveValue[origSelectItems.size()];
-
-                int primitiveValuesLength = primitiveValues.length;
-
-                if (hasAvg)
-                    primitiveValuesLength--;
-
-                for (int i = 0; i < primitiveValuesLength; i++) {
-                    if (i == primitiveValuesLength - 1 && hasAvg) {
-                        double sum = Double.parseDouble(primitiveValues[i]);
-                        double count = Double.parseDouble(primitiveValues[i + 1]);
-
-                        double avg = sum / count;
-
-                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(avg+"", "DECIMAL");
-
-                    } else {
-                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(primitiveValues[i], this.schema[i].getColumnDefinition().getColDataType().getDataType());
-                    }
+                for(int i = 0 ; i < value.length ; i++){
+                    value[i] = entry.getValue().get(i) ;
                 }
 
-                groupByMap.remove(key);
+                PrimitiveValue[] combineTuple = createTupleFromKeyVal(key, value) ;
 
-                return primitiveValueWrappers;
+
+                groupByMap.remove(pv);
+                useGroupByOutput = true;
+                return combineTuple;
             }
         }
 
@@ -117,7 +149,6 @@ public class GroupByIterator implements RAIterator {
 
             // selectItems = addGroupByColsToSelectItem(groupByColumnReferences, selectItems);
 
-            List<String> aggTypeOfSelectItems = getAggTypeOfSelectItems(origSelectItems);
 
             while (child.hasNext()) {
 
@@ -130,60 +161,37 @@ public class GroupByIterator implements RAIterator {
                 List<PrimitiveValue> projectedTuple = Arrays.asList(tuple);
 
                 String groupByCols = "";
-                for (int index = 0; index < groupByColumnReferences.size(); index++)
+                for (Integer index : indexOfNonGroupByCols)
                     groupByCols = groupByCols + projectedTuple.get(index).toRawString() + "|";
-                    //groupByCols = groupByCols + projectedTuple.get(index);
 
 
                 List<String> aggPrimitiveValues = new ArrayList<String>();
 
-                for (int index = groupByColumnReferences.size(); index < projectedTuple.size(); index++)
+                for (Integer index : indexOfGroupByCols)
                     aggPrimitiveValues.add(projectedTuple.get(index).toRawString());
 
-                groupByAccumulator(aggPrimitiveValues, aggTypeOfSelectItems, groupByCols);
+                groupByAccumulator(tuple, aggTypeOfSelectItems, indexOfNonGroupByCols, groupByCols);
 
                 tuple = null; // current tuple has been processed.
             }
 
             // Emits a row from Group By Map
 
-            for (Map.Entry<String, List<String>> entry : groupByMap.entrySet()) {
+            for (Map.Entry<String, List<PrimitiveValue>> entry : groupByMap.entrySet()) {
                 String pv = entry.getKey();
 
-                for (String aggVal : entry.getValue())
-                    pv = pv + aggVal + "|";
-
-                pv = pv.substring(0, pv.length() - 1);
-
-                String key = entry.getKey();
-
-                String[] primitiveValues = pv.split("\\|");
-
-                PrimitiveValue[] primitiveValueWrappers = new PrimitiveValue[origSelectItems.size()];
-
-                int primitiveValuesLength = primitiveValues.length;
-
-                if (aggTypeOfSelectItems.contains("avg") || aggTypeOfSelectItems.contains("AVG"))
-                    primitiveValuesLength--;
-
-                for (int i = 0; i < primitiveValuesLength; i++) {
-                    if (i == primitiveValuesLength - 1 && (aggTypeOfSelectItems.contains("avg") || aggTypeOfSelectItems.contains("AVG"))) { // TODO: Checks AVG only at last index in SelectItems
-                        double sum = Double.parseDouble(primitiveValues[i]);
-                        double count = Double.parseDouble(primitiveValues[i + 1]);
-
-                        double avg = sum / count;
-
-                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(avg+"", "DECIMAL");
-                    } else {
-
-                        primitiveValueWrappers[i] =
-                                commonLibInstance.convertToPrimitiveValue(primitiveValues[i], this.schema[i].getColumnDefinition().getColDataType().getDataType());
-                    }
+                PrimitiveValue key[] = commonLib.covertTupleToPrimitiveValue(pv.substring(0, pv.length()-1), keyColDef);
+                PrimitiveValue[] value = new PrimitiveValue[entry.getValue().size()] ;
+                for(int i = 0 ; i < value.length ; i++){
+                    value[i] = entry.getValue().get(i) ;
                 }
 
-                groupByMap.remove(key);
+                PrimitiveValue[] combineTuple = createTupleFromKeyVal(key, value) ;
+
+
+                groupByMap.remove(pv);
                 useGroupByOutput = true;
-                return primitiveValueWrappers;
+                return combineTuple;
             }
 
         } else { // Process group by without Aggregates
@@ -195,55 +203,85 @@ public class GroupByIterator implements RAIterator {
 
     }
 
-    private void groupByAccumulator(List<String> aggPrimitiveValues, List<String> aggType, String groupByCols) {
+    private PrimitiveValue[] createTupleFromKeyVal(PrimitiveValue[] key, PrimitiveValue[] value) throws PrimitiveValue.InvalidPrimitive {
+        PrimitiveValue[] newTuple = new PrimitiveValue[schema.length] ;
 
-        List<String> currentValues;
-        List<String> newValues = new ArrayList<String>();
+        for(int i = 0 ; i < key.length ; i++){
+            newTuple[indexOfNonGroupByCols.get(i)] = key[i] ;
+        }
+        int k = 0 ;
+        for(int j = 0; j < aggTypeOfSelectItems.size() ; j++){
+            if(aggTypeOfSelectItems.get(j).toLowerCase().equals("avg")){
+                double count = value[j].toDouble() ;
+                j++ ;
+                double sum = value[j].toDouble() ;
+                double avg = sum/count ;
+                newTuple[indexOfGroupByCols.get(k)] = new DoubleValue(avg);
+            }
+            else{
+                newTuple[indexOfGroupByCols.get(k)] = value[k] ;
+            }
+            k++ ;
+        }
+        return newTuple ;
+    }
+
+    private void groupByAccumulator(PrimitiveValue[] tuple, List<String> aggType, List<Integer> indexOfNonGroupByCols, String groupByCols) throws PrimitiveValue.InvalidPrimitive {
+
+        List<PrimitiveValue> currentValues;
+        List<PrimitiveValue> newValues = new ArrayList<PrimitiveValue>();
+
         if (groupByMap.containsKey(groupByCols)) {
             currentValues = groupByMap.get(groupByCols);
 
             String values = "";
-            for (int index = 0; index < aggType.size(); index++) {
+            for (int index = 0; index < currentValues.size(); index++) {
 
-                String temp = "";
                 if (aggType.get(index).toLowerCase().equals("count")) {
-                    temp = Double.parseDouble(currentValues.get(index)) + 1 + ""; //aggPrimitiveValues.get(index);
+
+                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + 1));
                 } else if (aggType.get(index).toLowerCase().equals("sum")) {
-                    temp = Double.parseDouble(currentValues.get(index)) + Double.parseDouble(aggPrimitiveValues.get(index)) + "";
+                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(index)].toDouble()));
                 } else if (aggType.get(index).toLowerCase().equals("min")) {
-                    temp = Math.min(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
+                    double first = currentValues.get(index).toDouble();
+                    double second = tuple[indexOfGroupByCols.get(index)].toDouble();
+                    newValues.add(new DoubleValue(Math.min(first, second)));
                 } else if (aggType.get(index).toLowerCase().equals("max")) {
-                    temp = Math.max(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
+                    double first = currentValues.get(index).toDouble();
+                    double second = tuple[indexOfGroupByCols.get(index)].toDouble();
+                    newValues.add(new DoubleValue(Math.max(first, second)));
                 } else if (aggType.get(index).toLowerCase().equals("avg")) {
                     hasAvg = true;
-                    String[] tmp = currentValues.get(index).split("\\|");
-                    int count = Integer.parseInt(tmp[1]) + 1;
-                    double sum = Double.parseDouble(tmp[0]) + Double.parseDouble(aggPrimitiveValues.get(index));
-                    temp = sum + "|" + count;
+                    PrimitiveValue count = new DoubleValue(currentValues.get(index).toDouble() + 1);
+                    newValues.add(count);
+                    index++;
+                    PrimitiveValue sum = new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(index)].toDouble());
+                    newValues.add(sum);
                 }
-
-                newValues.add(temp);
             }
             groupByMap.put(groupByCols, newValues);
         } else {
             for (int index = 0; index < aggType.size(); index++) {
-                String temp = "";
+                PrimitiveValue temp;
                 if (aggType.get(index).toLowerCase().equals("count")) {
-                    temp = 1 + ""; //aggPrimitiveValues.get(index);
+                    temp = new DoubleValue(1);
+                    newValues.add(temp);
                 } else if (aggType.get(index).toLowerCase().equals("sum")) {
-                    temp = aggPrimitiveValues.get(index);
+                    temp = tuple[indexOfGroupByCols.get(index)];
+                    newValues.add(temp);
                 } else if (aggType.get(index).toLowerCase().equals("min")) {
-                    temp = aggPrimitiveValues.get(index);
+                    temp = tuple[indexOfGroupByCols.get(index)];
+                    newValues.add(temp);
                 } else if (aggType.get(index).toLowerCase().equals("max")) {
-                    temp = aggPrimitiveValues.get(index);
+                    temp = tuple[indexOfGroupByCols.get(index)];
+                    newValues.add(temp);
                 } else if (aggType.get(index).toLowerCase().equals("avg")) {
                     hasAvg = true;
-                    int count = 1;
-                    String sum = aggPrimitiveValues.get(index);
-                    temp = sum + "|" + count;
+                    PrimitiveValue count = new DoubleValue(1);
+                    PrimitiveValue sum = tuple[indexOfGroupByCols.get(index)];
+                    newValues.add(count);
+                    newValues.add(sum);
                 }
-
-                newValues.add(temp);
             }
             groupByMap.put(groupByCols, newValues);
         }
@@ -252,7 +290,7 @@ public class GroupByIterator implements RAIterator {
     private List<String> getAggTypeOfSelectItems(List<SelectItem> selectItems) {
         List<String> list = new ArrayList<String>();
 
-        for (int index = groupByColumnReferences.size(); index < selectItems.size(); index++) {
+        for (int index = 0; index < selectItems.size(); index++) {
 
             Function function = null;
             if ((function = (Function) CommonLib.castAs(((SelectExpressionItem) selectItems.get(index)).getExpression(), Function.class)) != null)
@@ -368,22 +406,21 @@ public class GroupByIterator implements RAIterator {
 
     @Override
     public void setChild(RAIterator child) {
-        this.child = child ;
+        this.child = child;
     }
 
     @Override
     public Schema[] getSchema() {
-        return this.schema ;
+        return this.schema;
     }
 
     @Override
     public void setSchema(Schema[] schema) {
-        this.schema = schema ;
+        this.schema = schema;
     }
 
     @Override
-    public RAIterator optimize(RAIterator iterator)
-    {
+    public RAIterator optimize(RAIterator iterator) {
         RAIterator child = iterator.getChild();
         child = child.optimize(child);
         iterator.setChild(child);
