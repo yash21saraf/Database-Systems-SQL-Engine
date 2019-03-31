@@ -113,16 +113,16 @@ public class FilterIterator implements RAIterator
          if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.getChild(), MapIterator.class)) != null) {
             try {
                iterator = new MapIterator(
-                     new FilterIterator(
-                           mapIterator.getChild(),
-                           filterIterator.getExpression()
-                     ),
-                     mapIterator.getSelectItems(),
-                     mapIterator.getTableAlias()
+                       new FilterIterator(
+                               mapIterator.getChild(),
+                               filterIterator.getExpression()
+                       ),
+                       mapIterator.getSelectItems(),
+                       mapIterator.getTableAlias()
                );
-               System.out.println("Selection pushed into projection successfully.");
+               //System.out.println("Selection pushed into projection successfully.");
             } catch (Exception e) {
-               System.out.println("Error pushing selection into projection. Stacktrace: ");
+               //System.out.println("Error pushing selection into projection. Stacktrace: ");
                e.printStackTrace();
             }
          } else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(),JoinIterator.class)) != null) {
@@ -132,6 +132,7 @@ public class FilterIterator implements RAIterator
             Expression onExpression = joinIterator.getOnExpression();
             RAIterator leftChild = joinIterator.getChild();
             RAIterator rightChild = joinIterator.getRightChild();
+            Expression remainingExpression = null ;
 
             for (Expression expressionItem : expressionList) {
                if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
@@ -142,28 +143,58 @@ public class FilterIterator implements RAIterator
                         onExpression = equalsTo;
                      }
                   }
-               } else {
-                  if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                  else if ((commonLib.validateExpressionAgainstSchema(equalsTo.getLeftExpression(),rightSchema)) && commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),leftSchema)) {
+                     if (onExpression != null) {
+                        onExpression = new AndExpression(onExpression,equalsTo);
+                     } else {
+                        onExpression = equalsTo;
+                     }
+                  }
+                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
                      leftChild = new FilterIterator(leftChild,expressionItem);
                   }
-                  if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
                      rightChild = new FilterIterator(rightChild,expressionItem);
                   }
                }
+               else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                  leftChild = new FilterIterator(leftChild,expressionItem);
+               }
+
+               else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                  rightChild = new FilterIterator(rightChild,expressionItem);
+               }
+               else{
+                  if (remainingExpression != null) {
+                     remainingExpression = new AndExpression(remainingExpression,expressionItem);
+                  } else {
+                     remainingExpression = expressionItem;
+                  }
+               }
             }
+
             iterator = new JoinIterator(leftChild,rightChild,onExpression);
+
+            if(remainingExpression != null){
+               RAIterator child = iterator.getChild();
+               child = child.optimize(child);
+               iterator.setChild(child);
+               RAIterator newIterator = new FilterIterator(iterator, remainingExpression) ;
+               return newIterator ;
+            }
+
 
          } else if ((childFilterIterator = (FilterIterator) CommonLib.castAs(filterIterator.getChild(),FilterIterator.class)) != null) {
             iterator = new FilterIterator(childFilterIterator.getChild(),new AndExpression(filterIterator.getExpression(),childFilterIterator.getExpression()));
             iterator = iterator.optimize(iterator);
          } else if ((orderByIterator = (OrderByIterator) CommonLib.castAs(filterIterator.getChild(),OrderByIterator.class)) != null) {
             iterator = new OrderByIterator(
-                  new FilterIterator(
-                        orderByIterator.getChild(),
-                        filterIterator.getExpression()
-                  ),
-                  orderByIterator.getOrderByElementsList(),
-                  orderByIterator.getPlainSelect()
+                    new FilterIterator(
+                            orderByIterator.getChild(),
+                            filterIterator.getExpression()
+                    ),
+                    orderByIterator.getOrderByElementsList(),
+                    orderByIterator.getPlainSelect()
             );
          }
       }

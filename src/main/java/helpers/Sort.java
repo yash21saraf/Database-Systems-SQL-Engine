@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
+import static builders.IteratorBuilder.tableAliasToTableName;
+
 public class Sort {
 
     private List<Column> allColumns;
@@ -277,7 +279,11 @@ public class Sort {
                 sortKeyColumns.add(schemas[i].getColumnDefinition().getColumnName());
 
                 if (fileName.equals("")) {
-                    fileName = schemas[i].getTableName();
+                    if(tableAliasToTableName.containsKey(schemas[i].getTableName())){
+                        fileName = tableAliasToTableName.get(schemas[i].getTableName());
+                    }else{
+                        fileName = schemas[i].getTableName();
+                    }
                 }
             }
         }

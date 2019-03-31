@@ -26,6 +26,7 @@ public class Main {
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
+        String q3 = "CREATE TABLE T(g int NOT NULL, h int, i int)";
 //        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
 //        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
@@ -45,7 +46,7 @@ public class Main {
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
 //        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
 //        String q3 = "select * from R, S where R.c = S.f";
-        String q3 = "select a,c,d,f from R, S where R.a = S.d order by a desc, b";
+        String q4 = "select RA.a , SA.d , SA.f, TA.i from R as RA, S as SA, T as TA where RA.a = SA.d and SA.f = TA.i";
 
 
         for (int j = 0; j < args.length; j++) {
@@ -55,13 +56,13 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3};
+        String q[] = {q1, q2, q3, q4};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while (i < 3) {
+        while (i < q.length) {
             StringReader input = new StringReader(q[i].toLowerCase());
             CCJSqlParser parser = new CCJSqlParser(input);
             Statement query = parser.Statement();
@@ -109,6 +110,8 @@ public class Main {
             } catch (Exception e) {
                 val = value;
             }
+        }else{
+            System.out.print(value);
         }
         System.out.print(val);
     }

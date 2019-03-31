@@ -8,8 +8,11 @@ import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static builders.IteratorBuilder.tableAliasToTableName;
 import static helpers.CommonLib.listOfSortedFiles;
 import static helpers.CommonLib.mapOfSortedFileObjects;
 
@@ -19,6 +22,8 @@ public class JoinIterator implements RAIterator {
 
     Sort leftSort;
     Sort rightSort;
+
+    private boolean mergeSortJoin = true;
 
 
     //private static final Logger logger = LogManager.getLogger();
@@ -31,7 +36,7 @@ public class JoinIterator implements RAIterator {
     private PrimitiveValue[] rightTuple;
     private Schema[] schema;
     private boolean noRowFound = false;
-    private boolean mergeSortJoin = true;
+
     private boolean sorted = false;
     //endregion
 
@@ -74,8 +79,8 @@ public class JoinIterator implements RAIterator {
 
             if (mergeSortJoin && onExpression != null) {
                 if (!sorted)
-                    SortFiles();
-                PrimitiveValue[] mergedTuple = getNext(leftSort, rightSort);
+                    SortFiles(leftChild, rightChild, onExpression);
+                PrimitiveValue[] mergedTuple = getNext(leftChild, rightChild);
                 if (mergedTuple == null)
                     noRowFound = true;
                 return mergedTuple;
@@ -109,8 +114,82 @@ public class JoinIterator implements RAIterator {
         }
     }
 
-    private void SortFiles() throws Exception {
+
+    private PrimitiveValue[] getNext(RAIterator leftChild, RAIterator rightChild) throws Exception { // TODO: need to do key grouping
+
+        if (!(leftChild instanceof JoinIterator) && !(rightChild instanceof JoinIterator)) {
+            return getNextFromTwoSort(leftChild, rightChild);
+
+        } else if ((leftChild instanceof JoinIterator) && !(rightChild instanceof JoinIterator)) {
+            PrimitiveValue[] tuple = getNext(((JoinIterator) leftChild).leftChild, ((JoinIterator) leftChild).rightChild);
+
+            PrimitiveValue res[] = mergeAndReturnTuple(tuple, rightChild, leftChild.getSchema(), onExpression);
+
+        }
+
+        return null;
+
+    }
+
+    private PrimitiveValue[] mergeAndReturnTuple(PrimitiveValue[] tuple, RAIterator child, Schema[] tupleSchema) throws Exception {
+
+        Sort sort = getSort(child);
+
+        PrimitiveValue[] childTuple = sort.getTuple();
+
+        if (childTuple == null || tuple == null)
+            return null;
+
+
+        List<Integer> leftIndexList = sort.getIndexOfSortKey();
+
+        List<Integer> rightIndexList = sort.getIndexOfSortKey();
+
+        int leftIndex = sortIndexList.get(0);
+        int rightIndex = rightIndexList.get(0);
+
+
+    }
+
+    private PrimitiveValue[] mergeTuples(RAIterator next, RAIterator child) throws Exception {
+        Sort rightSort = null;
+        rightSort = getSort(child);
+
+        PrimitiveValue[] childTuple = rightSort.getTuple();
+        PrimitiveValue[] nextTuple = next.next();
+
+
+        return null;
+
+    }
+
+    private Sort getSort(RAIterator child) {
+        Schema[] schemas = child.getSchema();
+        for (Map.Entry<String, Sort> entry : mapOfSortedFileObjects.entrySet()) {
+            for (int i = 0; i < schemas.length; i++) {
+                String tablename = schemas[i].getTableName();
+                if (tableAliasToTableName.containsKey(tablename) || tableAliasToTableName.containsValue(tablename) || entry.getKey().equals(tablename)) { // TODO: validate the logic
+                    return mapOfSortedFileObjects.get(tablename);
+                }
+            }
+        }
+        return null;
+    }
+
+    private HashMap<String, Sort> SortFiles(RAIterator leftChild, RAIterator rightChild, Expression onExpression) throws Exception {
+
+        if (leftChild instanceof JoinIterator) {
+            SortFiles(((JoinIterator) leftChild).leftChild, ((JoinIterator) leftChild).rightChild, ((JoinIterator) leftChild).onExpression);
+            //leftChild = ((JoinIterator) leftChild).leftChild;
+        }
+
+        if (rightChild instanceof JoinIterator) {
+            SortFiles(((JoinIterator) rightChild).leftChild, ((JoinIterator) rightChild).rightChild, ((JoinIterator) rightChild).onExpression);
+            //rightChild = ((JoinIterator) rightChild).rightChild;
+        }
+
         List<Column> columnsList = commonLib.getColumnList(onExpression);
+        //HashMap<String, Sort> mapOfSortedFileObjects = new HashMap<String, Sort>();
 
         if (leftChild.hasNext() && rightChild.hasNext()) {
 
@@ -119,7 +198,7 @@ public class JoinIterator implements RAIterator {
 
             if (listOfSortedFiles.size() > 0) {
                 if (!listOfSortedFiles.contains(leftFileName)) {
-                    leftSort = new Sort(leftChild, columnsList, null,  null, true);
+                    leftSort = new Sort(leftChild, columnsList, null, null, (leftChild instanceof TableIterator));
                     leftSort.sort();
                     listOfSortedFiles.add(leftFileName.toLowerCase());
                     mapOfSortedFileObjects.put(leftFileName, leftSort);
@@ -128,7 +207,7 @@ public class JoinIterator implements RAIterator {
                     leftSort.reset();
                 }
                 if (!listOfSortedFiles.contains(rightFileName)) {
-                    rightSort = new Sort(rightChild, columnsList,null,  null, true);
+                    rightSort = new Sort(rightChild, columnsList, null, null, (leftChild instanceof TableIterator));
                     rightSort.sort();
                     listOfSortedFiles.add(rightFileName.toLowerCase());
                     mapOfSortedFileObjects.put(rightFileName, rightSort);
@@ -137,8 +216,8 @@ public class JoinIterator implements RAIterator {
                     rightSort.reset();
                 }
             } else {
-                leftSort = new Sort(leftChild, columnsList,null,  null, true);
-                rightSort = new Sort(rightChild, columnsList,null,  null, true);
+                leftSort = new Sort(leftChild, columnsList, null, null, (leftChild instanceof TableIterator));
+                rightSort = new Sort(rightChild, columnsList, null, null, (leftChild instanceof TableIterator));
 
                 leftSort.sort();
                 rightSort.sort();
@@ -152,6 +231,7 @@ public class JoinIterator implements RAIterator {
 
             sorted = true;
         }
+        return mapOfSortedFileObjects;
     }
 
     private String getFileName(RAIterator child) {
@@ -163,8 +243,13 @@ public class JoinIterator implements RAIterator {
         return "dummy";
     }
 
-    private PrimitiveValue[] getNext(Sort leftSort, Sort rightSort) throws Exception { // TODO: need to do key grouping
 
+    private PrimitiveValue[] getNextFromTwoSort(RAIterator leftChild, RAIterator rightChild) throws Exception {
+
+        Sort leftSort = null;
+        Sort rightSort = null;
+        leftSort = getSort(leftChild);
+        rightSort = getSort(rightChild);
         leftTuple = leftSort.getTuple();
         rightTuple = rightSort.getTuple();
 

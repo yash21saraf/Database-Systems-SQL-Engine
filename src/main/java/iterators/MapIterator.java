@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static builders.IteratorBuilder.tableAliasToTableName;
 import static helpers.CommonLib.castAs;
 
 public class MapIterator implements RAIterator

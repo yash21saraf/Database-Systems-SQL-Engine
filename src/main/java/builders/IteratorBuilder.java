@@ -30,6 +30,7 @@ public class IteratorBuilder {
 
     private Map<String, CreateTable> schemas = new HashMap();
     public static Map<String, Schema[]> iteratorSchemas= new HashMap();
+    public static Map<String, String> tableAliasToTableName= new HashMap();
 
     //endregion
 

@@ -8,6 +8,8 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.io.*;
 
+import static builders.IteratorBuilder.tableAliasToTableName;
+
 public class TableIterator implements RAIterator
 {
 
@@ -39,9 +41,11 @@ public class TableIterator implements RAIterator
       this.tableName = tableName;
       this.tableAlias = tableAlias;
 
-      if(this.tableAlias == null)
+      if(this.tableAlias == null) {
          this.schema = createSchema(columnDefinitions, tableName);
+      }
       else{
+         tableAliasToTableName.put(tableAlias, tableName);
          this.schema = createSchema(columnDefinitions,this.tableAlias);
          addOriginalSchema(columnDefinitions, tableName);
       }
