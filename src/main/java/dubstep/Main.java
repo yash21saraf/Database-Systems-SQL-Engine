@@ -17,8 +17,8 @@ import java.io.StringReader;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true;
-    static boolean debugEnabled = false;
+    public static boolean inMem = false;
+    static boolean debugEnabled = true;
 
     public static void main(String[] args) throws Exception
     {
@@ -30,6 +30,7 @@ public class Main {
 
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
+        String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
 //        String q3 = "select * from R UNION ALL select a from R";
 //        String q3 = "select A.a,b,c from R as A";
 //        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
@@ -47,8 +48,10 @@ public class Main {
 //        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
 //        String q3 = "select a, b, c from R order by a asc";
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
-        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
-
+//        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
+//        String q4 = "select a, b from R group by a";
+        String q4 = "select r.a, s.d from R,S where r.a = s.d ";
+//        String q4 = "select a,b,c,s.d from r,s,t where s.d < 7 and r.a = t.d and r.b = s.e";
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
@@ -56,13 +59,13 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3};
+        String q[] = {q1, q2, q3, q4};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while (i < 3) {
+        while (i < 4) {
             StringReader input = new StringReader(q[i].toLowerCase());
             CCJSqlParser parser = new CCJSqlParser(input);
             Statement query = parser.Statement();

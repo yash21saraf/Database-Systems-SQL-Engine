@@ -16,7 +16,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/";
+   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
 //   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
@@ -28,6 +28,7 @@ public class TableIterator implements RAIterator
    private Schema[] schema ;
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
+
 
    //endregion
 

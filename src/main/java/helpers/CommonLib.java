@@ -350,6 +350,21 @@ public class CommonLib
 
    }
 
+   public List<Integer> ColToSchemaIndexes(List<Column> ColoumList, Schema[] schemas) {
+      List<Integer> ColIndexes = new ArrayList<Integer>() ;
+      boolean flag = false;
+      for (Column column : ColoumList) {
+         for (int i = 0 ; i < schemas.length ; i++) {
+            if (schemas[i].getWholeColumnName().equals(column.getWholeColumnName())) {
+               ColIndexes.add(i) ;
+            } else if (schemas[i].getColumnDefinition().getColumnName().equals(column.getWholeColumnName())) {
+               ColIndexes.add(i) ;
+            }
+         }
+      }
+      return ColIndexes;
+   }
+
    //endregion
 
    //region Helper methods
@@ -374,6 +389,14 @@ public class CommonLib
          offset += array.length;
       }
       return result;
+   }
+
+   public boolean memoryPending(){
+      long freemem = Runtime.getRuntime().freeMemory();
+      if(freemem - 75000000 > 0){
+         return true ;
+      }
+      return  false ;
    }
 
    //endregion

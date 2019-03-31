@@ -12,6 +12,7 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import org.apache.logging.log4j.Logger;*/
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 public class FilterIterator implements RAIterator
@@ -99,6 +100,10 @@ public class FilterIterator implements RAIterator
       return expression;
    }
 
+   public void setExpression(Expression expression){
+      this.expression = expression ;
+   }
+
    @Override
    public RAIterator optimize(RAIterator iterator)
    {
@@ -132,6 +137,7 @@ public class FilterIterator implements RAIterator
             Expression onExpression = joinIterator.getOnExpression();
             RAIterator leftChild = joinIterator.getChild();
             RAIterator rightChild = joinIterator.getRightChild();
+            Expression remainingExpression = null ;
 
             for (Expression expressionItem : expressionList) {
                if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
@@ -142,16 +148,46 @@ public class FilterIterator implements RAIterator
                         onExpression = equalsTo;
                      }
                   }
-               } else {
-                  if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
-                     leftChild = new FilterIterator(leftChild,expressionItem);
+                  else if ((commonLib.validateExpressionAgainstSchema(equalsTo.getLeftExpression(),rightSchema)) && commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),leftSchema)) {
+                     if (onExpression != null) {
+                        onExpression = new AndExpression(onExpression,equalsTo);
+                     } else {
+                        onExpression = equalsTo;
+                     }
                   }
-                  if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                      leftChild = new FilterIterator(leftChild,expressionItem);
+                  }
+                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                      rightChild = new FilterIterator(rightChild,expressionItem);
+                  }
+               }
+               else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                     leftChild = new FilterIterator(leftChild,expressionItem);
+               }
+
+               else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
                      rightChild = new FilterIterator(rightChild,expressionItem);
+               }
+               else{
+                  if (remainingExpression != null) {
+                     remainingExpression = new AndExpression(remainingExpression,expressionItem);
+                  } else {
+                     remainingExpression = expressionItem;
                   }
                }
             }
+
             iterator = new JoinIterator(leftChild,rightChild,onExpression);
+
+            if(remainingExpression != null){
+               RAIterator child = iterator.getChild();
+               child = child.optimize(child);
+               iterator.setChild(child);
+               RAIterator newIterator = new FilterIterator(iterator, remainingExpression) ;
+               return newIterator ;
+            }
+
 
          } else if ((childFilterIterator = (FilterIterator) CommonLib.castAs(filterIterator.getChild(),FilterIterator.class)) != null) {
             iterator = new FilterIterator(childFilterIterator.getChild(),new AndExpression(filterIterator.getExpression(),childFilterIterator.getExpression()));

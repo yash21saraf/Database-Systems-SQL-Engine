@@ -250,80 +250,84 @@ public class OrderByIterator implements RAIterator {
             int rowCount = 0;
             List<String> listOfSortedFiles = new ArrayList<String>();
             while (child.hasNext()) {
-                sortedList.add(Arrays.asList(child.next()));
-                rowCount++;
+                PrimitiveValue[] tupleCheck = child.next() ;
+                if(tupleCheck != null ){
+                    sortedList.add(Arrays.asList(tupleCheck));
+                    rowCount++;
 
-                if (rowCount >= blockSize || !child.hasNext()) {
+                    if (rowCount >= blockSize || !child.hasNext()) {
 
-                    Collections.sort(sortedList, new Comparator<List<PrimitiveValue>>() {
-                        @Override
-                        public int compare(List<PrimitiveValue> first, List<PrimitiveValue> second) {
+                        Collections.sort(sortedList, new Comparator<List<PrimitiveValue>>() {
+                            @Override
+                            public int compare(List<PrimitiveValue> first, List<PrimitiveValue> second) {
 
-                            int i = 0;
+                                int i = 0;
 
-                            for (Integer index : indexOfOrderByElements) {
-                                String primitiveValue1 = first.get(index).toRawString();
-                                String primitiveValue2 = second.get(index).toRawString();
+                                for (Integer index : indexOfOrderByElements) {
+                                    String primitiveValue1 = first.get(index).toRawString();
+                                    String primitiveValue2 = second.get(index).toRawString();
 
 
-                                if (isNumber(primitiveValue1)) {
+                                    if (isNumber(primitiveValue1)) {
 
-                                    double pv1 = Double.parseDouble(primitiveValue1);
-                                    double pv2 = Double.parseDouble(primitiveValue2);
+                                        double pv1 = Double.parseDouble(primitiveValue1);
+                                        double pv2 = Double.parseDouble(primitiveValue2);
 
-                                    if (orderOfOrderByElements.get(i++)) {
+                                        if (orderOfOrderByElements.get(i++)) {
 
-                                        if (pv1 < pv2)
-                                            return -1;
-                                        else if (pv1 > pv2)
-                                            return 1;
-                                        else {
-                                            continue;
+                                            if (pv1 < pv2)
+                                                return -1;
+                                            else if (pv1 > pv2)
+                                                return 1;
+                                            else {
+                                                continue;
+                                            }
+
+                                        } else {
+
+                                            if (pv1 < pv2)
+                                                return 1;
+                                            else if (pv1 > pv2)
+                                                return -1;
+                                            else {
+                                                continue;
+                                            }
                                         }
 
                                     } else {
 
-                                        if (pv1 < pv2)
-                                            return 1;
-                                        else if (pv1 > pv2)
-                                            return -1;
-                                        else {
-                                            continue;
+
+                                        if (orderOfOrderByElements.get(i++)) {
+
+                                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                                return primitiveValue1.compareTo(primitiveValue2);
+                                            else {
+                                                continue;
+                                            }
+
+                                        } else {
+
+                                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
+                                                return -1 * primitiveValue1.compareTo(primitiveValue2);
+                                            else {
+                                                continue;
+                                            }
                                         }
                                     }
 
-                                } else {
-
-
-                                    if (orderOfOrderByElements.get(i++)) {
-
-                                        if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                            return primitiveValue1.compareTo(primitiveValue2);
-                                        else {
-                                            continue;
-                                        }
-
-                                    } else {
-
-                                        if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                            return -1 * primitiveValue1.compareTo(primitiveValue2);
-                                        else {
-                                            continue;
-                                        }
-                                    }
                                 }
-
+                                return 1;
                             }
-                            return 1;
-                        }
-                    });
+                        });
 
-                    String file = "SORTED_FILE_" + commonLib.getsortFileSeqNumber();
-                    writeDataDisk(file);
-                    listOfSortedFiles.add(file);
-                    sortedList.clear();
-                    rowCount = 0;
+                        String file = "SORTED_FILE_" + commonLib.getsortFileSeqNumber();
+                        writeDataDisk(file);
+                        listOfSortedFiles.add(file);
+                        sortedList.clear();
+                        rowCount = 0;
+                    }
                 }
+
             }
 
 
