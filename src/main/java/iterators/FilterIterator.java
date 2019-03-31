@@ -141,7 +141,19 @@ public class FilterIterator implements RAIterator
 
             for (Expression expressionItem : expressionList) {
                if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
-                  if ((commonLib.validateExpressionAgainstSchema(equalsTo.getLeftExpression(),leftSchema)) && commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),rightSchema)) {
+                  if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                     leftChild = new FilterIterator(leftChild,expressionItem);
+                     if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                        rightChild = new FilterIterator(rightChild,expressionItem);
+                     }
+                  }
+                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
+                     rightChild = new FilterIterator(rightChild,expressionItem);
+                     if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
+                        leftChild = new FilterIterator(leftChild, expressionItem);
+                     }
+                  }
+                  else if ((commonLib.validateExpressionAgainstSchema(equalsTo.getLeftExpression(),leftSchema)) && commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),rightSchema)) {
                      if (onExpression != null) {
                         onExpression = new AndExpression(onExpression,equalsTo);
                      } else {
@@ -154,12 +166,6 @@ public class FilterIterator implements RAIterator
                      } else {
                         onExpression = equalsTo;
                      }
-                  }
-                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
-                      leftChild = new FilterIterator(leftChild,expressionItem);
-                  }
-                  else if (commonLib.validateExpressionAgainstSchema(expressionItem,rightSchema)) {
-                      rightChild = new FilterIterator(rightChild,expressionItem);
                   }
                }
                else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {

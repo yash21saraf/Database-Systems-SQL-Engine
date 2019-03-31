@@ -55,7 +55,7 @@ public class LimitIterator implements RAIterator {
 
     @Override
     public RAIterator getChild() {
-        return null;
+        return this.child;
     }
 
     @Override

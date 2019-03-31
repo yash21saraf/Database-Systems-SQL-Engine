@@ -48,9 +48,9 @@ public class TableIterator implements RAIterator
       }
 
       try {
-         File file = new File(TABLE_DIRECTORY + tableName + ".csv") ;
+         File file = new File(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat") ;
 //         System.out.println("FILE LENGTH: " + file.length());
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat"));
 
 
       } catch (FileNotFoundException e) {
@@ -138,7 +138,7 @@ public class TableIterator implements RAIterator
       currentLine = null;
       try {
          br.close();
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + ".csv"));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat"));
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);

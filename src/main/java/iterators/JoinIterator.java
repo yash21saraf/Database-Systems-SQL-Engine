@@ -246,10 +246,10 @@ public class JoinIterator implements RAIterator
                    }
 
                    if (equalsTo.getLeftExpression() instanceof Column){
-                      rightColList.add((Column) equalsTo.getRightExpression()) ;
+                      rightColList.add((Column) equalsTo.getLeftExpression()) ;
                    }
                    else if (equalsTo.getLeftExpression() instanceof Expression){
-                      rightColList.addAll(commonLib.getColumnList(equalsTo.getRightExpression())) ;
+                      rightColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
                    }
 
                    rightExpList.add(equalsTo.getLeftExpression()) ;
@@ -387,7 +387,7 @@ public class JoinIterator implements RAIterator
                      updatedList.add(leftTuple);
                      leftBucket.put(leftKey, updatedList);
 
-                     if(leftBucketSize == 100) break ;leftBucketSize++ ;
+                     if(leftBucketSize == 1000000000) break ;leftBucketSize++ ;
 
                   }
             }

@@ -17,7 +17,7 @@ import java.io.StringReader;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false;
+    public static boolean inMem = true;
     static boolean debugEnabled = true;
 
     public static void main(String[] args) throws Exception
@@ -28,31 +28,99 @@ public class Main {
 
 */
 
-        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
-        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
-        String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
-//        String q3 = "select * from R UNION ALL select a from R";
-//        String q3 = "select A.a,b,c from R as A";
-//        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
-//        String q3 = "select R.a, R.b "|"from R,S as TT where R.a = 11";
-//        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
-//        String q3 = "select a,b,* from R";
-//        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
-//        String q3 = "select c, d, sum(a+b) from R, S where c != 9 group by c, d having sum(a+b) <> 35 order by c desc";
-//        String q3 = "select a, a+b from R,S" ;
-//        String q3 = "select * from r where a = (select a from s where c>5)" ; //TODO: Manage in expressions, Manage subqueries in where clause
-//        String q3 = "select a from r, (select d from s where e>7)";
-//        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
-//        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
-//        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
-//        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
-//        String q3 = "select a, b, c from R order by a asc";
-//        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
-//        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
-//        String q4 = "select a, b from R group by a";
-//        String q4 = "select r.a, s.d , t.d from R,S,T where r.a = s.d and r.a = t.d ";
-        String q4 = "select RA.a, RB.c, SA.d from R as RA, S as SA, R as RB where RA.a = RB.a and SA.d = RB.a" ;
+//        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
+//        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
+//        String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
+////        String q3 = "select * from R UNION ALL select a from R";
+////        String q3 = "select A.a,b,c from R as A";
+////        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
+////        String q3 = "select R.a, R.b "|"from R,S as TT where R.a = 11";
+////        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
+////        String q3 = "select a,b,* from R";
+////        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
+////        String q3 = "select c, d, sum(a+b) from R, S where c != 9 group by c, d having sum(a+b) <> 35 order by c desc";
+////        String q3 = "select a, a+b from R,S" ;
+////        String q3 = "select * from r where a = (select a from s where c>5)" ; //TODO: Manage in expressions, Manage subqueries in where clause
+////        String q3 = "select a from r, (select d from s where e>7)";
+////        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
+////        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
+////        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
+////        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
+////        String q3 = "select a, b, c from R order by a asc";
+////        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
+////        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
+////        String q4 = "select a, b from R group by a";
+////        String q4 = "select r.a, s.d , t.d from R,S,T where r.a = s.d and r.a = t.d ";
+//        String q4 = "select RA.a, RB.c, SA.d from R as RA, S as SA, R as RB, T where RA.a = RB.a and SA.d = RB.a and RA.a < T.d" ;
 //        String q4 = "select a,b,c,s.d from r,s,t where s.d < 7 and r.a = t.d and r.b = s.e";
+
+        String q1 = "CREATE TABLE LINEITEM(ORDERKEY INT,PARTKEY INT,SUPPKEY INT,LINENUMBER INT,QUANTITY DECIMAL,EXTENDEDPRICE DECIMAL,DISCOUNT DECIMAL,TAX DECIMAL,RETURNFLAG CHAR(1),LINESTATUS CHAR(1),SHIPDATE DATE,COMMITDATE DATE,RECEIPTDATE DATE,SHIPINSTRUCT CHAR(25),SHIPMODE CHAR(10),COMMENT VARCHAR(44),PRIMARY KEY (ORDERKEY,LINENUMBER));";
+        String q2 = "CREATE TABLE ORDERS(ORDERKEY INT,CUSTKEY INT,ORDERSTATUS CHAR(1),TOTALPRICE DECIMAL,ORDERDATE DATE,ORDERPRIORITY CHAR(15),CLERK CHAR(15),SHIPPRIORITY INT,COMMENT VARCHAR(79),PRIMARY KEY (ORDERKEY));" ;
+        String q3 = "CREATE TABLE PART(PARTKEY INT,NAME VARCHAR(55),MFGR CHAR(25),BRAND CHAR(10),TYPE VARCHAR(25),SIZE INT,CONTAINER CHAR(10),RETAILPRICE DECIMAL,COMMENT VARCHAR(23),PRIMARY KEY (PARTKEY));";
+        String q4 = "CREATE TABLE CUSTOMER(CUSTKEY INT,NAME VARCHAR(25),ADDRESS VARCHAR(40),NATIONKEY INT,PHONE CHAR(15),ACCTBAL DECIMAL,MKTSEGMENT CHAR(10),COMMENT VARCHAR(117),PRIMARY KEY (CUSTKEY));" ;
+        String q5 =  "CREATE TABLE SUPPLIER(SUPPKEY INT,NAME CHAR(25),ADDRESS VARCHAR(40),NATIONKEY INT,PHONE CHAR(15),ACCTBAL DECIMAL,COMMENT VARCHAR(101),PRIMARY KEY (SUPPKEY));" ;
+        String q6 = "CREATE TABLE PARTSUPP(PARTKEY INT,SUPPKEY INT,AVAILQTY INT,SUPPLYCOST DECIMAL,COMMENT VARCHAR(199),PRIMARY KEY (PARTKEY,SUPPKEY));" ;
+        String q7 = "CREATE TABLE NATION(NATIONKEY INT,NAME CHAR(25),REGIONKEY INT,COMMENT VARCHAR(152),PRIMARY KEY (NATIONKEY));";
+        String q8 = " CREATE TABLE REGION(REGIONKEY INT,NAME CHAR(25),COMMENT VARCHAR(152),PRIMARY KEY (REGIONKEY));" ;
+//        String q9 = "SELECT\n" +
+//                "  LINEITEM.ORDERKEY,\n" +
+//                "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+//                "  ORDERS.ORDERDATE,\n" +
+//                "  ORDERS.SHIPPRIORITY\n" +
+//                "FROM\n" +
+//                "  CUSTOMER,\n" +
+//                "  ORDERS,\n" +
+//                "  LINEITEM \n" +
+//                "WHERE\n" +
+//                "  CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+//                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+//                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
+//                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26')\n" +
+//                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+//                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+//                "LIMIT 10;";
+        String q9 = "SELECT\n" +
+                "  LINEITEM.ORDERKEY,\n" +
+                "  ORDERS.ORDERDATE,\n" +
+                "  ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "  CUSTOMER,\n" +
+                "  ORDERS,\n" +
+                "  LINEITEM \n" +
+                "WHERE\n" +
+                "  CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
+                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
+//
+//        String q9 = "SELECT\n" +
+//                "  LINEITEM.ORDERKEY,\n" +
+//                "  ORDERS.ORDERDATE,\n" +
+//                "  ORDERS.SHIPPRIORITY\n" +
+//                "FROM\n" +
+//                "  ORDERS,\n" +
+//                "  LINEITEM \n" +
+//                "WHERE\n" +
+//                "  LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+//                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
+//                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
+        String q10 = "SELECT\n" +
+                "  NATION.NAME,\n" +
+                "  SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
+                "FROM\n" +
+                "  REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
+                "WHERE\n" +
+                "  CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
+                "  AND LINEITEM.SUPPKEY = SUPPLIER.SUPPKEY\n" +
+                "  AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
+                "  AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
+                "  AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
+                "  AND REGION.NAME = 'ASIA'\n" +
+                "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
+                "  AND ORDERS.ORDERDATE < DATE('1995-01-01')\n" +
+                "GROUP BY NATION.NAME\n" +
+                "ORDER BY REVENUE DESC;" ;
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
@@ -60,14 +128,14 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q10};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while (i < 4) {
-            StringReader input = new StringReader(q[i].toLowerCase());
+        while (i < 9) {
+            StringReader input = new StringReader(q[i]);
             CCJSqlParser parser = new CCJSqlParser(input);
             Statement query = parser.Statement();
             try {
@@ -115,6 +183,10 @@ public class Main {
                 val = value;
             }
         }
+        else{
+            System.out.print(value);
+        }
+
         System.out.print(val);
     }
 
