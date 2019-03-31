@@ -20,7 +20,6 @@ public class FileIterator {
     private FileInputStream fileInputStream;
     private ObjectInputStream objectInputStream;
 
-
     public FileIterator(String tableName, String mergedFilename) {
         this.tableName = tableName;
         this.mergedFilename = mergedFilename;

@@ -8,100 +8,93 @@ import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true;
+    public static boolean inMem = false;
+    static boolean debugEnabled = false;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
+/*
+         Stream<String> lines = Files.lines(Paths.get("file.txt"));
+            String line32 = lines.skip(31).findFirst().get();
+
+*/
+
+        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
+        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
+//        String q3 = "select * from R UNION ALL select a from R";
+//        String q3 = "select A.a,b,c from R as A";
+//        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
+//        String q3 = "select R.a, R.b "|"from R,S as TT where R.a = 11";
+//        String q3 = "select count(1), avg(b+d), sum(a+c) from R, S";
+//        String q3 = "select a,b,* from R";
+//        String q3 = "select c, d, sum(a+b) from R, S where c != 78 group by c, d order by c, d desc";
+//        String q3 = "select c, d, sum(a+b) from R, S where c != 9 group by c, d having sum(a+b) <> 35 order by c desc";
+//        String q3 = "select a, a+b from R,S" ;
+//        String q3 = "select * from r where a = (select a from s where c>5)" ; //TODO: Manage in expressions, Manage subqueries in where clause
+//        String q3 = "select a from r, (select d from s where e>7)";
+//        String q3 ="select tt.a from (select a, b from R, (select d from S where e < 5) order by b desc) as tt";
+//        String q3 = "select p from (select a, sum(b+c) as p from r group by a)";
+//        String q3 = "select p.a, s.d from (select a,b,count(*) as q from r group by a,b order by b asc, a asc) as p ,s " ;
+//        String q3 = "select min(a + c), max(b), sum(a+b), avg(b+c),sum(a+b+c) from R" ;
+//        String q3 = "select a, b, c from R order by a asc";
+//        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
+//        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
+//        String q3 = "select * from R, S where R.c = S.f";
+        String q3 = "select a,c,d,f from R, S where R.a = S.d order by a desc, b";
+
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
-                inMem = false;
+                //inMem = false;
                 break;
             }
         }
 
+        String q[] = {q1, q2, q3};
+        int i = 0;
 
-        System.out.print("$> ");
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String in = "";
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            in += line;
-            if(line.charAt(line.length()-1) == ';')
-                break;
-        }
-
-        //System.out.println(in);
-
-        StringReader input = new StringReader(in);
-
-        CCJSqlParser parser = new CCJSqlParser(input);
-
-        //System.out.println("$> "); // print a prompt
-        Statement query;
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while ((query = parser.Statement()) != null) {
-
+        while (i < 3) {
+            StringReader input = new StringReader(q[i].toLowerCase());
+            CCJSqlParser parser = new CCJSqlParser(input);
+            Statement query = parser.Statement();
             try {
                 rootIterator = iteratorBuilder.parseStatement(query);
-
-                if (rootIterator != null) {
-                    rootIterator = rootIterator.optimize(rootIterator);
-                    setDataType(rootIterator);
-                    while (rootIterator.hasNext()) {
-                        PrimitiveValue[] tuple = rootIterator.next();
-                        if (tuple != null) {
-                            for (int index = 0; index < tuple.length; index++) {
-                                printResult(tuple, index);
-                                if (index != (tuple.length - 1)) {
-                                    //cnt++;
-                                    System.out.print("|");
-                                }
-                            }
-                            System.out.print("\n");
-                        }
-
-                    }
-                }
-
-                System.out.print("$> ");
-                reader = new BufferedReader(new InputStreamReader(System.in));
-
-                in ="";
-                while ((line = reader.readLine()) != null) {
-                    in += line+ " ";
-                    if(line.charAt(line.length()-1) == ';')
-                        break;
-                }
-
-
-                input = new StringReader(in);
-                parser = new CCJSqlParser(input);
-
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.print("$> ");
-                reader = new BufferedReader(new InputStreamReader(System.in));
-                while ((line = reader.readLine()) != null) {
-                    in += line;
-                    if(line.charAt(line.length()-1) == ';')
-                        break;
-                }
-
-                input = new StringReader(in);
-
-                parser = new CCJSqlParser(input);
             }
+            if (rootIterator != null) {
+                long startTime = System.nanoTime();
+                rootIterator = rootIterator.optimize(rootIterator);
+                setDataType(rootIterator);
+
+                while (rootIterator.hasNext()) {
+                    PrimitiveValue[] tuple = rootIterator.next();
+                    if (tuple != null) {
+                        for (int index = 0; index < tuple.length; index++) {
+                            printResult(tuple, index);
+                            //System.out.print(tuple[index].toRawString());
+                            if (index != (tuple.length - 1))
+                                System.out.print("|");
+                        }
+                        System.out.print("\n");
+                    }
+                }
+                if (debugEnabled) {
+                    long endTime = System.nanoTime();
+                    System.out.println(endTime - startTime);
+                    long freemem = Runtime.getRuntime().freeMemory();
+                    System.out.println(freemem);
+                }
+            }
+            i++;
         }
     }
 

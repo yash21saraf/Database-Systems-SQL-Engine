@@ -5,6 +5,7 @@ import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import helpers.Sort;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.util.List;
@@ -109,6 +110,7 @@ public class JoinIterator implements RAIterator {
     }
 
     private void SortFiles() throws Exception {
+        List<Column> columnsList = commonLib.getColumnList(onExpression);
 
         if (leftChild.hasNext() && rightChild.hasNext()) {
 
@@ -117,7 +119,7 @@ public class JoinIterator implements RAIterator {
 
             if (listOfSortedFiles.size() > 0) {
                 if (!listOfSortedFiles.contains(leftFileName)) {
-                    leftSort = new Sort(leftChild, onExpression);
+                    leftSort = new Sort(leftChild, columnsList, null,  null, true);
                     leftSort.sort();
                     listOfSortedFiles.add(leftFileName.toLowerCase());
                     mapOfSortedFileObjects.put(leftFileName, leftSort);
@@ -126,7 +128,7 @@ public class JoinIterator implements RAIterator {
                     leftSort.reset();
                 }
                 if (!listOfSortedFiles.contains(rightFileName)) {
-                    rightSort = new Sort(rightChild, onExpression);
+                    rightSort = new Sort(rightChild, columnsList,null,  null, true);
                     rightSort.sort();
                     listOfSortedFiles.add(rightFileName.toLowerCase());
                     mapOfSortedFileObjects.put(rightFileName, rightSort);
@@ -135,8 +137,8 @@ public class JoinIterator implements RAIterator {
                     rightSort.reset();
                 }
             } else {
-                leftSort = new Sort(leftChild, onExpression);
-                rightSort = new Sort(rightChild, onExpression);
+                leftSort = new Sort(leftChild, columnsList,null,  null, true);
+                rightSort = new Sort(rightChild, columnsList,null,  null, true);
 
                 leftSort.sort();
                 rightSort.sort();
