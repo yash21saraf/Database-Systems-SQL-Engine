@@ -50,7 +50,7 @@ public class Main {
 //        String q3 = "select a from (select a from R) where a > 3 AND b < 7 AND c > 1";
 //        String q3 = "select a from (select a,b,sum(b+c) as q from R,S where a>d group by a,b having sum(b+c) > 3 order by a desc) where a < 5";
 //        String q4 = "select a, b from R group by a";
-        String q4 = "select r.a, s.d from R,S where r.a = s.d ";
+        String q4 = "select r.a, s.d , t.d from R,S,T where r.a = s.d and r.a = t.d ";
 //        String q4 = "select a,b,c,s.d from r,s,t where s.d < 7 and r.a = t.d and r.b = s.e";
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {

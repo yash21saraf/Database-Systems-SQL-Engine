@@ -358,27 +358,27 @@ public class JoinIterator implements RAIterator
    private void fillBuckets() throws Exception {
       PrimitiveValue[] leftTuple = null ;
       Integer leftBucketSize = 0 ;
-
       try{
          while (leftChild.hasNext()) {
-            leftTuple = leftChild.next() ;
-            if (leftTuple == null) {
-               leftTuple = leftChild.next();
-               if (leftTuple == null)
-                  continue;
-            }else{
-                  leftBucketSize++ ;
-                  String leftKey = "" ;
-                  for(int i = 0 ; i < this.leftColIndexes.size() ; i++){
-                     leftKey = leftTuple[leftColIndexes.get(i)].toRawString() + "|" ;
+                  leftTuple = leftChild.next() ;
+                  if(leftTuple != null){
+
+                     leftBucketSize++ ;
+                     String leftKey = "" ;
+
+                     for(int i = 0 ; i < this.leftColIndexes.size() ; i++){
+                        leftKey = leftTuple[leftColIndexes.get(i)].toRawString() + "|" ;
+                     }
+
+                     List<PrimitiveValue[]> updatedList ;
+                     List<PrimitiveValue[]> currentList = leftBucket.get(leftKey);
+                     updatedList = (currentList != null) ? currentList : new LinkedList<PrimitiveValue[]>();
+                     updatedList.add(leftTuple);
+                     leftBucket.put(leftKey, updatedList);
+
+                     if(leftBucketSize == 100) break ;leftBucketSize++ ;
+
                   }
-                  List<PrimitiveValue[]> updatedList ;
-                  List<PrimitiveValue[]> currentList = leftBucket.get(leftKey);
-                  updatedList = (currentList != null) ? currentList : new LinkedList<PrimitiveValue[]>();
-                  updatedList.add(leftTuple);
-                  leftBucket.put(leftKey, updatedList);
-                  if(leftBucketSize == 100) break ;
-               }
             }
 
       }
