@@ -96,7 +96,7 @@ public class GroupByIterator implements RAIterator {
                         primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(avg+"", "DECIMAL");
 
                     } else {
-                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(primitiveValues[i], "DECIMAL");
+                        primitiveValueWrappers[i] = commonLibInstance.convertToPrimitiveValue(primitiveValues[i], this.schema[i].getColumnDefinition().getColDataType().getDataType());
                     }
                 }
 
@@ -163,11 +163,11 @@ public class GroupByIterator implements RAIterator {
 
                 int primitiveValuesLength = primitiveValues.length;
 
-                if (aggTypeOfSelectItems.contains("avg"))
+                if (aggTypeOfSelectItems.contains("avg") || aggTypeOfSelectItems.contains("AVG"))
                     primitiveValuesLength--;
 
                 for (int i = 0; i < primitiveValuesLength; i++) {
-                    if (i == primitiveValuesLength - 1 && aggTypeOfSelectItems.contains("avg")) { // TODO: Checks AVG only at last index in SelectItems
+                    if (i == primitiveValuesLength - 1 && (aggTypeOfSelectItems.contains("avg") || aggTypeOfSelectItems.contains("AVG"))) { // TODO: Checks AVG only at last index in SelectItems
                         double sum = Double.parseDouble(primitiveValues[i]);
                         double count = Double.parseDouble(primitiveValues[i + 1]);
 
@@ -177,7 +177,7 @@ public class GroupByIterator implements RAIterator {
                     } else {
 
                         primitiveValueWrappers[i] =
-                                commonLibInstance.convertToPrimitiveValue(primitiveValues[i], "DECIMAL");
+                                commonLibInstance.convertToPrimitiveValue(primitiveValues[i], this.schema[i].getColumnDefinition().getColDataType().getDataType());
                     }
                 }
 
@@ -206,15 +206,15 @@ public class GroupByIterator implements RAIterator {
             for (int index = 0; index < aggType.size(); index++) {
 
                 String temp = "";
-                if (aggType.get(index).equals("count")) {
+                if (aggType.get(index).toLowerCase().equals("count")) {
                     temp = Double.parseDouble(currentValues.get(index)) + 1 + ""; //aggPrimitiveValues.get(index);
-                } else if (aggType.get(index).equals("sum")) {
+                } else if (aggType.get(index).toLowerCase().equals("sum")) {
                     temp = Double.parseDouble(currentValues.get(index)) + Double.parseDouble(aggPrimitiveValues.get(index)) + "";
-                } else if (aggType.get(index).equals("min")) {
+                } else if (aggType.get(index).toLowerCase().equals("min")) {
                     temp = Math.min(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
-                } else if (aggType.get(index).equals("max")) {
+                } else if (aggType.get(index).toLowerCase().equals("max")) {
                     temp = Math.max(Double.parseDouble(currentValues.get(index)), Double.parseDouble(aggPrimitiveValues.get(index))) + "";
-                } else if (aggType.get(index).equals("avg")) {
+                } else if (aggType.get(index).toLowerCase().equals("avg")) {
                     hasAvg = true;
                     String[] tmp = currentValues.get(index).split("\\|");
                     int count = Integer.parseInt(tmp[1]) + 1;
@@ -228,15 +228,15 @@ public class GroupByIterator implements RAIterator {
         } else {
             for (int index = 0; index < aggType.size(); index++) {
                 String temp = "";
-                if (aggType.get(index).equals("count")) {
+                if (aggType.get(index).toLowerCase().equals("count")) {
                     temp = 1 + ""; //aggPrimitiveValues.get(index);
-                } else if (aggType.get(index).equals("sum")) {
+                } else if (aggType.get(index).toLowerCase().equals("sum")) {
                     temp = aggPrimitiveValues.get(index);
-                } else if (aggType.get(index).equals("min")) {
+                } else if (aggType.get(index).toLowerCase().equals("min")) {
                     temp = aggPrimitiveValues.get(index);
-                } else if (aggType.get(index).equals("max")) {
+                } else if (aggType.get(index).toLowerCase().equals("max")) {
                     temp = aggPrimitiveValues.get(index);
-                } else if (aggType.get(index).equals("avg")) {
+                } else if (aggType.get(index).toLowerCase().equals("avg")) {
                     hasAvg = true;
                     int count = 1;
                     String sum = aggPrimitiveValues.get(index);

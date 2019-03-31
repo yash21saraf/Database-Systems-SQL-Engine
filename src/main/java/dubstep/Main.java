@@ -121,6 +121,23 @@ public class Main {
                 "  AND ORDERS.ORDERDATE < DATE('1995-01-01')\n" +
                 "GROUP BY NATION.NAME\n" +
                 "ORDER BY REVENUE DESC;" ;
+        String q11 = " SELECT\n" +
+                "  LINEITEM.ORDERKEY,\n" +
+                "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "  ORDERS.ORDERDATE,\n" +
+                "  ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "  CUSTOMER,\n" +
+                "  ORDERS,\n" +
+                "  LINEITEM \n" +
+                "WHERE\n" +
+                "  CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
+                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26')\n" +
+                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+                "LIMIT 10;" ;
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
@@ -128,7 +145,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q10};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
@@ -176,7 +193,7 @@ public class Main {
         String value = tuple[index].toRawString();
         String datatype = colDataTypes[index].getDataType();
         String val = "";
-        if (datatype.equals("int")) {
+        if (datatype.toLowerCase().equals("int")) {
             try {
                 val = value.substring(0, value.indexOf("."));
             } catch (Exception e) {

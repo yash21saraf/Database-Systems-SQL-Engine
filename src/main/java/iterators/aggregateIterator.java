@@ -91,7 +91,7 @@ public class aggregateIterator implements RAIterator {
             PrimitiveValue primitiveValueWrapper[] = new PrimitiveValue[aggResult.length];
 
             for (int index = 0; index < aggResult.length; index++) {
-                if (aggTypeOfSelectItems.get(index).equals("avg")) {
+                if (aggTypeOfSelectItems.get(index).toLowerCase().equals("avg")) {
                     String avgResult[] = aggResult[index].split(" ");
                     double sum = Double.parseDouble(avgResult[0]);
                     double cnt = Double.parseDouble(avgResult[1]);
@@ -118,26 +118,26 @@ public class aggregateIterator implements RAIterator {
             if (aggValues.size() > 0) {
                 String oldValues[] = aggValues.get(0).split("\\|");
 
-                if (aggTypeOfSelectItems.get(index).equals("count")) {
+                if (aggTypeOfSelectItems.get(index).toLowerCase().equals("count")) {
                     int cnt = Integer.parseInt(oldValues[index]) + 1;
                     newValues = newValues + "|" + cnt;
-                } else if (aggTypeOfSelectItems.get(index).equals("sum")) {
+                } else if (aggTypeOfSelectItems.get(index).toLowerCase().equals("sum")) {
                     double sum = Double.parseDouble(oldValues[index]) + Double.parseDouble(pv);
                     newValues = newValues + "|" + sum;
-                } else if (aggTypeOfSelectItems.get(index).equals("min")) {
+                } else if (aggTypeOfSelectItems.get(index).toLowerCase().equals("min")) {
                     double min = Math.min(Double.parseDouble(oldValues[index]), Double.parseDouble(pv));
                     newValues = newValues + "|" + min;
-                } else if (aggTypeOfSelectItems.get(index).equals("max")) {
+                } else if (aggTypeOfSelectItems.get(index).toLowerCase().equals("max")) {
                     double max = Math.max(Double.parseDouble(oldValues[index]), Double.parseDouble(pv));
                     newValues = newValues + "|" + max;
-                } else if (aggTypeOfSelectItems.get(index).equals("avg")) {
+                } else if (aggTypeOfSelectItems.get(index).toLowerCase().equals("avg")) {
                     String avgVal[] = oldValues[index].split(" ");
                     int cnt = Integer.parseInt(avgVal[1]) + 1;
                     double sum = Double.parseDouble(avgVal[0]) + Double.parseDouble(pv);
                     newValues = newValues + "|" + sum + " " + cnt; // Using "/" as separator for avg
                 }
             } else {
-                if (aggTypeOfSelectItems.get(index).equals("avg")) {
+                if (aggTypeOfSelectItems.get(index).toLowerCase().equals("avg")) {
                     newValues = newValues + "|" + pv + " " + "1";
                 } else {
                     newValues = newValues + "|" + pv;
