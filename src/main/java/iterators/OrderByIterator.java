@@ -74,9 +74,14 @@ public class OrderByIterator implements RAIterator {
         }
 
         for (OrderByElement orderByElement : orderByElementsList) {
-            int index = 0;
+            int index = 0 ;
             for (SelectExpressionItem selectExpressionItem : listOfSelectItems) {
-                if (selectExpressionItem.getExpression().equals(orderByElement.getExpression())) {
+                if(selectExpressionItem.getAlias() != null && selectExpressionItem.getAlias().equals(orderByElement.getExpression().toString())){
+                    indexOfOrderByElements.add(index) ;
+                    orderOfOrderByElements.add((orderByElement.isAsc())) ;
+                    break ;
+                }
+                else if (selectExpressionItem.getExpression().equals(orderByElement.getExpression())) {
                     indexOfOrderByElements.add(index);
                     orderOfOrderByElements.add(orderByElement.isAsc());
                     break;

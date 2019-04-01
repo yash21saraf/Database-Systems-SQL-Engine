@@ -136,7 +136,7 @@ public class Main {
                 "  AND REGION.NAME = 'ASIA'\n" +
                 "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
                 "  AND ORDERS.ORDERDATE < DATE('1995-01-01')" ;
-        String q11 = " SELECT\n" +
+        String q11 = " SELECT ORDERDATE FROM (SELECT\n" +
                 "  LINEITEM.ORDERKEY,\n" +
                 "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
                 "  ORDERS.ORDERDATE,\n" +
@@ -151,8 +151,8 @@ public class Main {
                 "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
                 "  AND LINEITEM.SHIPDATE > DATE('1995-03-26')\n" +
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
-                "ORDER BY REVENUE DESC, ORDERDATE\n" +
-                "LIMIT 10;" ;
+                "ORDER BY ORDERDATE\n" +
+                "LIMIT 10);" ;
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
@@ -184,8 +184,8 @@ public class Main {
                     PrimitiveValue[] tuple = rootIterator.next();
                     if (tuple != null) {
                         for (int index = 0; index < tuple.length; index++) {
-                            printResult(tuple, index);
-                            //System.out.print(tuple[index].toRawString());
+//                            printResult(tuple, index);
+                            System.out.print(tuple[index].toRawString());
                             if (index != (tuple.length - 1))
                                 System.out.print("|");
                         }

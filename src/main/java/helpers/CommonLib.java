@@ -1,5 +1,6 @@
 package helpers;
 
+import dubstep.Main;
 import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
@@ -15,6 +16,7 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class CommonLib
@@ -26,13 +28,12 @@ public class CommonLib
     private static CommonLib commonLib = CommonLib.getInstance();
     public static long blockSize = 100000;
 
-    public synchronized static int getsortFileSeqNumber() {
-        return sortFileSeqNumber++;
-    }
+   public static final int N = 15;
+   public static List<String> listOfSortedFiles = new ArrayList<String>();
+   public static HashMap<String, Sort> mapOfSortedFileObjects = new HashMap<String, Sort>();
+   public volatile int sortMergeSeqNumber = 50000;
+   public volatile int orderBySeqNumber = 70000;
 
-    public synchronized static int getmergeFileSeqNumber() {
-        return mergeFileSeqNumber++;
-    }
 
    //region Variables
 
@@ -59,6 +60,8 @@ public class CommonLib
    //endregion
 
    //region Singleton implementation
+
+
 
    private static CommonLib instance;
 
@@ -330,6 +333,30 @@ public class CommonLib
 
    }
 
+   public synchronized int getOrderBySeqNumber() {
+      return orderBySeqNumber++;
+   }
+
+   public synchronized static int getsortFileSeqNumber() {
+      return sortFileSeqNumber++;
+   }
+
+   public synchronized int getSortMergeSeqNumber() {
+      return sortMergeSeqNumber++;
+   }
+
+   //endregion
+
+   //region Singleton implementation
+
+   public synchronized static int getmergeFileSeqNumber() {
+      return mergeFileSeqNumber++;
+   }
+
+   public int getN() {
+      return N;
+   }
+
    public Boolean validateExpressionAgainstSchema(Expression expression, Schema[] schemas) {
 
       boolean flag = false;
@@ -398,6 +425,63 @@ public class CommonLib
       }
       return  false ;
    }
+
+   public PrimitiveValue PrimitiveValueComparator(PrimitiveValue first, PrimitiveValue second, String operator) throws PrimitiveValue.InvalidPrimitive {
+
+      if(operator.toLowerCase().equals("sum")){
+         if(first instanceof LongValue){
+            return new LongValue(first.toLong() + second.toLong()) ;
+         }else{
+            return new DoubleValue(first.toDouble() + second.toDouble()) ;
+         }
+      }
+      else if(operator.toLowerCase().equals("min")){
+         if(first instanceof LongValue){
+              return new LongValue(Math.min(first.toLong(), second.toLong()));
+         }
+         else if(first instanceof DoubleValue){
+            return new DoubleValue(Math.min(first.toDouble(), second.toDouble())) ;
+         }
+         else if(first instanceof DateValue){
+            int comp = ((DateValue) first).getValue().compareTo(((DateValue) second).getValue());
+            if(comp < 0){
+               return new DateValue(first.toRawString());
+            }
+            else return new DateValue(second.toRawString()) ;
+         }
+         else{
+            int comp = first.toRawString().compareTo(second.toRawString());
+            if(comp < 0 ){
+               return new StringValue(first.toRawString()) ;
+            }
+            else return new StringValue(second.toRawString()) ;
+         }
+      }else if(operator.toLowerCase().equals("max")){
+         if(first instanceof LongValue){
+            return new LongValue(Math.max(first.toLong(), second.toLong()));
+         }
+         else if(first instanceof DoubleValue){
+            return new DoubleValue(Math.max(first.toDouble(), second.toDouble())) ;
+         }
+         else if(first instanceof DateValue){
+            int comp = ((DateValue) first).getValue().compareTo(((DateValue) second).getValue());
+            if(comp > 0){
+               return new DateValue(first.toRawString());
+            }
+            else return new DateValue(second.toRawString()) ;
+         }
+         else{
+            int comp = first.toRawString().compareTo(second.toRawString());
+            if(comp > 0 ){
+               return new StringValue(first.toRawString()) ;
+            }
+            else return new StringValue(second.toRawString()) ;
+         }
+      }
+      return null ;
+   }
+
+
 
    //endregion
 

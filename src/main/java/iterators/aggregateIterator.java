@@ -120,17 +120,13 @@ public class aggregateIterator implements RAIterator {
                 int j = 0 ;
                 for (int index = 0; index < aggType.size(); index++) {
                     if (aggType.get(index).toLowerCase().equals("count")) {
-                        newValues.add(new DoubleValue(aggValues.get(j).toDouble() + 1));
+                        newValues.add(new LongValue(aggValues.get(j).toLong() + 1));
                     } else if (aggType.get(index).toLowerCase().equals("sum")) {
-                        newValues.add(new DoubleValue(aggValues.get(j).toDouble() + tuple[index].toDouble()));
+                        newValues.add(commonLib.PrimitiveValueComparator(aggValues.get(j), tuple[index], "sum"));
                     } else if (aggType.get(index).toLowerCase().equals("min")) {
-                        double first = aggValues.get(j).toDouble();
-                        double second = tuple[index].toDouble();
-                        newValues.add(new DoubleValue(Math.min(first, second)));
+                        newValues.add(commonLib.PrimitiveValueComparator(aggValues.get(j), tuple[index], "min"));
                     } else if (aggType.get(index).toLowerCase().equals("max")) {
-                        double first = aggValues.get(j).toDouble();
-                        double second = tuple[index].toDouble();
-                        newValues.add(new DoubleValue(Math.max(first, second)));
+                        newValues.add(commonLib.PrimitiveValueComparator(aggValues.get(j), tuple[index], "max")) ;
                     } else if (aggType.get(index).toLowerCase().equals("avg")) {
                         PrimitiveValue count = new DoubleValue(aggValues.get(j).toDouble() + 1);
                         newValues.add(count);
@@ -143,18 +139,18 @@ public class aggregateIterator implements RAIterator {
             } else {
                 for (int index = 0; index < aggType.size(); index++) {
                     if (aggType.get(index).toLowerCase().equals("count")) {
-                        newValues.add(new DoubleValue(1));
+                        newValues.add(new LongValue(1));
                     } else if (aggType.get(index).toLowerCase().equals("sum")) {
-                        newValues.add(new DoubleValue(tuple[index].toDouble()));
+                        newValues.add(tuple[index]);
                     } else if (aggType.get(index).toLowerCase().equals("min")) {
-                        newValues.add(new DoubleValue(tuple[index].toDouble()));
+                            newValues.add(tuple[index]);
                     } else if (aggType.get(index).toLowerCase().equals("max")) {
-                        newValues.add(new DoubleValue(tuple[index].toDouble()));
+                        newValues.add(tuple[index]);
                     } else if (aggType.get(index).toLowerCase().equals("avg")) {
                         hasAvg = true;
                         PrimitiveValue count = new DoubleValue(1);
                         newValues.add(count);
-                        PrimitiveValue sum = new DoubleValue(tuple[index].toDouble());
+                        PrimitiveValue sum = tuple[index];
                         newValues.add(sum);
                     }
                 }

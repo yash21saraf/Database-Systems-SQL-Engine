@@ -239,18 +239,13 @@ public class GroupByIterator implements RAIterator {
             for (int index = 0; index < currentValues.size(); index++) {
 
                 if (aggType.get(j).toLowerCase().equals("count")) {
-
-                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + 1));
+                    newValues.add(new LongValue(currentValues.get(index).toLong() + 1));
                 } else if (aggType.get(j).toLowerCase().equals("sum")) {
-                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(j)].toDouble()));
+                    newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "sum"));
                 } else if (aggType.get(j).toLowerCase().equals("min")) {
-                    double first = currentValues.get(index).toDouble();
-                    double second = tuple[indexOfGroupByCols.get(j)].toDouble();
-                    newValues.add(new DoubleValue(Math.min(first, second)));
+                    newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "min"));
                 } else if (aggType.get(j).toLowerCase().equals("max")) {
-                    double first = currentValues.get(index).toDouble();
-                    double second = tuple[indexOfGroupByCols.get(j)].toDouble();
-                    newValues.add(new DoubleValue(Math.max(first, second)));
+                    newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "max"));
                 } else if (aggType.get(j).toLowerCase().equals("avg")) {
                     hasAvg = true;
                     PrimitiveValue count = new DoubleValue(currentValues.get(index).toDouble() + 1);
@@ -266,7 +261,7 @@ public class GroupByIterator implements RAIterator {
             for (int index = 0; index < aggType.size(); index++) {
                 PrimitiveValue temp;
                 if (aggType.get(index).toLowerCase().equals("count")) {
-                    temp = new DoubleValue(1);
+                    temp = new LongValue(1);
                     newValues.add(temp);
                 } else if (aggType.get(index).toLowerCase().equals("sum")) {
                     temp = tuple[indexOfGroupByCols.get(index)];
@@ -370,7 +365,7 @@ public class GroupByIterator implements RAIterator {
                             temp.setAlias(selectExpressionItem.getAlias());
                         } else {
                             LongValue expression = new LongValue(1);
-                            temp.setExpression(expression); // TODO : How to pass Count(*) expression during unpacking?
+                            temp.setExpression(expression);
                             temp.setAlias(selectExpressionItem.getExpression().toString());
                             aggColMap.put(temp.getAlias(), "count");
                         }
