@@ -212,14 +212,14 @@ public class GroupByIterator implements RAIterator {
         int k = 0 ;
         for(int j = 0; j < aggTypeOfSelectItems.size() ; j++){
             if(aggTypeOfSelectItems.get(j).toLowerCase().equals("avg")){
-                double count = value[j].toDouble() ;
-                j++ ;
-                double sum = value[j].toDouble() ;
+                double count = value[k].toDouble() ;
+                k++ ;
+                double sum = value[k].toDouble() ;
                 double avg = sum/count ;
-                newTuple[indexOfGroupByCols.get(k)] = new DoubleValue(avg);
+                newTuple[indexOfGroupByCols.get(j)] = new DoubleValue(avg);
             }
             else{
-                newTuple[indexOfGroupByCols.get(k)] = value[k] ;
+                newTuple[indexOfGroupByCols.get(j)] = value[k] ;
             }
             k++ ;
         }
@@ -235,29 +235,31 @@ public class GroupByIterator implements RAIterator {
             currentValues = groupByMap.get(groupByCols);
 
             String values = "";
+            int j = 0 ;
             for (int index = 0; index < currentValues.size(); index++) {
 
-                if (aggType.get(index).toLowerCase().equals("count")) {
+                if (aggType.get(j).toLowerCase().equals("count")) {
 
                     newValues.add(new DoubleValue(currentValues.get(index).toDouble() + 1));
-                } else if (aggType.get(index).toLowerCase().equals("sum")) {
-                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(index)].toDouble()));
-                } else if (aggType.get(index).toLowerCase().equals("min")) {
+                } else if (aggType.get(j).toLowerCase().equals("sum")) {
+                    newValues.add(new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(j)].toDouble()));
+                } else if (aggType.get(j).toLowerCase().equals("min")) {
                     double first = currentValues.get(index).toDouble();
-                    double second = tuple[indexOfGroupByCols.get(index)].toDouble();
+                    double second = tuple[indexOfGroupByCols.get(j)].toDouble();
                     newValues.add(new DoubleValue(Math.min(first, second)));
-                } else if (aggType.get(index).toLowerCase().equals("max")) {
+                } else if (aggType.get(j).toLowerCase().equals("max")) {
                     double first = currentValues.get(index).toDouble();
-                    double second = tuple[indexOfGroupByCols.get(index)].toDouble();
+                    double second = tuple[indexOfGroupByCols.get(j)].toDouble();
                     newValues.add(new DoubleValue(Math.max(first, second)));
-                } else if (aggType.get(index).toLowerCase().equals("avg")) {
+                } else if (aggType.get(j).toLowerCase().equals("avg")) {
                     hasAvg = true;
                     PrimitiveValue count = new DoubleValue(currentValues.get(index).toDouble() + 1);
                     newValues.add(count);
                     index++;
-                    PrimitiveValue sum = new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(index)].toDouble());
+                    PrimitiveValue sum = new DoubleValue(currentValues.get(index).toDouble() + tuple[indexOfGroupByCols.get(j)].toDouble());
                     newValues.add(sum);
                 }
+                j++ ;
             }
             groupByMap.put(groupByCols, newValues);
         } else {

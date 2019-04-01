@@ -105,8 +105,10 @@ public class Main {
 //                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
 //                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
         String q10 = "SELECT\n" +
-                "  NATION.NAME,\n" +
-                "  SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
+                "  SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "  AVG(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS A, \n" +
+                "  MIN(LINEITEM.EXTENDEDPRICE) AS B, \n" +
+                "  AVG(LINEITEM.EXTENDEDPRICE) AS C \n" +
                 "FROM\n" +
                 "  REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
                 "WHERE\n" +
@@ -119,8 +121,21 @@ public class Main {
                 "  AND REGION.NAME = 'ASIA'\n" +
                 "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
                 "  AND ORDERS.ORDERDATE < DATE('1995-01-01')\n" +
-                "GROUP BY NATION.NAME\n" +
                 "ORDER BY REVENUE DESC;" ;
+        String q12 = "SELECT\n" +
+                " COUNT(*)\n" +
+                "FROM\n" +
+                "  REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
+                "WHERE\n" +
+                "  CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
+                "  AND LINEITEM.SUPPKEY = SUPPLIER.SUPPKEY\n" +
+                "  AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
+                "  AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
+                "  AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
+                "  AND REGION.NAME = 'ASIA'\n" +
+                "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
+                "  AND ORDERS.ORDERDATE < DATE('1995-01-01')" ;
         String q11 = " SELECT\n" +
                 "  LINEITEM.ORDERKEY,\n" +
                 "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
@@ -145,7 +160,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q10};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();

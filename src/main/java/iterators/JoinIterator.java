@@ -75,75 +75,75 @@ public class JoinIterator implements RAIterator
    public boolean hasNext() throws Exception
    {
 
-      if(onExpression != null){
+//      if(onExpression != null){
          if(this.first){
             defineHashColumns();
          }
          return hashHasNext() ;
-      }
+//      }
 
-      else{
-         try {
-            if (!rightChild.hasNext())
-               return leftChild.hasNext();
-            return true;
-         } catch (Exception e) {
-            //logger.error("Error in reading from right table of join.");
-            throw e;
-         }
-      }
+//      else{
+//         try {
+//            if (!rightChild.hasNext())
+//               return leftChild.hasNext();
+//            return true;
+//         } catch (Exception e) {
+//            //logger.error("Error in reading from right table of join.");
+//            throw e;
+//         }
+//      }
 
    }
 
    @Override
    public PrimitiveValue[] next() throws Exception
    {
-      if(onExpression != null){
+//      if(onExpression != null){
          return hashNext() ;
-      }
+//      }
 
-      else{
+//      else{
          // region NLJ
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
          ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      try {
-          if (this.first){
-              this.first = false ;
-              if (leftChild.hasNext())
-                  leftTuple = leftChild.next();
-          }
-              if (!rightChild.hasNext()) {
-              rightChild.reset();
-              leftTuple = leftChild.next();
-          }
-
-          rightTuple = rightChild.next();
-
-          if(rightTuple == null || leftTuple == null) {
-              return null;
-          }
-
-          if (onExpression != null) {
-            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
-            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
-            if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
-               return CommonLib.concatArrays(leftTuple,rightTuple);
-            }
-         } else if(rightTuple != null && leftTuple != null){
-            return CommonLib.concatArrays(leftTuple,rightTuple);
-         }
-         return null;
-      } catch (Exception e) {
-         //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
-         throw e;
-      }
+//      try {
+//          if (this.first){
+//              this.first = false ;
+//              if (leftChild.hasNext())
+//                  leftTuple = leftChild.next();
+//          }
+//              if (!rightChild.hasNext()) {
+//              rightChild.reset();
+//              leftTuple = leftChild.next();
+//          }
+//
+//          rightTuple = rightChild.next();
+//
+//          if(rightTuple == null || leftTuple == null) {
+//              return null;
+//          }
+//
+//          if (onExpression != null) {
+//            PrimitiveValueWrapper[] wrappedLeftTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(leftTuple, leftChild.getSchema());
+//            PrimitiveValueWrapper[] wrappedRightTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(rightTuple, rightChild.getSchema());
+//            if (commonLib.eval(onExpression,wrappedRightTuple, wrappedLeftTuple).getPrimitiveValue().toBool()) {
+//               return CommonLib.concatArrays(leftTuple,rightTuple);
+//            }
+//         } else if(rightTuple != null && leftTuple != null){
+//            return CommonLib.concatArrays(leftTuple,rightTuple);
+//         }
+//         return null;
+//      } catch (Exception e) {
+//         //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
+//         throw e;
+//      }
 
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
          ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
          // endregion
-      }
+//      }
 
 
    }
@@ -320,10 +320,6 @@ public class JoinIterator implements RAIterator
          }
          return false ;
       }
-
-//   private Boolean twoPassHashNext(){
-//
-//   }
 
 
    private PrimitiveValue[] hashNext() throws Exception {

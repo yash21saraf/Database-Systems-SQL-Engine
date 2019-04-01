@@ -209,6 +209,8 @@ public class IteratorBuilder {
         }
 
 
+
+
         if(plainSelect.getHaving() != null) {
             rootIterator = new HavingIterator(rootIterator, plainSelect.getSelectItems(), plainSelect.getHaving());
         }
