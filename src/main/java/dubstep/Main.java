@@ -153,6 +153,9 @@ public class Main {
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY ORDERDATE\n" +
                 "LIMIT 10);" ;
+
+        String q13 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY - 0 = ORDERS.ORDERKEY";
+
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
@@ -160,7 +163,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q12};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();

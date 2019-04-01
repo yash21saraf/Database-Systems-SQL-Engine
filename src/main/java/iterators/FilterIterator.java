@@ -167,6 +167,13 @@ public class FilterIterator implements RAIterator
                         onExpression = equalsTo;
                      }
                   }
+                  else{
+                     if (remainingExpression != null) {
+                        remainingExpression = new AndExpression(remainingExpression,expressionItem);
+                     } else {
+                        remainingExpression = expressionItem;
+                     }
+                  }
                }
                else if (commonLib.validateExpressionAgainstSchema(expressionItem,leftSchema)) {
                      leftChild = new FilterIterator(leftChild,expressionItem);
