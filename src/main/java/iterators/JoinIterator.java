@@ -3,8 +3,8 @@ package iterators;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.PrimitiveValue;
+import helpers.Sort;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
@@ -47,6 +47,17 @@ public class JoinIterator implements RAIterator
    private PrimitiveValue[] currentRightTuple = null ;
    private Integer leftBucketPointer = 0 ;
 
+
+   ///////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////
+   //////// HYBRID JOIN ALGORITHM ////////////////////////
+   ///////////////////////////////////////////////////////
+   private boolean hybridJoin = false ;
+   Sort leftSort ;
+   Sort rightSort ;
+   private boolean hybridHashNext = true ;
+   private PrimitiveValue[] hybridCurrentRightTuple = null ;
+   private boolean workingOnBucket = true ;
 
 
    //endregion
@@ -268,35 +279,97 @@ public class JoinIterator implements RAIterator
    }
 
    private boolean hashHasNext() throws Exception {
-      if(this.first){
-         while(commonLib.memoryPending() && leftChild.hasNext()){
+      if(this.first) {
+         while (false && leftChild.hasNext()) {
             fillBuckets();
          }
-         if(leftBucket.isEmpty() && !leftChild.hasNext()){
-            return false ;
+         if (leftBucket.isEmpty() && !leftChild.hasNext()) {
+            return false;
+         } else if (!leftChild.hasNext()) {
+            this.onePass = true;
+         } else if (!rightChild.hasNext()) {
+            return false;
          }
-         else if(!leftChild.hasNext()){
-            this.onePass = true ;
-         }
-         else if(!rightChild.hasNext()){
-            return false ;
-         }
-         else{
-            while(this.currentRightTuple == null){
-               this.currentRightTuple = rightChild.next() ;
-               if(this.currentRightTuple == null && !rightChild.hasNext()){
-                  return false ;
-               }
+
+         while (this.currentRightTuple == null) {
+            this.currentRightTuple = rightChild.next();
+            if (this.currentRightTuple == null && !rightChild.hasNext()) {
+               return false;
             }
          }
+
+         ///////////HYBRID LOGIC/////////////////////////////////////
+         if (leftChild.hasNext()) {
+            this.hybridJoin = true;
+
+            leftSort = new Sort(leftChild, leftExpList);
+
+            rightSort = new Sort(rightChild, rightExpList);
+
+            leftSort.newSort();
+            rightSort.newSort();
+            this.hybridCurrentRightTuple = rightSort.getTuple();
+
+            if (this.hybridCurrentRightTuple == null) return false;
+
+         }
+         ///////////////////////////////////////////////////////////////////
          this.first = false ;
       }
       if(this.onePass){
          return onePassHashHasNext() ;
       }
+      else if(this.hybridJoin){
+         return hybridHasNext() ;
+      }
       return false ;
-//      else
-//         return twoPassHashNext() ;
+
+   }
+
+   private Boolean hybridHasNext() throws Exception{
+
+      if(this.hybridCurrentRightTuple == null){
+         return false ;
+      }
+      else{
+         return this.hybridHashNext ;
+      }
+   }
+
+   private PrimitiveValue[] hybridNext() throws Exception {
+
+      String rightKey ;
+      rightKey = createKey(hybridCurrentRightTuple, rightExpList, "right") ;
+
+      if(leftBucket.containsKey(rightKey) && this.workingOnBucket){
+         if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
+            PrimitiveValue[] leftTuple = leftBucket.get(rightKey).get(leftBucketPointer) ;
+            leftBucketPointer++ ;
+            return commonLib.concatArrays(leftTuple,this.currentRightTuple);
+         }
+         else{
+            this.workingOnBucket = false ;
+            this.leftBucketPointer = 0 ;
+         }
+      }
+      else{
+         PrimitiveValue[] hybridCurrentLeftTuple = leftSort.getTuple() ;
+         while(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) < 0 && hybridCurrentLeftTuple != null){
+            hybridCurrentLeftTuple = leftSort.getTuple() ;
+         }
+
+         if(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) == 0){
+            return  commonLib.concatArrays(hybridCurrentLeftTuple, hybridCurrentRightTuple) ;
+         }
+
+         if(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) > 0){
+            this.hybridCurrentRightTuple = rightSort.getTuple() ;
+            this.workingOnBucket = true ;
+         }
+         return null ;
+
+      }
+      return null ;
    }
 
    private  Boolean onePassHashHasNext() throws Exception {
@@ -309,9 +382,8 @@ public class JoinIterator implements RAIterator
          }
          else {
             String rightKey = "" ;
-            for(int i = 0 ; i < this.rightColIndexes.size() ; i++){
-               rightKey = rightKey + "|" + currentRightTuple[rightColIndexes.get(i)].toRawString() ;
-            }
+            rightKey = createKey(currentRightTuple, rightExpList, "right") ;
+
             if(leftBucket.containsKey(rightKey)){
                if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
                   return true ;
@@ -326,6 +398,11 @@ public class JoinIterator implements RAIterator
          if(this.onePass){
             return oneHashNext() ;
          }
+         else if(this.hybridJoin){
+            return hybridNext() ;
+         }
+         // Handle another way
+         // Just added this for some return value
          return oneHashNext() ;
    }
 
@@ -340,9 +417,8 @@ public class JoinIterator implements RAIterator
       }
 
       String rightKey = "" ;
-      for(int i = 0 ; i < this.rightColIndexes.size() ; i++){
-         rightKey = rightKey + "|" + currentRightTuple[rightColIndexes.get(i)].toRawString() ;
-      }
+      rightKey = createKey(currentRightTuple, rightExpList, "right") ;
+
       if(leftBucket.containsKey(rightKey)){
          if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
             PrimitiveValue[] leftTuple = leftBucket.get(rightKey).get(leftBucketPointer) ;
@@ -371,11 +447,9 @@ public class JoinIterator implements RAIterator
                   if(leftTuple != null){
 
                      leftBucketSize++ ;
-                     String leftKey = "" ;
+                     String leftKey ;
 
-                     for(int i = 0 ; i < this.leftColIndexes.size() ; i++){
-                        leftKey = leftKey + "|" + leftTuple[leftColIndexes.get(i)].toRawString() ;
-                     }
+                     leftKey = createKey(leftTuple, leftExpList , "left");
 
                      List<PrimitiveValue[]> updatedList ;
                      List<PrimitiveValue[]> currentList = leftBucket.get(leftKey);
@@ -383,7 +457,7 @@ public class JoinIterator implements RAIterator
                      updatedList.add(leftTuple);
                      leftBucket.put(leftKey, updatedList);
 
-                     if(leftBucketSize == 1000000000) break ;leftBucketSize++ ;
+                     if(leftBucketSize == 100) break ;leftBucketSize++ ;
 
                   }
             }
@@ -393,6 +467,83 @@ public class JoinIterator implements RAIterator
          //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
          throw e;
       }
+   }
+
+   private String createKey(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
+      String key = "" ;
+      for(int i = 0 ; i < expression.size() ; i++){
+         PrimitiveValueWrapper[] wrappedTuple ;
+         PrimitiveValue result ;
+
+         if(side.equals("left")){
+            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema()) ;
+         }else{
+            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema()) ;
+         }
+         result = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
+         key = key + "|" + result.toRawString() ;
+      }
+      return key ;
+   }
+
+   private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
+      PrimitiveValue[] key = new PrimitiveValue[expression.size()] ;
+      for(int i = 0 ; i < expression.size() ; i++){
+         PrimitiveValueWrapper[] wrappedTuple ;
+         if(side.equals("left")){
+            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema()) ;
+         }else{
+            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema()) ;
+         }
+         key[i] = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
+      }
+      return key ;
+   }
+
+   private int newSortCompare(PrimitiveValue[] a, PrimitiveValue[] b) {
+
+      PrimitiveValue[] o1key = null ;
+      PrimitiveValue[] o2key = null;
+
+      try {
+         o1key = createKeyPrimitive(a, leftExpList, "left");
+         o2key = createKeyPrimitive(b, rightExpList, "right") ;
+
+
+         for (int i = 0; i < leftExpList.size(); i++) {
+
+            if (o1key[i] instanceof StringValue) {
+               int comp = o1key[i].toString().compareTo(o2key[i].toString());
+               if (comp != 0)
+                  return comp;
+               else
+                  continue;
+            } else if (o1key[i] instanceof LongValue) {
+               int comp = Long.valueOf(o1key[i].toLong()).compareTo(o2key[i].toLong());
+               if (comp != 0)
+                  return comp;
+               else
+                  continue;
+            } else if (o1key[i] instanceof DoubleValue) {
+               int comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
+               if (comp != 0)
+                  return comp;
+               else
+                  continue;
+            } else if (o1key[i] instanceof DateValue) {
+               int comp = ((DateValue) o1key[i]).getValue().compareTo(((DateValue) o2key[i]).getValue());
+               if (comp != 0)
+                  return comp;
+               else
+                  continue;
+            }
+         }
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+      }
+      // TODO : Confirm return value
+      return 0;
    }
    //endregion
 }

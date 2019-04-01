@@ -154,7 +154,7 @@ public class Main {
                 "ORDER BY ORDERDATE\n" +
                 "LIMIT 10);" ;
 
-        String q13 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY - 0 = ORDERS.ORDERKEY";
+        String q13 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY = ORDERS.ORDERKEY";
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
@@ -163,7 +163,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q12};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
