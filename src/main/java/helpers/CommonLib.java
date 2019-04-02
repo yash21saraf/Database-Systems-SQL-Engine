@@ -26,9 +26,9 @@ public class CommonLib
     public static volatile int sortFileSeqNumber = 1000;
     public static volatile int mergeFileSeqNumber = 10000;
     private static CommonLib commonLib = CommonLib.getInstance();
-    public static long blockSize = 100000;
+    public static long blockSize = 1000000;
 
-   public static final int N = 100;
+   public static final int N = 1;
    public static List<String> listOfSortedFiles = new ArrayList<String>();
    public static HashMap<String, Sort> mapOfSortedFileObjects = new HashMap<String, Sort>();
    public volatile int sortMergeSeqNumber = 50000;

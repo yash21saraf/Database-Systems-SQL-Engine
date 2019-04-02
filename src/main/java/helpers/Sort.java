@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 
+
 public class Sort {
 
     private List<Column> allColumns;
@@ -33,6 +34,7 @@ public class Sort {
     private long blockSize = commonLib.blockSize;
     private List<Boolean> orderOfOrderByElements;
     private List<Integer> indexOfOrderByElements;
+    private Integer temppppp = 0 ;
 
     private Boolean isSourceFile;
 
@@ -505,7 +507,10 @@ public class Sort {
                         o1key = createKeyPrimitive(a);
                         o2key = createKeyPrimitive(b) ;
 
-
+//                        System.out.println(temppppp) ;
+//                        temppppp++ ;
+//                        System.out.println(Arrays.toString(o1key));
+//                        System.out.println(Arrays.toString(o2key));
                         for (int i = 0; i < expressions.size(); i++) {
 
                             if (o1key[i] instanceof StringValue) {
@@ -521,7 +526,8 @@ public class Sort {
                                 else
                                     continue;
                             } else if (o1key[i] instanceof DoubleValue) {
-                                int comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
+                                int comp = Double.valueOf(o1key[i].toDouble()).compareTo(o2key[i].toDouble()) ;
+//                                int comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
                                 if (comp != 0)
                                     return comp;
                                 else
@@ -542,8 +548,6 @@ public class Sort {
             }
         });
     }
-
-
 
 
     private void sortList(List<PrimitiveValue[]> sortedData) {

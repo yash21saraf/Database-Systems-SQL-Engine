@@ -17,9 +17,9 @@ import java.io.StringReader;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false;
+    public static boolean inMem = true ;
     static boolean debugEnabled = false;
-    public static String extension = ".csv" ;
+    public static String extension = ".dat" ;
 
     public static void main(String[] args) throws Exception
     {
@@ -207,7 +207,7 @@ public class Main {
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY REVENUE DESC, ORDERDATE\n" +
                 "LIMIT 10;";
-        String q18 = "select r.a,s.d from r,s where r.a = s.d;" ;
+        String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
         for (int j = 0; j < args.length; j++) {

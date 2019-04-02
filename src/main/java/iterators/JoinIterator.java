@@ -66,6 +66,8 @@ public class JoinIterator implements RAIterator
    private boolean smjHasNextFlag = true ;
    private List<PrimitiveValue[]> smjBucket = new ArrayList<PrimitiveValue[]>() ;
    private Integer smjBucketPointer = 0 ;
+   private boolean bufferOverflow = false ;
+   private Integer bufferSize = 1000000000 ;
 
    //endregion
 
@@ -93,7 +95,8 @@ public class JoinIterator implements RAIterator
    public boolean hasNext() throws Exception
    {
          // One pass Hash Join for In Memory
-         if(Main.inMem){
+//         if(Main.inMem){
+      if(false){
             if(this.first){
                defineHashColumns();
             }
@@ -126,7 +129,8 @@ public class JoinIterator implements RAIterator
    public PrimitiveValue[] next() throws Exception
    {
       // One pass Hash Join for In Memory Calculations
-         if(Main.inMem){
+//         if(Main.inMem){
+      if(false){
             return hashNext() ;
          }
          // Sorted Merge Join for On Disk Calculations
@@ -363,14 +367,21 @@ public class JoinIterator implements RAIterator
       else if(smjBucketPointer == smjBucket.size()-1){
          returnValue = commonLib.concatArrays(smjLeftTuple,smjBucket.get(smjBucketPointer)) ;
          smjBucketPointer = 0 ;
-         smjLeftTuple = leftSort.getTupleNew() ;
-         if(smjLeftTuple == null){
-            smjHasNextFlag = false ;
-         }
-         else if(newSortCompare(smjLeftTuple, smjBucket.get(0)) != 0){
+         if(bufferOverflow){
+            bufferOverflow = false ;
             smjBucket.clear();
             SMJfillBuckets();
+         }else{
+            smjLeftTuple = leftSort.getTupleNew() ;
+            if(smjLeftTuple == null){
+               smjHasNextFlag = false ;
+            }
+            else if(newSortCompare(smjLeftTuple, smjBucket.get(0)) != 0){
+               smjBucket.clear();
+               SMJfillBuckets();
+            }
          }
+
       }
       return returnValue ;
    }
@@ -392,12 +403,15 @@ public class JoinIterator implements RAIterator
       // Make sure you don't change the value for lefttuple until and unless the join with arraylist is complete
 
 
-
       if(this.smjHasNextFlag){
          while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) == 0){
             this.smjBucket.add(this.smjRightTuple) ;
             this.smjRightTuple = rightSort.getTupleNew() ;
             if(this.smjRightTuple == null){
+               break ;
+            }
+            if(smjBucket.size() == bufferSize){
+               bufferOverflow = true ;
                break ;
             }
          }

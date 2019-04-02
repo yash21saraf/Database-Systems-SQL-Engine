@@ -26,7 +26,7 @@ public class FilterIterator implements RAIterator
    private Expression expression;
    private Schema[] schema ;
    private PrimitiveValue[] tuple;
-
+   private boolean hasNextValue = false ;
 
    //endregion
 
@@ -49,13 +49,18 @@ public class FilterIterator implements RAIterator
 
    public boolean hasNext() throws Exception {
 
+      if(hasNextValue)
+         return true;
+
       while (child.hasNext()) {
          tuple = child.next();
          if (tuple == null)
             return false;
          PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
-         if (commonLib.eval(expression, wrappedTuple).getPrimitiveValue().toBool())
+         if (commonLib.eval(expression, wrappedTuple).getPrimitiveValue().toBool()) {
+            hasNextValue = true;
             return true;
+         }
       }
 
       return false;
@@ -63,6 +68,7 @@ public class FilterIterator implements RAIterator
 
    @Override
    public PrimitiveValue[] next() throws Exception {
+      hasNextValue = false;
       return tuple;
    }
 

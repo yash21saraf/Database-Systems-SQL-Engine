@@ -3,8 +3,11 @@ package iterators;
 import dubstep.Main;
 import helpers.CommonLib;
 import helpers.Schema;
+import helpers.Sort;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.io.*;
@@ -35,6 +38,11 @@ public class OrderByIterator implements RAIterator {
     private BufferedReader brMergedFile1;
     private BufferedReader brMergedFile2;
     private List<String> mergedFileLists = new ArrayList<String>();
+
+    ////////////////////////////////////////
+    PrimitiveValue tuple[];
+    Sort sort;
+
 
     private String leftData;
     private String rightData;
@@ -215,189 +223,66 @@ public class OrderByIterator implements RAIterator {
         } else {
             if (onDiskSorted) {
 
-                if(limit!=null){
-                    if(onDiscRowToReturn == onDiskSortedList.size()) {
-                        noDataFound = true;
-                        return null;
-                    }
-                    String row[] = onDiskSortedList.get(onDiscRowToReturn).split("\\|");
-                    PrimitiveValue[] primitiveValue = new PrimitiveValue[row.length];
-                    for (int i = 0; i < row.length; i++) {
-                        primitiveValue[i] = new StringValue(row[i]);
-                    }
-                    onDiscRowToReturn++;
-
-                    return primitiveValue;
-                }
-
-                if (onDiscRowToReturn >= blockSize) {
-                    sortWithoutMerge();
-                    onDiscRowToReturn = 0;
-                    if (noDataFound)
-                        return null;
-                }
-
-                if(onDiscRowToReturn == onDiskSortedList.size()) {
+                tuple = sort.getTuple();
+                if (tuple == null) {
                     noDataFound = true;
-                    return null;
                 }
-
-                String row[] = onDiskSortedList.get(onDiscRowToReturn).split("\\|");
-                PrimitiveValue[] primitiveValue = new PrimitiveValue[row.length];
-                for (int i = 0; i < row.length; i++) {
-                    primitiveValue[i] = new StringValue(row[i]);
-                }
-                onDiscRowToReturn++;
-
-                return primitiveValue;
+                return tuple;
             }
 
-            int rowCount = 0;
-            List<String> listOfSortedFiles = new ArrayList<String>();
-            while (child.hasNext()) {
-                PrimitiveValue[] tupleCheck = child.next() ;
-                if(tupleCheck != null ){
-                    sortedList.add(Arrays.asList(tupleCheck));
-                    rowCount++;
+            else if (child.hasNext()) {
 
-                    if (rowCount >= blockSize || !child.hasNext()) {
+                List<Column> columnsList = getColumnList(orderByElementsList);
+                sort = new Sort(child, columnsList, orderOfOrderByElements, indexOfOrderByElements, false);
 
-                        Collections.sort(sortedList, new Comparator<List<PrimitiveValue>>() {
-                            @Override
-                            public int compare(List<PrimitiveValue> first, List<PrimitiveValue> second) {
+                sort.sort();
 
-                                int i = 0;
-
-                                for (Integer index : indexOfOrderByElements) {
-                                    String primitiveValue1 = first.get(index).toRawString();
-                                    String primitiveValue2 = second.get(index).toRawString();
-
-
-                                    if (isNumber(primitiveValue1)) {
-
-                                        double pv1 = Double.parseDouble(primitiveValue1);
-                                        double pv2 = Double.parseDouble(primitiveValue2);
-
-                                        if (orderOfOrderByElements.get(i++)) {
-
-                                            if (pv1 < pv2)
-                                                return -1;
-                                            else if (pv1 > pv2)
-                                                return 1;
-                                            else {
-                                                continue;
-                                            }
-
-                                        } else {
-
-                                            if (pv1 < pv2)
-                                                return 1;
-                                            else if (pv1 > pv2)
-                                                return -1;
-                                            else {
-                                                continue;
-                                            }
-                                        }
-
-                                    } else {
-
-
-                                        if (orderOfOrderByElements.get(i++)) {
-
-                                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                                return primitiveValue1.compareTo(primitiveValue2);
-                                            else {
-                                                continue;
-                                            }
-
-                                        } else {
-
-                                            if (primitiveValue1.compareTo(primitiveValue2) != 0)
-                                                return -1 * primitiveValue1.compareTo(primitiveValue2);
-                                            else {
-                                                continue;
-                                            }
-                                        }
-                                    }
-
-                                }
-                                return 1;
-                            }
-                        });
-
-                        String file = "SORTED_FILE_" + commonLib.getsortFileSeqNumber();
-                        writeDataDisk(file);
-                        listOfSortedFiles.add(file);
-                        sortedList.clear();
-                        rowCount = 0;
-                    }
+                onDiskSorted = true;
+                tuple = sort.getTuple();
+                if (tuple == null) {
+                    noDataFound = true;
                 }
-
+                return tuple;
             }
-
-
-            while (listOfSortedFiles.size() > 0) {
-                if (listOfSortedFiles.size() >= 2) {
-
-                    String firstFile = listOfSortedFiles.get(0);
-                    String secondFile = listOfSortedFiles.get(1);
-
-                    listOfSortedFiles.remove(1);
-                    listOfSortedFiles.remove(0);
-
-                    String filename = "MERGED_FILE_" + commonLib.getmergeFileSeqNumber();
-                    merge(firstFile, secondFile, filename);
-                    mergedFileLists.add(filename);
-
-                    if (listOfSortedFiles.size() == 0 && mergedFileLists.size() == 2) {
-                        // All data are sorted now and are in two final merged files.
-                        break;
-                    }
-                    if(listOfSortedFiles.size() == 1 && mergedFileLists.size() == 1) {
-                        mergedFileLists.add(listOfSortedFiles.get(0));
-                        listOfSortedFiles.remove(0);
-                        break;
-                    }
-
-                    if(listOfSortedFiles.size() == 1 && mergedFileLists.size() > 0){
-                        listOfSortedFiles.addAll(mergedFileLists);
-                        mergedFileLists.clear();
-                    }
-                    if (listOfSortedFiles.size() == 0) {
-                        listOfSortedFiles.addAll(mergedFileLists);
-                        mergedFileLists.clear();
-                    }
-
-                } else if(listOfSortedFiles.size() == 1) { // Not yet tested.
-                    mergedFileLists.add(listOfSortedFiles.get(0));
-                    listOfSortedFiles.remove(0);
-                    break;
-                }
-            }
-
-            onDiskSorted = true;
-
-            if(mergedFileLists.size() == 1){
-                File file = new File(path + "dummy");
-                file.createNewFile();
-                mergedFileLists.add("dummy");
-            }
-
-            brMergedFile1 = new BufferedReader(new FileReader(path + mergedFileLists.get(0)));
-            brMergedFile2 = new BufferedReader(new FileReader(path + mergedFileLists.get(1)));
-
-            sortWithoutMerge(); // Creates a sorted block from final two merged files
+            return null;
         }
 
-        String row[] = onDiskSortedList.get(onDiscRowToReturn).split("\\|");
-        PrimitiveValue[] primitiveValue = new PrimitiveValue[row.length];
-        for (int i = 0; i < row.length; i++) {
-            primitiveValue[i] = new StringValue(row[i]);
+    }
 
+    private List<Column> getColumnList(List<OrderByElement> orderByElementsList) {
+        List<Column> columnList = new ArrayList<Column>();
+
+        Schema[] schemas = child.getSchema();
+
+        for (OrderByElement expression : orderByElementsList) {
+            columnList.add((Column) expression.getExpression());
         }
-        onDiscRowToReturn++;
 
-        return primitiveValue;
+        for (int i = 0; i < schemas.length; i++) {
+            if (hasColumnName(columnList, schemas[i])) {
+                setTableName(columnList, schemas[i].getColumnDefinition().getColumnName(), schemas[i].getTableName());
+            }
+        }
+
+        return columnList;
+    }
+
+    private boolean hasColumnName(List<Column> columnList, Schema schema) {
+
+        for (Column column : columnList) {
+            if (column.getColumnName().equals(schema.getColumnDefinition().getColumnName()))
+                return true;
+        }
+        return false;
+    }
+
+    private void setTableName(List<Column> columnList, String columnName, String tableName) {
+        for (int i = 0; i < columnList.size(); i++) {
+            if (columnList.get(i).getColumnName().equals(columnName)) {
+                columnList.get(i).setTable(new Table(null, tableName.toLowerCase()));
+                return;
+            }
+        }
     }
 
     private void sortWithoutMerge() { // TODO: Might have a bug to fix.
