@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false ;
+    public static boolean inMem = true ;
     static boolean debugEnabled = false;
     public static String extension = ".dat" ;
 
@@ -211,14 +211,16 @@ public class Main {
         String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
-        for (int j = 0; j < args.length; j++) {
+        String a = "SELECT * FROM REGION, NATION WHERE NATION.REGIONKEY = REGION.REGIONKEY AND REGION.NAME = 'ASIA';";
+//            String a = "SELECT * FROM NATION ORDER BY NATION.REGIONKEY;" ;
+            for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
                 break;
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q16};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();

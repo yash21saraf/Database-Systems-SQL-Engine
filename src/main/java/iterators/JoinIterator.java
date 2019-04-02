@@ -343,10 +343,11 @@ public class JoinIterator implements RAIterator
             this.smjRightTuple = rightSort.getTupleNew();
             this.smjLeftTuple = leftSort.getTupleNew();
             if(this.smjRightTuple == null || this.smjLeftTuple == null){
+               smjHasNextFlag = false ;
                return false ;
             }
             SMJfillBuckets();
-            return true ;
+            return smjHasNextFlag ;
          }
          else{
             return false ;
@@ -361,24 +362,29 @@ public class JoinIterator implements RAIterator
    private PrimitiveValue[] smjNext() throws Exception {
       PrimitiveValue[] returnValue = null ;
       if(smjBucketPointer < smjBucket.size()-1){
-         returnValue =  commonLib.concatArrays(smjLeftTuple, smjBucket.get(smjBucketPointer)) ;
+         returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple) ;
          smjBucketPointer++ ;
       }
       else if(smjBucketPointer == smjBucket.size()-1){
-         returnValue = commonLib.concatArrays(smjLeftTuple,smjBucket.get(smjBucketPointer)) ;
+         returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple) ;
          smjBucketPointer = 0 ;
          if(bufferOverflow){
             bufferOverflow = false ;
             smjBucket.clear();
             SMJfillBuckets();
          }else{
-            smjLeftTuple = leftSort.getTupleNew() ;
-            if(smjLeftTuple == null){
+            smjRightTuple = rightSort.getTupleNew() ;
+            if(smjRightTuple == null){
                smjHasNextFlag = false ;
             }
-            else if(newSortCompare(smjLeftTuple, smjBucket.get(0)) != 0){
+            else if(newSortCompare(smjBucket.get(0), smjRightTuple) !=0){
                smjBucket.clear();
-               SMJfillBuckets();
+               if(this.smjLeftTuple != null){
+                  SMJfillBuckets();
+               }
+               else{
+                  smjHasNextFlag = false ;
+               }
             }
          }
 
@@ -400,14 +406,14 @@ public class JoinIterator implements RAIterator
 
       // Here we have lefttuple = righttuple or smjHasNextFlag as false.
       // Keep adding the tuple to smjbucket as it will be joined with leftTuple
-      // Make sure you don't change the value for lefttuple until and unless the join with arraylist is complete
+      // Make sure you don't change the value for righttuple until and unless the join with arraylist is complete
 
 
       if(this.smjHasNextFlag){
          while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) == 0){
-            this.smjBucket.add(this.smjRightTuple) ;
-            this.smjRightTuple = rightSort.getTupleNew() ;
-            if(this.smjRightTuple == null){
+            this.smjBucket.add(this.smjLeftTuple) ;
+            this.smjLeftTuple = leftSort.getTupleNew() ;
+            if(this.smjLeftTuple == null){
                break ;
             }
             if(smjBucket.size() == bufferSize){
@@ -416,11 +422,12 @@ public class JoinIterator implements RAIterator
             }
          }
       }
+
       // If we have smjHasNextFlag as false, we are returning hasNext as false.
       // Or we have obtained a case where lefttuple = righttuple
       // So the smjBucket size is at least one.
-      // Also we getting a new rightTuple here. So we need to make sure that we only
-      // call leftSort.getTuple before calling the SMJfillBuckets() again.
+      // Also we getting a new leftTuple here. So we need to make sure that we only
+      // call rightSort.getTuple before calling the SMJfillBuckets() again.
    }
 
    // While lefttuple < righttuple. Keep getting tuple from left until either
