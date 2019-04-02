@@ -25,6 +25,8 @@ public class FilterIterator implements RAIterator
    private RAIterator child;
    private Expression expression;
    private Schema[] schema ;
+   private PrimitiveValue[] tuple;
+
 
    //endregion
 
@@ -45,27 +47,23 @@ public class FilterIterator implements RAIterator
 
    //region Iterator methods
 
-   @Override
-   public boolean hasNext() throws Exception
-   {
-      return child.hasNext();
+   public boolean hasNext() throws Exception {
+
+      while (child.hasNext()) {
+         tuple = child.next();
+         if (tuple == null)
+            return false;
+         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
+         if (commonLib.eval(expression, wrappedTuple).getPrimitiveValue().toBool())
+            return true;
+      }
+
+      return false;
    }
 
    @Override
-   public PrimitiveValue[] next() throws Exception
-   {
-      PrimitiveValue[] tuple = child.next();
-      if (tuple == null)
-         return null;
-      try {
-         PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
-         if (commonLib.eval(expression,wrappedTuple).getPrimitiveValue().toBool())
-            return tuple;
-         return null;
-      } catch (SQLException e) {
-         //logger.error("Exception in FilterIterator eval().");
-         throw e;
-      }
+   public PrimitiveValue[] next() throws Exception {
+      return tuple;
    }
 
    @Override

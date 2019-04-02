@@ -1,5 +1,6 @@
 package iterators;
 
+import dubstep.Main;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
@@ -34,31 +35,37 @@ public class JoinIterator implements RAIterator
    ////////////////////////////////////////////////////
    //////// Hash Join Variables ///////////////////////
    ////////////////////////////////////////////////////
-   private boolean hashCreated = false ;
    private Map<String, List<PrimitiveValue[]>> leftBucket = new HashMap<String, List<PrimitiveValue[]>>() ;
-   private Map<String, List<PrimitiveValue[]>> rightBucket = new HashMap<String, List<PrimitiveValue[]>>() ;
-   private List<Column> leftColList = null ;
-   private List<Column> rightColList = null ;
    private List<Expression> leftExpList = null ;
    private List<Expression> rightExpList = null ;
-   private List<Integer> leftColIndexes = new ArrayList<Integer>() ;
-   private List<Integer> rightColIndexes = new ArrayList<Integer>() ;
    private boolean onePass = false ;
    private PrimitiveValue[] currentRightTuple = null ;
    private Integer leftBucketPointer = 0 ;
 
+   ///////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////
+   // Created functionality but not used.
+   // Can be uncommented in getHashColumns Function to obtain values
+   // for leftColList, rightColList, leftColIndexes, and rightColIndexes
+   ///////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////
+
+   //   private List<Integer> leftColIndexes = new ArrayList<Integer>() ;
+   //   private List<Column> leftColList = null ;
+   //   private List<Column> rightColList = null ;
+   //   private List<Integer> rightColIndexes = new ArrayList<Integer>() ;
 
    ///////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////
-   //////// HYBRID JOIN ALGORITHM ////////////////////////
+   //////// SORTED MERGE JOIN ALGORITHM ////////////////////////
    ///////////////////////////////////////////////////////
-   private boolean hybridJoin = false ;
-   Sort leftSort ;
-   Sort rightSort ;
-   private boolean hybridHashNext = true ;
-   private PrimitiveValue[] hybridCurrentRightTuple = null ;
-   private boolean workingOnBucket = true ;
-
+   private Sort leftSort ;
+   private Sort rightSort ;
+   private PrimitiveValue[] smjRightTuple = null ;
+   private PrimitiveValue[] smjLeftTuple = null ;
+   private boolean smjHasNextFlag = true ;
+   private List<PrimitiveValue[]> smjBucket = new ArrayList<PrimitiveValue[]>() ;
+   private Integer smjBucketPointer = 0 ;
 
    //endregion
 
@@ -85,15 +92,24 @@ public class JoinIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
-
-//      if(onExpression != null){
-         if(this.first){
-            defineHashColumns();
+         // One pass Hash Join for In Memory
+         if(Main.inMem){
+            if(this.first){
+               defineHashColumns();
+            }
+            return hashHasNext() ;
          }
-         return hashHasNext() ;
-//      }
 
-//      else{
+         // Sorted Merge Join for On Disk
+         else{
+            if(this.first){
+               defineHashColumns();
+            }
+            return smjHasNext() ;
+         }
+
+         // Nested Loop Join used for Checkpoint 1
+         //region Nested Loop Join Logic
 //         try {
 //            if (!rightChild.hasNext())
 //               return leftChild.hasNext();
@@ -103,18 +119,23 @@ public class JoinIterator implements RAIterator
 //            throw e;
 //         }
 //      }
-
+      //endregion
    }
 
    @Override
    public PrimitiveValue[] next() throws Exception
    {
-//      if(onExpression != null){
-         return hashNext() ;
-//      }
+      // One pass Hash Join for In Memory Calculations
+         if(Main.inMem){
+            return hashNext() ;
+         }
+         // Sorted Merge Join for On Disk Calculations
+         else{
+            return smjNext() ;
+         }
 
-//      else{
-         // region NLJ
+         // Nested Loop Join Logic used for Checkpoint 1
+         // region Nested Loop Join Logic
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
          ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,8 +175,6 @@ public class JoinIterator implements RAIterator
          ////////////////// NESTED LOOP JOIN ////////////////////////////////////////////////////////////////////////////
          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
          // endregion
-//      }
-
 
    }
    // region overridden methods
@@ -220,68 +239,14 @@ public class JoinIterator implements RAIterator
 
    // endregion
 
-    private void defineHashColumns(){
-       if(onExpression != null){
-          List<Expression> expressionList = commonLib.getExpressionList(onExpression);
-          Schema[] rightSchema = rightChild.getSchema();
-          List<Column> leftColList = new ArrayList<Column>();
-          List<Column> rightColList = new ArrayList<Column>()  ;
-          List<Expression> leftExpList = new ArrayList<Expression>() ;
-          List<Expression> rightExpList = new ArrayList<Expression>() ;
-          EqualsTo equalsTo;
-          for (Expression expressionItem : expressionList) {
-             if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
-                if (commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),rightSchema)) {
-                     if (equalsTo.getRightExpression() instanceof Column){
-                        rightColList.add((Column) equalsTo.getRightExpression()) ;
-                     }
-                     else if (equalsTo.getRightExpression() instanceof Expression){
-                        rightColList.addAll(commonLib.getColumnList(equalsTo.getRightExpression())) ;
-                     }
 
-                     if (equalsTo.getLeftExpression() instanceof Column){
-                      leftColList.add((Column) equalsTo.getLeftExpression()) ;
-                     }
-                     else if (equalsTo.getLeftExpression() instanceof Expression){
-                      leftColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
-                     }
-                   rightExpList.add(equalsTo.getRightExpression()) ;
-                   leftExpList.add(equalsTo.getLeftExpression()) ;
-                }
-                else {
-                   if (equalsTo.getRightExpression() instanceof Column){
-                      leftColList.add((Column) equalsTo.getRightExpression()) ;
-                   }
-                   else if (equalsTo.getRightExpression() instanceof Expression){
-                      leftColList.addAll(commonLib.getColumnList(equalsTo.getRightExpression())) ;
-                   }
-
-                   if (equalsTo.getLeftExpression() instanceof Column){
-                      rightColList.add((Column) equalsTo.getLeftExpression()) ;
-                   }
-                   else if (equalsTo.getLeftExpression() instanceof Expression){
-                      rightColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
-                   }
-
-                   rightExpList.add(equalsTo.getLeftExpression()) ;
-                   leftExpList.add(equalsTo.getRightExpression()) ;
-                }
-             }
-          }
-
-          this.leftColList = leftColList ;
-          this.rightColList = rightColList ;
-          this.leftColIndexes = commonLib.ColToSchemaIndexes(leftColList,leftChild.getSchema()) ;
-          this.rightColIndexes = commonLib.ColToSchemaIndexes(rightColList, rightSchema) ;
-          this.leftExpList = leftExpList ;
-          this.rightExpList = rightExpList ;
-       }
-   }
 
    private boolean hashHasNext() throws Exception {
+
       if(this.first) {
-         while (false && leftChild.hasNext()) {
-            fillBuckets();
+         this.first = false ;
+         while (commonLib.memoryPending() && leftChild.hasNext()) {
+            onePassFillBuckets();
          }
          if (leftBucket.isEmpty() && !leftChild.hasNext()) {
             return false;
@@ -297,116 +262,42 @@ public class JoinIterator implements RAIterator
                return false;
             }
          }
-
-         ///////////HYBRID LOGIC/////////////////////////////////////
-         if (leftChild.hasNext()) {
-            this.hybridJoin = true;
-
-            leftSort = new Sort(leftChild, leftExpList);
-
-            rightSort = new Sort(rightChild, rightExpList);
-
-            leftSort.newSort();
-            rightSort.newSort();
-            this.hybridCurrentRightTuple = rightSort.getTuple();
-
-            if (this.hybridCurrentRightTuple == null) return false;
-
-         }
-         ///////////////////////////////////////////////////////////////////
-         this.first = false ;
       }
       if(this.onePass){
          return onePassHashHasNext() ;
       }
-      else if(this.hybridJoin){
-         return hybridHasNext() ;
-      }
       return false ;
-
    }
 
-   private Boolean hybridHasNext() throws Exception{
-
-      if(this.hybridCurrentRightTuple == null){
-         return false ;
+   private PrimitiveValue[] hashNext() throws Exception {
+      if(this.onePass){
+         return onePassHashNext() ;
       }
-      else{
-         return this.hybridHashNext ;
-      }
-   }
-
-   private PrimitiveValue[] hybridNext() throws Exception {
-
-      String rightKey ;
-      rightKey = createKey(hybridCurrentRightTuple, rightExpList, "right") ;
-
-      if(leftBucket.containsKey(rightKey) && this.workingOnBucket){
-         if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
-            PrimitiveValue[] leftTuple = leftBucket.get(rightKey).get(leftBucketPointer) ;
-            leftBucketPointer++ ;
-            return commonLib.concatArrays(leftTuple,this.currentRightTuple);
-         }
-         else{
-            this.workingOnBucket = false ;
-            this.leftBucketPointer = 0 ;
-         }
-      }
-      else{
-         PrimitiveValue[] hybridCurrentLeftTuple = leftSort.getTuple() ;
-         while(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) < 0 && hybridCurrentLeftTuple != null){
-            hybridCurrentLeftTuple = leftSort.getTuple() ;
-         }
-
-         if(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) == 0){
-            return  commonLib.concatArrays(hybridCurrentLeftTuple, hybridCurrentRightTuple) ;
-         }
-
-         if(newSortCompare(hybridCurrentLeftTuple, hybridCurrentRightTuple) > 0){
-            this.hybridCurrentRightTuple = rightSort.getTuple() ;
-            this.workingOnBucket = true ;
-         }
-         return null ;
-
-      }
-      return null ;
+      return onePassHashNext() ;
    }
 
    private  Boolean onePassHashHasNext() throws Exception {
 
-         if(rightChild.hasNext()){
-            return true ;
-         }
-         else if (this.currentRightTuple == null){
-              return false ;
-         }
-         else {
-            String rightKey = "" ;
-            rightKey = createKey(currentRightTuple, rightExpList, "right") ;
-
-            if(leftBucket.containsKey(rightKey)){
-               if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
-                  return true ;
-               }
-            }
-         }
+      if(rightChild.hasNext()){
+         return true ;
+      }
+      else if (this.currentRightTuple == null){
          return false ;
       }
+      else {
+         String rightKey = "" ;
+         rightKey = createKey(currentRightTuple, rightExpList, "right") ;
 
-
-   private PrimitiveValue[] hashNext() throws Exception {
-         if(this.onePass){
-            return oneHashNext() ;
+         if(leftBucket.containsKey(rightKey)){
+            if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
+               return true ;
+            }
          }
-         else if(this.hybridJoin){
-            return hybridNext() ;
-         }
-         // Handle another way
-         // Just added this for some return value
-         return oneHashNext() ;
+      }
+      return false ;
    }
 
-   private PrimitiveValue[] oneHashNext() throws Exception {
+   private PrimitiveValue[] onePassHashNext() throws Exception {
 
       while(this.currentRightTuple == null){
          this.currentRightTuple = rightChild.next() ;
@@ -437,8 +328,113 @@ public class JoinIterator implements RAIterator
       return null ;
    }
 
+   private Boolean smjHasNext() throws Exception {
+      if(this.first) {
+         this.first = false ;
+         if(leftChild.hasNext() && rightChild.hasNext()){
+            leftSort = new Sort(leftChild, leftExpList) ;
+            rightSort = new Sort(rightChild, rightExpList);
+            leftSort.newSort();
+            rightSort.newSort();
+            this.smjRightTuple = rightSort.getTupleNew();
+            this.smjLeftTuple = leftSort.getTupleNew();
+            if(this.smjRightTuple == null || this.smjLeftTuple == null){
+               return false ;
+            }
+            SMJfillBuckets();
+            return true ;
+         }
+         else{
+            return false ;
+         }
+      }
+      else{
+         return smjHasNextFlag ;
+      }
+   }
 
-   private void fillBuckets() throws Exception {
+
+   private PrimitiveValue[] smjNext() throws Exception {
+      PrimitiveValue[] returnValue = null ;
+      if(smjBucketPointer < smjBucket.size()-1){
+         returnValue =  commonLib.concatArrays(smjLeftTuple, smjBucket.get(smjBucketPointer)) ;
+         smjBucketPointer++ ;
+      }
+      else if(smjBucketPointer == smjBucket.size()-1){
+         returnValue = commonLib.concatArrays(smjLeftTuple,smjBucket.get(smjBucketPointer)) ;
+         smjBucketPointer = 0 ;
+         smjLeftTuple = leftSort.getTupleNew() ;
+         if(smjLeftTuple == null){
+            smjHasNextFlag = false ;
+         }
+         else if(newSortCompare(smjLeftTuple, smjBucket.get(0)) != 0){
+            smjBucket.clear();
+            SMJfillBuckets();
+         }
+      }
+      return returnValue ;
+   }
+
+   private void SMJfillBuckets() throws Exception {
+
+      while(this.smjHasNextFlag){
+         if(newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0){
+            iterateLeft();
+         }else if(newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0){
+            iterateRight();
+         }else{
+            break ;
+         }
+      }
+
+      // Here we have lefttuple = righttuple or smjHasNextFlag as false.
+      // Keep adding the tuple to smjbucket as it will be joined with leftTuple
+      // Make sure you don't change the value for lefttuple until and unless the join with arraylist is complete
+
+
+
+      if(this.smjHasNextFlag){
+         while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) == 0){
+            this.smjBucket.add(this.smjRightTuple) ;
+            this.smjRightTuple = rightSort.getTupleNew() ;
+            if(this.smjRightTuple == null){
+               break ;
+            }
+         }
+      }
+      // If we have smjHasNextFlag as false, we are returning hasNext as false.
+      // Or we have obtained a case where lefttuple = righttuple
+      // So the smjBucket size is at least one.
+      // Also we getting a new rightTuple here. So we need to make sure that we only
+      // call leftSort.getTuple before calling the SMJfillBuckets() again.
+   }
+
+   // While lefttuple < righttuple. Keep getting tuple from left until either
+   // lefttuple > righttuple OR lefttuple = righttuple.
+   private void iterateLeft() throws Exception {
+      while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0){
+         this.smjLeftTuple =leftSort.getTupleNew() ;
+         if(this.smjLeftTuple == null){
+            this.smjHasNextFlag = false ;
+            break ;
+         }
+      }
+   }
+
+   // While lefttuple > righttuple. Keep getting tuple from left until either
+   // lefttuple < righttuple OR lefttuple = righttuple.
+   private void iterateRight() throws Exception {
+      while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0){
+         this.smjRightTuple = rightSort.getTupleNew() ;
+         if(this.smjRightTuple == null){
+            this.smjHasNextFlag = false ;
+            break ;
+         }
+      }
+   }
+
+
+   private void onePassFillBuckets() throws Exception {
       PrimitiveValue[] leftTuple = null ;
       Integer leftBucketSize = 0 ;
       try{
@@ -469,8 +465,72 @@ public class JoinIterator implements RAIterator
       }
    }
 
+   private void defineHashColumns(){
+      if(onExpression != null){
+         List<Expression> expressionList = commonLib.getExpressionList(onExpression);
+         Schema[] rightSchema = rightChild.getSchema();
+
+//         List<Column> leftColList = new ArrayList<Column>();
+//         List<Column> rightColList = new ArrayList<Column>()  ;
+         List<Expression> leftExpList = new ArrayList<Expression>() ;
+         List<Expression> rightExpList = new ArrayList<Expression>() ;
+         EqualsTo equalsTo;
+         for (Expression expressionItem : expressionList) {
+            if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
+               if (commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),rightSchema)) {
+                  // Functionality for getting Column Lists and Columns Indexes
+                  // Uncomment later if required
+//                  if (equalsTo.getRightExpression() instanceof Column){
+//                     rightColList.add((Column) equalsTo.getRightExpression()) ;
+//                  }
+//                  else if (equalsTo.getRightExpression() instanceof Expression){
+//                     rightColList.addAll(commonLib.getColumnList(equalsTo.getRightExpression())) ;
+//                  }
+//
+//                  if (equalsTo.getLeftExpression() instanceof Column){
+//                     leftColList.add((Column) equalsTo.getLeftExpression()) ;
+//                  }
+//                  else if (equalsTo.getLeftExpression() instanceof Expression){
+//                     leftColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
+//                  }
+                  rightExpList.add(equalsTo.getRightExpression()) ;
+                  leftExpList.add(equalsTo.getLeftExpression()) ;
+               }
+               else {
+//                  if (equalsTo.getRightExpression() instanceof Column){
+//                     leftColList.add((Column) equalsTo.getRightExpression()) ;
+//                  }
+//                  else if (equalsTo.getRightExpression() instanceof Expression){
+//                     leftColList.addAll(commonLib.getColumnList(equalsTo.getRightExpression())) ;
+//                  }
+//
+//                  if (equalsTo.getLeftExpression() instanceof Column){
+//                     rightColList.add((Column) equalsTo.getLeftExpression()) ;
+//                  }
+//                  else if (equalsTo.getLeftExpression() instanceof Expression){
+//                     rightColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
+//                  }
+
+                  rightExpList.add(equalsTo.getLeftExpression()) ;
+                  leftExpList.add(equalsTo.getRightExpression()) ;
+               }
+            }
+         }
+
+//         this.leftColList = leftColList ;
+//         this.rightColList = rightColList ;
+//         this.leftColIndexes = commonLib.ColToSchemaIndexes(leftColList,leftChild.getSchema()) ;
+//         this.rightColIndexes = commonLib.ColToSchemaIndexes(rightColList, rightSchema) ;
+         this.leftExpList = leftExpList ;
+         this.rightExpList = rightExpList ;
+      }
+   }
+
    private String createKey(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
       String key = "" ;
+      if(expression ==  null){
+         return "crossJoin" ;
+      }
       for(int i = 0 ; i < expression.size() ; i++){
          PrimitiveValueWrapper[] wrappedTuple ;
          PrimitiveValue result ;
@@ -487,6 +547,11 @@ public class JoinIterator implements RAIterator
    }
 
    private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
+      if(expression == null){
+         PrimitiveValue[] key = new PrimitiveValue[1] ;
+         key[1] = new DoubleValue(1111) ;
+         return key ;
+      }
       PrimitiveValue[] key = new PrimitiveValue[expression.size()] ;
       for(int i = 0 ; i < expression.size() ; i++){
          PrimitiveValueWrapper[] wrappedTuple ;
@@ -542,7 +607,6 @@ public class JoinIterator implements RAIterator
       catch (Exception e) {
          e.printStackTrace();
       }
-      // TODO : Confirm return value
       return 0;
    }
    //endregion

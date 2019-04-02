@@ -17,8 +17,9 @@ import java.io.StringReader;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true;
+    public static boolean inMem = false;
     static boolean debugEnabled = false;
+    public static String extension = ".csv" ;
 
     public static void main(String[] args) throws Exception
     {
@@ -28,9 +29,9 @@ public class Main {
 
 */
 
-//        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
-//        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
-//        String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
+        String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
+        String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
+        String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
 ////        String q3 = "select * from R UNION ALL select a from R";
 ////        String q3 = "select A.a,b,c from R as A";
 ////        String q3 = "select a , sum(b+c), count(c), min(b) from R where a != 170 group by a";
@@ -54,15 +55,15 @@ public class Main {
 //        String q4 = "select RA.a, RB.c, SA.d from R as RA, S as SA, R as RB, T where RA.a = RB.a and SA.d = RB.a and RA.a < T.d" ;
 //        String q4 = "select a,b,c,s.d from r,s,t where s.d < 7 and r.a = t.d and r.b = s.e";
 
-        String q1 = "CREATE TABLE LINEITEM(ORDERKEY INT,PARTKEY INT,SUPPKEY INT,LINENUMBER INT,QUANTITY DECIMAL,EXTENDEDPRICE DECIMAL,DISCOUNT DECIMAL,TAX DECIMAL,RETURNFLAG CHAR(1),LINESTATUS CHAR(1),SHIPDATE DATE,COMMITDATE DATE,RECEIPTDATE DATE,SHIPINSTRUCT CHAR(25),SHIPMODE CHAR(10),COMMENT VARCHAR(44),PRIMARY KEY (ORDERKEY,LINENUMBER));";
-        String q2 = "CREATE TABLE ORDERS(ORDERKEY INT,CUSTKEY INT,ORDERSTATUS CHAR(1),TOTALPRICE DECIMAL,ORDERDATE DATE,ORDERPRIORITY CHAR(15),CLERK CHAR(15),SHIPPRIORITY INT,COMMENT VARCHAR(79),PRIMARY KEY (ORDERKEY));" ;
-        String q3 = "CREATE TABLE PART(PARTKEY INT,NAME VARCHAR(55),MFGR CHAR(25),BRAND CHAR(10),TYPE VARCHAR(25),SIZE INT,CONTAINER CHAR(10),RETAILPRICE DECIMAL,COMMENT VARCHAR(23),PRIMARY KEY (PARTKEY));";
+        String q9 = "CREATE TABLE LINEITEM(ORDERKEY INT,PARTKEY INT,SUPPKEY INT,LINENUMBER INT,QUANTITY DECIMAL,EXTENDEDPRICE DECIMAL,DISCOUNT DECIMAL,TAX DECIMAL,RETURNFLAG CHAR(1),LINESTATUS CHAR(1),SHIPDATE DATE,COMMITDATE DATE,RECEIPTDATE DATE,SHIPINSTRUCT CHAR(25),SHIPMODE CHAR(10),COMMENT VARCHAR(44),PRIMARY KEY (ORDERKEY,LINENUMBER));";
+        String q10 = "CREATE TABLE ORDERS(ORDERKEY INT,CUSTKEY INT,ORDERSTATUS CHAR(1),TOTALPRICE DECIMAL,ORDERDATE DATE,ORDERPRIORITY CHAR(15),CLERK CHAR(15),SHIPPRIORITY INT,COMMENT VARCHAR(79),PRIMARY KEY (ORDERKEY));" ;
+        String q11 = "CREATE TABLE PART(PARTKEY INT,NAME VARCHAR(55),MFGR CHAR(25),BRAND CHAR(10),TYPE VARCHAR(25),SIZE INT,CONTAINER CHAR(10),RETAILPRICE DECIMAL,COMMENT VARCHAR(23),PRIMARY KEY (PARTKEY));";
         String q4 = "CREATE TABLE CUSTOMER(CUSTKEY INT,NAME VARCHAR(25),ADDRESS VARCHAR(40),NATIONKEY INT,PHONE CHAR(15),ACCTBAL DECIMAL,MKTSEGMENT CHAR(10),COMMENT VARCHAR(117),PRIMARY KEY (CUSTKEY));" ;
         String q5 =  "CREATE TABLE SUPPLIER(SUPPKEY INT,NAME CHAR(25),ADDRESS VARCHAR(40),NATIONKEY INT,PHONE CHAR(15),ACCTBAL DECIMAL,COMMENT VARCHAR(101),PRIMARY KEY (SUPPKEY));" ;
         String q6 = "CREATE TABLE PARTSUPP(PARTKEY INT,SUPPKEY INT,AVAILQTY INT,SUPPLYCOST DECIMAL,COMMENT VARCHAR(199),PRIMARY KEY (PARTKEY,SUPPKEY));" ;
         String q7 = "CREATE TABLE NATION(NATIONKEY INT,NAME CHAR(25),REGIONKEY INT,COMMENT VARCHAR(152),PRIMARY KEY (NATIONKEY));";
         String q8 = " CREATE TABLE REGION(REGIONKEY INT,NAME CHAR(25),COMMENT VARCHAR(152),PRIMARY KEY (REGIONKEY));" ;
-//        String q9 = "SELECT\n" +
+//        String q12 = "SELECT\n" +
 //                "  LINEITEM.ORDERKEY,\n" +
 //                "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
 //                "  ORDERS.ORDERDATE,\n" +
@@ -79,21 +80,21 @@ public class Main {
 //                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
 //                "ORDER BY REVENUE DESC, ORDERDATE\n" +
 //                "LIMIT 10;";
-        String q9 = "SELECT\n" +
-                "  LINEITEM.ORDERKEY,\n" +
-                "  ORDERS.ORDERDATE,\n" +
-                "  ORDERS.SHIPPRIORITY\n" +
-                "FROM\n" +
-                "  CUSTOMER,\n" +
-                "  ORDERS,\n" +
-                "  LINEITEM \n" +
-                "WHERE\n" +
-                "  CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
-                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
-                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
-                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
+//        String q12 = "SELECT\n" +
+//                "  LINEITEM.ORDERKEY,\n" +
+//                "  ORDERS.ORDERDATE,\n" +
+//                "  ORDERS.SHIPPRIORITY\n" +
+//                "FROM\n" +
+//                "  CUSTOMER,\n" +
+//                "  ORDERS,\n" +
+//                "  LINEITEM \n" +
+//                "WHERE\n" +
+//                "  CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+//                "  AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+//                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
+//                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
 //
-//        String q9 = "SELECT\n" +
+//        String q12 = "SELECT\n" +
 //                "  LINEITEM.ORDERKEY,\n" +
 //                "  ORDERS.ORDERDATE,\n" +
 //                "  ORDERS.SHIPPRIORITY\n" +
@@ -104,7 +105,7 @@ public class Main {
 //                "  LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
 //                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
 //                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
-        String q10 = "SELECT\n" +
+        String q12 = "SELECT\n" +
                 "  SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE, \n" +
                 "  AVG(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS A, \n" +
                 "  MIN(LINEITEM.EXTENDEDPRICE) AS B, \n" +
@@ -122,7 +123,7 @@ public class Main {
                 "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
                 "  AND ORDERS.ORDERDATE < DATE('1995-01-01')\n" +
                 "ORDER BY REVENUE DESC;" ;
-        String q12 = "SELECT\n" +
+        String q13 = "SELECT\n" +
                 " COUNT(*)\n" +
                 "FROM\n" +
                 "  REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
@@ -136,7 +137,7 @@ public class Main {
                 "  AND REGION.NAME = 'ASIA'\n" +
                 "  AND ORDERS.ORDERDATE >= DATE('1994-01-01')\n" +
                 "  AND ORDERS.ORDERDATE < DATE('1995-01-01')" ;
-        String q11 = " SELECT ORDERDATE FROM (SELECT\n" +
+        String q14 = " SELECT ORDERDATE FROM (SELECT\n" +
                 "  LINEITEM.ORDERKEY,\n" +
                 "  SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
                 "  ORDERS.ORDERDATE,\n" +
@@ -154,7 +155,60 @@ public class Main {
                 "ORDER BY ORDERDATE\n" +
                 "LIMIT 10);" ;
 
-        String q13 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY = ORDERS.ORDERKEY";
+        String q15 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY = ORDERS.ORDERKEY";
+        String q16 = "SELECT\n" +
+                "NATION.NAME,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
+                "FROM\n" +
+                "REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
+                "WHERE\n" +
+                "CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
+                "AND LINEITEM.SUPPKEY = SUPPLIER.SUPPKEY\n" +
+                "AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
+                "AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
+                "AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
+                "AND REGION.NAME = 'EUROPE'\n" +
+                "AND ORDERS.ORDERDATE >= DATE('1995-01-01')\n" +
+                "AND ORDERS.ORDERDATE < DATE('1996-01-01')\n" +
+                "GROUP BY NATION.NAME\n" +
+                "ORDER BY REVENUE DESC;" ;
+        String q17 = "SELECT\n" +
+                "LINEITEM.ORDERKEY,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "ORDERS.ORDERDATE,\n" +
+                "ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "CUSTOMER,\n" +
+                "ORDERS,\n" +
+                "LINEITEM \n" +
+                "WHERE\n" +
+                "CUSTOMER.MKTSEGMENT = 'AUTOMOBILE' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "AND ORDERS.ORDERDATE < DATE('1995-03-12')\n" +
+                "AND LINEITEM.SHIPDATE > DATE('1995-03-12')\n" +
+                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+                "LIMIT 10;";
+        String q20 = "SELECT\n" +
+                "LINEITEM.ORDERKEY,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "ORDERS.ORDERDATE,\n" +
+                "ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "CUSTOMER,\n" +
+                "ORDERS,\n" +
+                "LINEITEM \n" +
+                "WHERE\n" +
+                "CUSTOMER.MKTSEGMENT = 'AUTOMOBILE' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "AND ORDERS.ORDERDATE < DATE('1995-03-12')\n" +
+                "AND LINEITEM.SHIPDATE > DATE('1995-03-12')\n" +
+                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+                "LIMIT 10;";
+        String q18 = "select r.a,s.d from r,s where r.a = s.d;" ;
+        String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
         for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
@@ -163,13 +217,13 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q11};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q20};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while (i < 9) {
+        while (i < 12) {
             StringReader input = new StringReader(q[i]);
             CCJSqlParser parser = new CCJSqlParser(input);
             Statement query = parser.Statement();

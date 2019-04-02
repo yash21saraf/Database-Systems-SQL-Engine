@@ -1,6 +1,7 @@
 package iterators;
 
 import builders.IteratorBuilder;
+import dubstep.Main;
 import helpers.CommonLib;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -16,7 +17,7 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
+   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHinmem/";
 //   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
@@ -48,9 +49,9 @@ public class TableIterator implements RAIterator
       }
 
       try {
-         File file = new File(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat") ;
+         File file = new File(TABLE_DIRECTORY + tableName + Main.extension) ;
 //         System.out.println("FILE LENGTH: " + file.length());
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat"));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + Main.extension));
 
 
       } catch (FileNotFoundException e) {
@@ -138,7 +139,7 @@ public class TableIterator implements RAIterator
       currentLine = null;
       try {
          br.close();
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName.toUpperCase() + ".dat"));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + Main.extension));
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);
