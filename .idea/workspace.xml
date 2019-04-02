@@ -4,20 +4,13 @@
     <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dubstep/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Sort.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/Sort.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/helpers/CommonLib.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/helpers/CommonLib.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/FilterIterator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/iterators/JoinIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/JoinIterator.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator$2.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/OrderByIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/iterators/TableIterator.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,32 +28,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1513">
-              <caret line="19" column="39" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
+            <state relative-caret-position="192">
+              <caret line="31" column="74" selection-start-line="31" selection-start-column="74" selection-end-line="31" selection-end-column="74" />
               <folding>
                 <element signature="method#printResult#0;class#Main#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="580">
-              <caret line="159" selection-start-line="159" selection-end-line="159" />
-              <folding>
-                <element signature="e#6559#6560#0" expanded="true" />
-                <element signature="e#6592#6593#0" expanded="true" />
-                <element signature="e#6652#6653#0" expanded="true" />
-                <element signature="e#6687#6688#0" expanded="true" />
-                <element signature="e#6736#6737#0" expanded="true" />
-                <element signature="e#6771#6772#0" expanded="true" />
-                <element signature="e#6831#6832#0" expanded="true" />
-                <element signature="e#6868#6869#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -76,10 +50,38 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="191">
+              <caret line="218" column="16" selection-start-line="218" selection-start-column="16" selection-end-line="218" selection-end-column="16" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#651#673#0" expanded="true" />
+                <element signature="e#2230#2252#0" expanded="true" />
+                <element signature="e#3418#3624#0" />
+                <element signature="e#4225#7278#1" />
+                <element signature="e#4758#7026#0" expanded="true" />
+                <element signature="e#7025#7026#0" expanded="true" />
+                <element signature="e#8445#9055#0" />
+                <element signature="e#8571#8579#0" expanded="true" />
+                <element signature="e#9061#9336#0" />
+                <element signature="e#9342#9697#0" />
+                <element signature="e#8917#8918#0" expanded="true" />
+                <element signature="e#8998#8999#0" expanded="true" />
+                <element signature="e#9168#9169#0" expanded="true" />
+                <element signature="e#9262#9263#0" expanded="true" />
+                <element signature="e#9345#9346#0" expanded="true" />
+                <element signature="e#9441#9442#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="214" column="52" selection-start-line="214" selection-start-column="52" selection-end-line="214" selection-end-column="52" />
+            <state relative-caret-position="311">
+              <caret line="410" selection-start-line="410" selection-end-line="410" />
               <folding>
                 <element signature="e#1121#1129#0" expanded="true" />
                 <element signature="e#1203#1233#0" expanded="true" />
@@ -87,7 +89,6 @@
                 <element signature="e#15952#15953#0" expanded="true" />
                 <element signature="e#16012#16013#0" expanded="true" />
                 <element signature="e#16046#16047#0" expanded="true" />
-                <element signature="e#16095#16096#0" expanded="true" />
                 <element signature="e#16129#16130#0" expanded="true" />
                 <element signature="e#16189#16190#0" expanded="true" />
                 <element signature="e#16225#16226#0" expanded="true" />
@@ -96,38 +97,52 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="232" column="17" selection-start-line="232" selection-start-column="17" selection-end-line="232" selection-end-column="17" />
+            <state relative-caret-position="374">
+              <caret line="82" selection-start-line="82" selection-end-line="82" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#651#673#0" expanded="true" />
-                <element signature="e#1028#1036#0" expanded="true" />
-                <element signature="e#1260#1268#0" expanded="true" />
-                <element signature="e#2230#2252#0" expanded="true" />
-                <element signature="e#4758#7026#0" expanded="true" />
-                <element signature="e#7025#7026#0" expanded="true" />
-                <element signature="e#8445#9055#0" />
-                <element signature="e#8571#8579#0" expanded="true" />
-                <element signature="e#9061#9336#0" />
-                <element signature="e#9342#9697#0" />
-                <element signature="e#15323#15331#0" expanded="true" />
-                <element signature="e#19016#20975#0" expanded="true" />
-                <element signature="e#20974#20975#0" expanded="true" />
-                <element signature="e#22152#22153#0" expanded="true" />
-                <element signature="e#22194#22195#0" expanded="true" />
-                <element signature="e#22241#22242#0" expanded="true" />
-                <element signature="e#22275#22276#0" expanded="true" />
-                <element signature="e#22412#22413#0" expanded="true" />
-                <element signature="e#22445#22446#0" expanded="true" />
-                <element signature="e#22505#22506#0" expanded="true" />
-                <element signature="e#22539#22540#0" expanded="true" />
-                <element signature="e#22588#22589#0" expanded="true" />
-                <element signature="e#22622#22623#0" expanded="true" />
-                <element signature="e#22682#22683#0" expanded="true" />
-                <element signature="e#22718#22719#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#397#398#0" expanded="true" />
+                <element signature="e#436#437#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="235">
+              <caret line="218" selection-start-line="218" selection-end-line="218" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/select/PlainSelect.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
+              <folding>
+                <element signature="e#1004#1005#0" expanded="true" />
+                <element signature="e#1703#1704#0" expanded="true" />
+                <element signature="e#1746#1747#0" expanded="true" />
+                <element signature="e#1907#1908#0" expanded="true" />
+                <element signature="e#1940#1941#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -136,47 +151,23 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Sort.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="507" selection-start-line="507" selection-end-line="507" />
+            <state relative-caret-position="338">
+              <caret line="401" selection-start-line="401" selection-end-line="401" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="n#!!doc;n#priorityQueue#0;n#Sort#0" />
                 <element signature="n#!!doc;n#priorityQueueNew#0;n#Sort#0" />
-                <element signature="method#Sort#0;class#Sort#0" />
                 <element signature="method#Sort#1;class#Sort#0" />
+                <element signature="e#11086#11087#0" expanded="true" />
+                <element signature="e#11123#11124#0" expanded="true" />
                 <element signature="method#sort#0;class#Sort#0" />
                 <element signature="e#14311#14329#0" expanded="true" />
                 <element signature="method#fillPriorityQueueWithFirstIndex#0;class#Sort#0" />
-                <element signature="method#initializeVariables#0;class#Sort#0" />
+                <element signature="e#16446#16454#0" expanded="true" />
                 <element signature="method#getTuple#0;class#Sort#0" />
                 <element signature="e#20172#22286#0" expanded="true" />
                 <element signature="e#22285#22286#0" expanded="true" />
-                <element signature="method#sortList#0;class#Sort#0" />
                 <element signature="method#reset#0;class#Sort#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/TableIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="19" column="85" selection-start-line="19" selection-start-column="85" selection-end-line="19" selection-end-column="85" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="30" column="32" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="32" />
-              <folding>
-                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -185,8 +176,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="133" column="16" lean-forward="true" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
+            <state relative-caret-position="524">
+              <caret line="132" column="2" selection-start-line="132" selection-start-column="2" selection-end-line="132" selection-end-column="2" />
               <folding>
                 <element signature="e#2360#2378#0" expanded="true" />
                 <element signature="e#1946#2236#0" />
@@ -218,18 +209,6 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="28" column="41" selection-start-line="28" selection-start-column="41" selection-end-line="28" selection-end-column="41" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -241,8 +220,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>vm</find>
-      <find>wrapper</find>
       <find>is</find>
       <find>system</find>
       <find>isAgg</find>
@@ -270,6 +247,8 @@
       <find>getTuple</find>
       <find>leftSo</find>
       <find>return</find>
+      <find>indexofSortKey</find>
+      <find>getOrder</find>
       <find>inMem</find>
     </findStrings>
   </component>
@@ -306,9 +285,9 @@
         <option value="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" />
         <option value="$PROJECT_DIR$/src/main/java/helpers/Sort.java" />
+        <option value="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" />
         <option value="$PROJECT_DIR$/src/main/java/dubstep/Main.java" />
-        <option value="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" />
       </list>
     </option>
   </component>
@@ -406,7 +385,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="Common&#9;FILE&#9;file://D:/Work/Projects/sqlparse/sqlparse/src/main/java/helpers/CommonLib.java&#10;Fil&#9;FILE&#9;file://D:/Work/Projects/sqlparse/sqlparse/src/main/java/iterators/FilterIterator.java&#10;Function&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/Function.class&#10;Eval&#9;FILE&#9;jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class&#10;Column&#9;PSI&#9;JAVA://net.sf.jsqlparser.schema.Column" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554232259019" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554236988279" />
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/Database-Systems-master" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -432,7 +411,7 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="dubstep.Main" />
       <module name="sqlparse" />
-      <option name="VM_PARAMETERS" value="-Xmx5000m -Djava.util.Arrays.useLegacyMergeSort=true" />
+      <option name="VM_PARAMETERS" value="-Xmx5000m" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -603,14 +582,21 @@
       <option name="project" value="LOCAL" />
       <updated>1554191704202</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="OrderBy change req">
+      <created>1554232300739</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1554232300739</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23685667" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23685667" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -619,15 +605,15 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4986165" visible="true" weight="0.22570194" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4997233" weight="0.27969763" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4986165" weight="0.29049677" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4997233" weight="0.30453563" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5013835" side_tool="true" weight="0.3034557" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.31965443" />
+      <window_info active="true" anchor="bottom" id="Messages" order="10" visible="true" weight="0.31965443" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.24958494" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -692,7 +678,8 @@
     <MESSAGE value="Sorting for Join Iterator Created. HybridJoin started, not tested." />
     <MESSAGE value="Hybrid Join" />
     <MESSAGE value="Sorted Merge Join Base Logic Working. Require modifications for Memory Management" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sorted Merge Join Base Logic Working. Require modifications for Memory Management" />
+    <MESSAGE value="OrderBy change req" />
+    <option name="LAST_COMMIT_MESSAGE" value="OrderBy change req" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -714,6 +701,48 @@
           <line>113</line>
           <properties />
           <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java</url>
+          <line>218</line>
+          <properties />
+          <option name="timeStamp" value="244" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/helpers/Sort.java</url>
+          <line>553</line>
+          <properties />
+          <option name="timeStamp" value="246" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/helpers/Sort.java</url>
+          <line>207</line>
+          <properties />
+          <option name="timeStamp" value="247" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/helpers/Sort.java</url>
+          <line>386</line>
+          <properties />
+          <option name="timeStamp" value="248" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java</url>
+          <line>218</line>
+          <properties />
+          <option name="timeStamp" value="249" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java</url>
+          <line>249</line>
+          <properties />
+          <option name="timeStamp" value="250" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java</url>
+          <line>241</line>
+          <properties />
+          <option name="timeStamp" value="251" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -742,13 +771,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-293">
-          <caret line="741" column="76" selection-start-line="741" selection-start-column="76" selection-end-line="741" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/../../../jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/StringValue.class" />
     <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/create/table/ColumnDefinition.class" />
     <entry file="jar://D:/UB/Spring 2019/CSE 562 - Database Systems/Projects/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/schema/Column.class" />
@@ -899,18 +921,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#397#398#0" expanded="true" />
-            <element signature="e#436#437#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/helpers/FileIterator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-169">
@@ -918,13 +928,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3349">
-          <caret line="31" column="71" selection-start-line="31" selection-start-column="71" selection-end-line="31" selection-end-column="71" />
         </state>
       </provider>
     </entry>
@@ -1009,58 +1012,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="30" column="32" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="32" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="214" column="52" selection-start-line="214" selection-start-column="52" selection-end-line="214" selection-end-column="52" />
-          <folding>
-            <element signature="e#1121#1129#0" expanded="true" />
-            <element signature="e#1203#1233#0" expanded="true" />
-            <element signature="e#15919#15920#0" expanded="true" />
-            <element signature="e#15952#15953#0" expanded="true" />
-            <element signature="e#16012#16013#0" expanded="true" />
-            <element signature="e#16046#16047#0" expanded="true" />
-            <element signature="e#16095#16096#0" expanded="true" />
-            <element signature="e#16129#16130#0" expanded="true" />
-            <element signature="e#16189#16190#0" expanded="true" />
-            <element signature="e#16225#16226#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Sort.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="507" selection-start-line="507" selection-end-line="507" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="n#!!doc;n#priorityQueue#0;n#Sort#0" />
-            <element signature="n#!!doc;n#priorityQueueNew#0;n#Sort#0" />
-            <element signature="method#Sort#0;class#Sort#0" />
-            <element signature="method#Sort#1;class#Sort#0" />
-            <element signature="method#sort#0;class#Sort#0" />
-            <element signature="e#14311#14329#0" expanded="true" />
-            <element signature="method#fillPriorityQueueWithFirstIndex#0;class#Sort#0" />
-            <element signature="method#initializeVariables#0;class#Sort#0" />
-            <element signature="method#getTuple#0;class#Sort#0" />
-            <element signature="e#20172#22286#0" expanded="true" />
-            <element signature="e#22285#22286#0" expanded="true" />
-            <element signature="method#sortList#0;class#Sort#0" />
-            <element signature="method#reset#0;class#Sort#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="580">
@@ -1085,10 +1036,120 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Schema.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#397#398#0" expanded="true" />
+            <element signature="e#436#437#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/Sort.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="338">
+          <caret line="401" selection-start-line="401" selection-end-line="401" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="n#!!doc;n#priorityQueue#0;n#Sort#0" />
+            <element signature="n#!!doc;n#priorityQueueNew#0;n#Sort#0" />
+            <element signature="method#Sort#1;class#Sort#0" />
+            <element signature="e#11086#11087#0" expanded="true" />
+            <element signature="e#11123#11124#0" expanded="true" />
+            <element signature="method#sort#0;class#Sort#0" />
+            <element signature="e#14311#14329#0" expanded="true" />
+            <element signature="method#fillPriorityQueueWithFirstIndex#0;class#Sort#0" />
+            <element signature="e#16446#16454#0" expanded="true" />
+            <element signature="method#getTuple#0;class#Sort#0" />
+            <element signature="e#20172#22286#0" expanded="true" />
+            <element signature="e#22285#22286#0" expanded="true" />
+            <element signature="method#reset#0;class#Sort#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="82" selection-start-line="82" selection-end-line="82" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="410" selection-start-line="410" selection-end-line="410" />
+          <folding>
+            <element signature="e#1121#1129#0" expanded="true" />
+            <element signature="e#1203#1233#0" expanded="true" />
+            <element signature="e#15919#15920#0" expanded="true" />
+            <element signature="e#15952#15953#0" expanded="true" />
+            <element signature="e#16012#16013#0" expanded="true" />
+            <element signature="e#16046#16047#0" expanded="true" />
+            <element signature="e#16129#16130#0" expanded="true" />
+            <element signature="e#16189#16190#0" expanded="true" />
+            <element signature="e#16225#16226#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/statement/select/PlainSelect.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+          <folding>
+            <element signature="e#1004#1005#0" expanded="true" />
+            <element signature="e#1703#1704#0" expanded="true" />
+            <element signature="e#1746#1747#0" expanded="true" />
+            <element signature="e#1907#1908#0" expanded="true" />
+            <element signature="e#1940#1941#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="235">
+          <caret line="218" selection-start-line="218" selection-end-line="218" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="218" column="16" selection-start-line="218" selection-start-column="16" selection-end-line="218" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#651#673#0" expanded="true" />
+            <element signature="e#2230#2252#0" expanded="true" />
+            <element signature="e#3418#3624#0" />
+            <element signature="e#4225#7278#1" />
+            <element signature="e#4758#7026#0" expanded="true" />
+            <element signature="e#7025#7026#0" expanded="true" />
+            <element signature="e#8445#9055#0" />
+            <element signature="e#8571#8579#0" expanded="true" />
+            <element signature="e#9061#9336#0" />
+            <element signature="e#9342#9697#0" />
+            <element signature="e#8917#8918#0" expanded="true" />
+            <element signature="e#8998#8999#0" expanded="true" />
+            <element signature="e#9168#9169#0" expanded="true" />
+            <element signature="e#9262#9263#0" expanded="true" />
+            <element signature="e#9345#9346#0" expanded="true" />
+            <element signature="e#9441#9442#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="133" column="16" lean-forward="true" selection-start-line="133" selection-start-column="16" selection-end-line="133" selection-end-column="16" />
+        <state relative-caret-position="524">
+          <caret line="132" column="2" selection-start-line="132" selection-start-column="2" selection-end-line="132" selection-end-column="2" />
           <folding>
             <element signature="e#2360#2378#0" expanded="true" />
             <element signature="e#1946#2236#0" />
@@ -1121,45 +1182,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1513">
-          <caret line="19" column="39" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
+        <state relative-caret-position="192">
+          <caret line="31" column="74" selection-start-line="31" selection-start-column="74" selection-end-line="31" selection-end-column="74" />
           <folding>
             <element signature="method#printResult#0;class#Main#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="232" column="17" selection-start-line="232" selection-start-column="17" selection-end-line="232" selection-end-column="17" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#651#673#0" expanded="true" />
-            <element signature="e#1028#1036#0" expanded="true" />
-            <element signature="e#1260#1268#0" expanded="true" />
-            <element signature="e#2230#2252#0" expanded="true" />
-            <element signature="e#4758#7026#0" expanded="true" />
-            <element signature="e#7025#7026#0" expanded="true" />
-            <element signature="e#8445#9055#0" />
-            <element signature="e#8571#8579#0" expanded="true" />
-            <element signature="e#9061#9336#0" />
-            <element signature="e#9342#9697#0" />
-            <element signature="e#15323#15331#0" expanded="true" />
-            <element signature="e#19016#20975#0" expanded="true" />
-            <element signature="e#20974#20975#0" expanded="true" />
-            <element signature="e#22152#22153#0" expanded="true" />
-            <element signature="e#22194#22195#0" expanded="true" />
-            <element signature="e#22241#22242#0" expanded="true" />
-            <element signature="e#22275#22276#0" expanded="true" />
-            <element signature="e#22412#22413#0" expanded="true" />
-            <element signature="e#22445#22446#0" expanded="true" />
-            <element signature="e#22505#22506#0" expanded="true" />
-            <element signature="e#22539#22540#0" expanded="true" />
-            <element signature="e#22588#22589#0" expanded="true" />
-            <element signature="e#22622#22623#0" expanded="true" />
-            <element signature="e#22682#22683#0" expanded="true" />
-            <element signature="e#22718#22719#0" expanded="true" />
           </folding>
         </state>
       </provider>

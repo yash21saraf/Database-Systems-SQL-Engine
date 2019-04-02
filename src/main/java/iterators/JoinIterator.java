@@ -95,8 +95,8 @@ public class JoinIterator implements RAIterator
    public boolean hasNext() throws Exception
    {
          // One pass Hash Join for In Memory
-//         if(Main.inMem){
-      if(false){
+         if(Main.inMem){
+//      if(false){
             if(this.first){
                defineHashColumns();
             }
@@ -129,8 +129,8 @@ public class JoinIterator implements RAIterator
    public PrimitiveValue[] next() throws Exception
    {
       // One pass Hash Join for In Memory Calculations
-//         if(Main.inMem){
-      if(false){
+         if(Main.inMem){
+//      if(false){
             return hashNext() ;
          }
          // Sorted Merge Join for On Disk Calculations

@@ -207,10 +207,6 @@ public class Sort {
         this.indexOfOrderByElements = indexOfOrderByElements;
         this.isSourceFile = isSourceFile;
 
-       /* if (onExpression == null) { // TODO: SortMerge should not be called for cross join
-        } else {
-            this.allColumns = commonLib.getColumnList(onExpression);
-        }*/
 
         initializeVariables();
 

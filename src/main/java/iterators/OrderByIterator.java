@@ -5,12 +5,10 @@ import helpers.CommonLib;
 import helpers.Schema;
 import helpers.Sort;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 
-import java.io.*;
 import java.util.*;
 
 
@@ -20,8 +18,6 @@ public class OrderByIterator implements RAIterator {
 
     public boolean sorted = false;
 
-
-    String path = TableIterator.TABLE_DIRECTORY;
     private RAIterator child;
     private List<OrderByElement> orderByElementsList;
     private List<List<PrimitiveValue>> sortedList = new ArrayList<List<PrimitiveValue>>();
@@ -30,29 +26,16 @@ public class OrderByIterator implements RAIterator {
     private int currentIndex = 0;
     private Schema[] schema;
     private PlainSelect plainSelect;
+
     // On disk variables
     public boolean onDiskSorted = false;
-    private List<String> onDiskSortedList = new ArrayList<String>();
     private boolean noDataFound = false;
-    private int onDiscRowToReturn = 0;
-    private BufferedReader brMergedFile1;
-    private BufferedReader brMergedFile2;
-    private List<String> mergedFileLists = new ArrayList<String>();
 
     ////////////////////////////////////////
     PrimitiveValue tuple[];
     Sort sort;
 
-
-    private String leftData;
-    private String rightData;
-
-    private Limit limit;
-    private boolean limitReached = false;
-    private long totalRowCounter = 0;
-
     private CommonLib commonLib = CommonLib.getInstance();
-    long blockSize = commonLib.blockSize;
     // On disk variables ends here
 
     //endregion
@@ -66,7 +49,7 @@ public class OrderByIterator implements RAIterator {
         this.schema = child.getSchema();
         this.plainSelect = plainSelect;
 
-        limit = plainSelect.getLimit();
+        Limit limit = plainSelect.getLimit();
 
         initializeVars(plainSelect);
     }
@@ -279,430 +262,12 @@ public class OrderByIterator implements RAIterator {
     private void setTableName(List<Column> columnList, String columnName, String tableName) {
         for (int i = 0; i < columnList.size(); i++) {
             if (columnList.get(i).getColumnName().equals(columnName)) {
-                columnList.get(i).setTable(new Table(null, tableName.toLowerCase()));
+                columnList.get(i).setTable(new Table(null, tableName));
                 return;
             }
         }
     }
 
-    private void sortWithoutMerge() { // TODO: Might have a bug to fix.
-
-        int cnt = 0;
-        onDiskSortedList.clear();
-
-        try {
-            if(leftData == null)
-                leftData = getLeftData();
-            if(rightData == null)
-                rightData = getRightData();
-
-            while (leftData != null && rightData != null) {
-                if (cnt < blockSize) {
-                    //onDiskSortedList.add(leftData);
-
-                    if (isLeftGreater(leftData, rightData)) {
-                        onDiskSortedList.add(leftData);
-                        leftData = getLeftData();
-                        cnt++;
-                        // Limit check
-                        totalRowCounter++;
-                        if(limit!=null){
-                            if(totalRowCounter >= limit.getRowCount()){
-                                limitReached = true;
-                                sortList(onDiskSortedList);
-                                return;
-                            }
-                        }
-                    } else if (!isLeftGreater(leftData, rightData)) {
-                        onDiskSortedList.add(rightData);
-                        rightData = getRightData();
-                        cnt++;
-                        // Limit check
-                        totalRowCounter++;
-                        if(limit!=null){
-                            if(totalRowCounter >= limit.getRowCount()){
-                                limitReached = true;
-                                sortList(onDiskSortedList);
-                                return;
-                            }
-                        }
-                    } else { // TODO: Handle for Equality.
-                        onDiskSortedList.add(leftData);
-                        onDiskSortedList.add(rightData);
-                        cnt += 2;
-                        // Limit check
-                        totalRowCounter+=2;
-                        if(limit!=null){
-                            if(totalRowCounter >= limit.getRowCount()){
-                                limitReached = true;
-                                sortList(onDiskSortedList);
-                                return;
-                            }
-                        }
-                    }
-
-                    if (cnt >= blockSize) {
-                        sortList(onDiskSortedList);
-                        return;
-                    }
-                }
-            }
-            if (leftData != null) {
-                while (leftData != null) {
-                    if (cnt < blockSize) {
-                        onDiskSortedList.add(leftData);
-                        leftData = getLeftData();
-                        cnt++;
-                        // Limit check
-                        totalRowCounter++;
-                        if(limit!=null){
-                            if(totalRowCounter >= limit.getRowCount()){
-                                limitReached = true;
-                                sortList(onDiskSortedList);
-                                return;
-                            }
-                        }
-                        if (cnt >= blockSize) {
-                            sortList(onDiskSortedList);
-                            return;
-                        }
-
-                    }
-                }
-
-            } else if (rightData != null) {
-                while (rightData != null) {
-                    if (cnt < blockSize) {
-                        onDiskSortedList.add(rightData);
-                        rightData = getRightData();
-                        cnt++;
-                        // Limit check
-                        totalRowCounter++;
-                        if(limit!=null){
-                            if(totalRowCounter >= limit.getRowCount()){
-                                limitReached = true;
-                                sortList(onDiskSortedList);
-                                return;
-                            }
-                        }
-                        if (cnt >= blockSize) {
-                            sortList(onDiskSortedList);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (leftData == null && rightData == null && onDiskSortedList.size() > 0) {
-                sortList(onDiskSortedList);
-                return;
-            }
-
-            if (leftData == null && rightData == null) {
-                noDataFound = true;
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isLeftGreater(String leftData, String rightData) {
-
-
-        String first[] = leftData.split("\\|");
-        String second[] = rightData.split("\\|");
-
-        int i = 0;
-
-        for (Integer index : indexOfOrderByElements) {
-            String primitiveValue1 = first[index];
-            String primitiveValue2 = second[index];
-
-            if (isNumber(primitiveValue1)) {
-
-                double pv1 = Double.parseDouble(primitiveValue1);
-                double pv2 = Double.parseDouble(primitiveValue2);
-
-                if (orderOfOrderByElements.get(i++)) {
-
-                    if (pv1 < pv2)
-                        return true;
-                    else if (pv1 > pv2)
-                        return false;
-                    else {
-                        continue;
-                    }
-
-                } else {
-
-                    if (pv1 < pv2)
-                        return false;
-                    else if (pv1 > pv2)
-                        return true;
-                    else {
-                        continue;
-                    }
-                }
-
-            } else {
-
-                if (orderOfOrderByElements.get(i++)) {
-
-                    if (primitiveValue1.compareTo(primitiveValue2) > 0)
-                        return true;
-                    else if (primitiveValue1.compareTo(primitiveValue2) < 0)
-                        return false;
-                    else {
-                        continue;
-                    }
-
-                } else {
-
-                    if (primitiveValue1.compareTo(primitiveValue2) > 0)
-                        return false;
-                    else if (primitiveValue1.compareTo(primitiveValue2) < 0)
-                        return true;
-                    else {
-                        continue;
-                    }
-                }
-            }
-
-        }
-
-
-        return true; // TODO: DEFAULT returns true.
-    }
-
-    private String getLeftData() {
-
-        try {
-            return brMergedFile1.readLine();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null; // Should not come here.
-    }
-
-    private String getRightData() {
-
-        try {
-            return brMergedFile2.readLine();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null; // Should not come here.
-    }
-
-    private void merge(String firstFile, String secondFile, String filename) {
-
-        int cnt = 0;
-
-        List<String> sortedData = new ArrayList<String>();
-
-        try {
-            BufferedReader brFirstFile = new BufferedReader(new FileReader(path + firstFile));
-            BufferedReader brSecondFile = new BufferedReader(new FileReader(path + secondFile));
-            String line1 = brFirstFile.readLine();
-            String line2 = brSecondFile.readLine();
-            while (line1 != null && line2 != null) { // TODO: Should be merged after checking orderOfOrderByElements
-                if (cnt < blockSize) {
-
-                    if (isLeftGreater(line1, line2)) {
-                        sortedData.add(line1);
-                        line1 = brFirstFile.readLine();
-                        cnt++;
-                    } else if (!isLeftGreater(line1, line2)) {
-                        sortedData.add(line2);
-                        line2 = brSecondFile.readLine();
-                        cnt++;
-                    } else {
-                        sortedData.add(line1);
-                        sortedData.add(line2);
-                        cnt += 2;
-                    }
-
-                } else {
-
-                    sortList(sortedData);
-                    writeDataDisk(filename, sortedData);
-                    sortedData.clear();
-                    sortedData.add(line1);
-                    sortedData.add(line2);
-                    line1 = brFirstFile.readLine();
-                    line2 = brSecondFile.readLine();
-                    cnt = 2;
-                }
-            }
-            if (line1 != null) {
-                while(line1 != null){
-                    if (cnt < blockSize) {
-                        sortedData.add(line1);
-                        cnt++;
-                        line1 = brFirstFile.readLine();
-                    } else {
-                        sortList(sortedData);
-                        writeDataDisk(filename, sortedData);
-                        sortedData.clear();
-                        cnt = 0;
-                    }
-                }
-
-            } else if (line2 != null) {
-                while(line2 != null){
-                    if (cnt < blockSize) {
-                        sortedData.add(line2);
-                        cnt++;
-                        line2 = brSecondFile.readLine();
-                    } else {
-                        sortList(sortedData);
-                        writeDataDisk(filename, sortedData);
-                        sortedData.clear();
-                        cnt = 0;
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(sortedData.size() > 0)
-            writeDataDisk(filename, sortedData);
-    }
-
-    private void writeDataDisk(String filename, List<String> sortedData) {
-
-        File file = new File(path + filename);
-
-        FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
-
-        try {
-            bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-            for (String data : sortedData) {
-                bufferedWriter.write(data + "\n");
-            }
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fileWriter != null) {
-                    fileWriter.close();
-                }
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void sortList(List<String> sortedData) { // TODO: Fix it. It currently sorts on string ordering. Change it to primitive values
-        Collections.sort(sortedData, new Comparator<String>() {
-            @Override
-            public int compare(String a, String b) {
-
-                String first[] = a.split("\\|");
-                String second[] = b.split("\\|");
-
-                int i = 0;
-
-                for (Integer index : indexOfOrderByElements) {
-                    String val1 = first[index];
-                    String val2 = second[index];
-
-
-                    if (isNumber(val1)) {
-
-                        double pv1 = Double.parseDouble(val1);
-                        double pv2 = Double.parseDouble(val2);
-
-                        if (orderOfOrderByElements.get(i++)) {
-
-                            if (pv1 < pv2)
-                                return -1;
-                            else if (pv1 > pv2)
-                                return 1;
-                            else {
-                                continue;
-                            }
-
-                        } else {
-
-                            if (pv1 < pv2)
-                                return 1;
-                            else if (pv1 > pv2)
-                                return -1;
-                            else {
-                                continue;
-                            }
-                        }
-
-                    } else {
-
-
-                        if (orderOfOrderByElements.get(i++)) {
-
-                            if (val1.compareTo(val2) != 0)
-                                return val1.compareTo(val2);
-                            else {
-                                continue;
-                            }
-
-                        } else {
-
-                            if (val1.compareTo(val2) != 0)
-                                return -1 * val1.compareTo(val2);
-                            else {
-                                continue;
-                            }
-                        }
-                    }
-                }
-                return 1;
-            }
-        });
-    }
-
-    private void writeDataDisk(String filename) {
-
-        File file = new File(path + filename);
-
-        FileWriter fileWriter = null;
-        BufferedWriter bufferedWriter = null;
-
-        StringBuilder dataToWrite = new StringBuilder();
-        try {
-            bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-            for (List<PrimitiveValue> list : sortedList) {
-                for (PrimitiveValue data : list)
-                    dataToWrite.append("|" + data.toRawString());
-                bufferedWriter.write(dataToWrite.toString().substring(1) + "\n");
-                dataToWrite = new StringBuilder();
-            }
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fileWriter != null) {
-                    fileWriter.close();
-                }
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     public List<OrderByElement> getOrderByElementsList()
     {

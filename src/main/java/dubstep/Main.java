@@ -13,11 +13,12 @@ import net.sf.jsqlparser.statement.create.table.ColDataType;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.Arrays;
 
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true ;
+    public static boolean inMem = false ;
     static boolean debugEnabled = false;
     public static String extension = ".dat" ;
 
@@ -28,7 +29,7 @@ public class Main {
             String line32 = lines.skip(31).findFirst().get();
 
 */
-
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
         String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
@@ -217,7 +218,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q20};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
