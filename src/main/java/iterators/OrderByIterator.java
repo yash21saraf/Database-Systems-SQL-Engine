@@ -55,6 +55,41 @@ public class OrderByIterator implements RAIterator {
     }
 
     private void initializeVars(PlainSelect plainSelect) {
+
+        AllTableColumns allTableColumns;
+        AllColumns allColumns;
+        SelectItem selectItem;
+        List<SelectItem> selectItemList = new ArrayList<SelectItem>();
+
+        if ((allTableColumns = (AllTableColumns) CommonLib.castAs(plainSelect.getSelectItems().get(0), AllTableColumns.class)) != null) {
+
+            for (int i = 0; i < schema.length; i++) {
+                if (allTableColumns.getTable().getName().equals(schema[i].getTableName())) {
+                    selectItem = new SelectExpressionItem();
+                    Column column = new Column();
+                    column.setTable(new Table(schema[i].getTableName()));
+                    column.setColumnName(schema[i].getColumnDefinition().getColumnName());
+                    ((SelectExpressionItem) selectItem).setExpression(column);
+                    selectItemList.add(selectItem);
+                }
+                plainSelect.setSelectItems(selectItemList);
+            }
+
+
+        } else if ((allColumns = (AllColumns) CommonLib.castAs(plainSelect.getSelectItems().get(0), AllColumns.class)) != null) {
+
+            for (int i = 0; i < schema.length; i++) {
+                selectItem = new SelectExpressionItem();
+                Column column = new Column();
+                column.setTable(new Table(schema[i].getTableName()));
+                column.setColumnName(schema[i].getColumnDefinition().getColumnName());
+                ((SelectExpressionItem) selectItem).setExpression(column);
+                selectItemList.add(selectItem);
+            }
+            plainSelect.setSelectItems(selectItemList);
+        }
+
+
         indexOfOrderByElements = new ArrayList<Integer>();
         orderOfOrderByElements = new ArrayList<Boolean>();
         List<SelectExpressionItem> listOfSelectItems = new ArrayList<SelectExpressionItem>();

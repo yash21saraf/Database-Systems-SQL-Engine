@@ -20,7 +20,7 @@ public class Main {
     public static ColDataType colDataTypes[];
     public static boolean inMem = true ;
     static boolean debugEnabled = false;
-    public static String extension = ".dat" ;
+
 
     public static void main(String[] args) throws Exception
     {

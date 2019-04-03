@@ -17,7 +17,9 @@ public class TableIterator implements RAIterator
    //private static final Logger logger = LogManager.getLogger();
    private CommonLib commonLib = CommonLib.getInstance();
 
-   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
+//   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
+   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/";
+   public static String extension = ".dat" ;
 //   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
@@ -49,9 +51,9 @@ public class TableIterator implements RAIterator
       }
 
       try {
-         File file = new File(TABLE_DIRECTORY + tableName + Main.extension) ;
+         File file = new File(TABLE_DIRECTORY + tableName + extension) ;
 //         System.out.println("FILE LENGTH: " + file.length());
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + Main.extension));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + extension));
 
 
       } catch (FileNotFoundException e) {
@@ -139,7 +141,7 @@ public class TableIterator implements RAIterator
       currentLine = null;
       try {
          br.close();
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + Main.extension));
+         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + extension));
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);
