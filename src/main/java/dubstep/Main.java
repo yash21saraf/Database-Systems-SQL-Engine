@@ -211,6 +211,8 @@ public class Main {
         String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
+        String q30 = "select count(NATIONKEY) , REGIONKEY from nation group by REGIONKEY ";
+
         String a = "SELECT * FROM REGION, NATION WHERE NATION.REGIONKEY = REGION.REGIONKEY AND REGION.NAME = 'ASIA';";
 //            String a = "SELECT * FROM NATION ORDER BY NATION.REGIONKEY;" ;
             for (int j = 0; j < args.length; j++) {
@@ -220,7 +222,7 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q16};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q17};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
