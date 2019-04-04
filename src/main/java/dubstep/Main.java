@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true ;
+    public static boolean inMem = false ;
     static boolean debugEnabled = false;
 
 
@@ -222,13 +222,13 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q17};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
 
-        while (i < 12) {
+        while (i < q.length) {
             StringReader input = new StringReader(q[i]);
             CCJSqlParser parser = new CCJSqlParser(input);
             Statement query = parser.Statement();
@@ -240,7 +240,6 @@ public class Main {
             if (rootIterator != null) {
                 long startTime = System.nanoTime();
                 rootIterator = rootIterator.optimize(rootIterator);
-                setDataType(rootIterator);
 
                 while (rootIterator.hasNext()) {
                     PrimitiveValue[] tuple = rootIterator.next();
@@ -264,34 +263,4 @@ public class Main {
             i++;
         }
     }
-
-    private static void printResult(PrimitiveValue[] tuple, int index) {
-
-        String value = tuple[index].toRawString();
-        String datatype = colDataTypes[index].getDataType();
-        String val = "";
-        if (datatype.toLowerCase().equals("int")) {
-            try {
-                val = value.substring(0, value.indexOf("."));
-            } catch (Exception e) {
-                val = value;
-            }
-        }
-        else{
-            System.out.print(value);
-        }
-
-        System.out.print(val);
-    }
-
-    private static void setDataType(RAIterator rootIterator) {
-
-        Schema[] schemas = rootIterator.getSchema();
-        colDataTypes = new ColDataType[schemas.length];
-
-        for (int i = 0; i < schemas.length; i++) {
-            colDataTypes[i] = schemas[i].getColumnDefinition().getColDataType();
-        }
-    }
-
 }

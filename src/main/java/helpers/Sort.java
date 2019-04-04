@@ -207,7 +207,6 @@ public class Sort {
         this.indexOfOrderByElements = indexOfOrderByElements;
         this.isSourceFile = isSourceFile;
 
-
         initializeVariables();
 
     }

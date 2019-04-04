@@ -43,7 +43,7 @@ public class FileIterator {
     public void writeDataDisk(List<PrimitiveValue[]> sortedData) throws Exception { // TODO: Does it append?
 
         for (PrimitiveValue[] data : sortedData) {
-            objectOutputStream.writeObject(data);
+            objectOutputStream.writeUnshared(data);
         }
         objectOutputStream.writeObject(null);
         objectOutputStream.close();
@@ -54,7 +54,7 @@ public class FileIterator {
         try {
             if (objectInputStream == null)
                 objectInputStream = new ObjectInputStream(bufferedInputStream);
-            primitiveValues = (PrimitiveValue[]) objectInputStream.readObject();
+            primitiveValues = (PrimitiveValue[]) objectInputStream.readUnshared();
         } catch (Exception e) {
             e.printStackTrace();
             //return null;

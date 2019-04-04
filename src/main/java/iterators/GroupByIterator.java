@@ -174,14 +174,6 @@ public class GroupByIterator implements RAIterator {
 
                 PrimitiveValue[] returnTuple = aggPrimitiveValues;
 
-//                if(currentTuple == null && prevTuple != null){
-//                    noDatafound = true;
-//                    if (hasAvg)
-//                        return convertAndReturn(returnTuple);
-//                    else
-//                        return aggPrimitiveValues;
-//                }
-
                 if(currentTuple == null){
                     noDatafound = true;
                     if (hasAvg)
@@ -425,29 +417,23 @@ public class GroupByIterator implements RAIterator {
             aggPrimitiveValues = new PrimitiveValue[currentTuple.length + getCountofAvg()];
 
             int k = 0;
-            int j = 0;
             for(int index = 0; index < aggPrimitiveValues.length; index++){
 
                 if(indexOfNonGroupByCols.contains(index)) {
                     aggPrimitiveValues[index] = currentTuple[k++];
                 } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("count")) {
                     aggPrimitiveValues[index] = new LongValue(1);
-                    j++;
                 } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("sum")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                    j++;
                 } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("min")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                    j++;
                 } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("max")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                    j++;
                 } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("avg")) {
                     hasAvg = true;
                     aggPrimitiveValues[index] = new DoubleValue(1);
                     index++;
                     aggPrimitiveValues[index] = currentTuple[k++];
-                    j++;
                 }
             }
             return aggPrimitiveValues;
