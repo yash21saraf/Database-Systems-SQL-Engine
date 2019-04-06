@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false ;
+    public static boolean inMem = true ;
     static boolean debugEnabled = false;
 
 
@@ -27,7 +27,6 @@ public class Main {
 /*
          Stream<String> lines = Files.lines(Paths.get("file.txt"));
             String line32 = lines.skip(31).findFirst().get();
-
 */
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
@@ -211,18 +210,39 @@ public class Main {
         String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
-        String q30 = "select count(NATIONKEY) , REGIONKEY from nation group by REGIONKEY ";
+        String q30 = "SELECT LINEITEM.SHIPMODE,\n" +
+                "SUM(CASE\n" +
+                "WHEN ORDERPRIORITY ='1-URGENT'\n" +
+                "OR ORDERPRIORITY ='2-HIGH'\n" +
+                "THEN 1\n" +
+                "ELSE 0\n" +
+                "END) AS HIGH_LINE_COUNT,\n" +
+                "SUM(CASE\n" +
+                "WHEN ORDERPRIORITY <> '1-URGENT'\n" +
+                "AND ORDERPRIORITY <> '2-HIGH'\n" +
+                "THEN 1\n" +
+                "ELSE 0\n" +
+                "END) AS LOW_LINE_COUNT\n" +
+                "FROM LINEITEM, ORDERS\n" +
+                "WHERE ORDERS.ORDERKEY = LINEITEM.ORDERKEY\n" +
+                "  AND (LINEITEM.SHIPMODE='AIR' OR LINEITEM.SHIPMODE='RAIL')\n" +
+                "  AND LINEITEM.COMMITDATE < LINEITEM.RECEIPTDATE\n" +
+                "  AND LINEITEM.SHIPDATE < LINEITEM.COMMITDATE\n" +
+                "  AND LINEITEM.RECEIPTDATE >= DATE('1995-01-01')\n" +
+                "  AND LINEITEM.RECEIPTDATE < DATE('1996-01-01')\n" +
+                "GROUP BY LINEITEM.SHIPMODE\n" +
+                "ORDER BY LINEITEM.SHIPMODE;";
 
         String a = "SELECT * FROM REGION, NATION WHERE NATION.REGIONKEY = REGION.REGIONKEY AND REGION.NAME = 'ASIA';";
 //            String a = "SELECT * FROM NATION ORDER BY NATION.REGIONKEY;" ;
-            for (int j = 0; j < args.length; j++) {
+        for (int j = 0; j < args.length; j++) {
             if (args[j].equals("--on-disk")) {
                 //inMem = false;
                 break;
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12};
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q30};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();

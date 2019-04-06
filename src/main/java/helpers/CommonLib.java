@@ -11,6 +11,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.sql.SQLException;
@@ -272,6 +273,7 @@ public class CommonLib
       Subtraction subtraction;
       Multiplication multiplication;
       Division division;
+      CaseExpression caseExpression;
 
 
       if ((column = (Column) castAs(expression,Column.class)) != null) {
@@ -326,6 +328,12 @@ public class CommonLib
       else if ((division = (Division) castAs(expression,Division.class)) != null) {
          columnList.addAll(getColumnList(division.getLeftExpression()));
          columnList.addAll(getColumnList(division.getRightExpression()));
+      }
+      else if ((caseExpression = (CaseExpression) castAs(expression,CaseExpression.class)) != null) {
+
+         //Column column1 = new Column(new Table("ORDERS"), "ORDERPRIORITY");
+         //column1.setColumnName("ORDERPRIORITY");
+         columnList.addAll(getColumnList(caseExpression.getWhenClauses().get(0).getWhenExpression()));
       }
 
       return columnList;
