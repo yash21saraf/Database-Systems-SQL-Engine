@@ -26,14 +26,13 @@ public class CommonLib
     public static volatile int sortFileSeqNumber = 1000;
     public static volatile int mergeFileSeqNumber = 10000;
     private static CommonLib commonLib = CommonLib.getInstance();
-    public static long blockSize = 1000000;
+    public static long blockSize = 5000;
 
-   public static final int N = 1;
+   public static final int N = 200;
    public static List<String> listOfSortedFiles = new ArrayList<String>();
    public static HashMap<String, Sort> mapOfSortedFileObjects = new HashMap<String, Sort>();
    public volatile int sortMergeSeqNumber = 50000;
    public volatile int orderBySeqNumber = 70000;
-
 
    //region Variables
 
@@ -138,23 +137,24 @@ public class CommonLib
       return convertedTuple;
 
    }
-
+    PrimitiveValueWrapper[] convertedTuple;
+    PrimitiveValueWrapper convertedValuein;
    public PrimitiveValueWrapper[] convertTuplePrimitiveValueToPrimitiveValueWrapperArray(PrimitiveValue[] tuple,Schema[] schema) throws Exception
    {
 
       if (tuple == null)
          return null;
 
-      PrimitiveValueWrapper[] convertedTuple = new PrimitiveValueWrapper[tuple.length];
+      convertedTuple = new PrimitiveValueWrapper[tuple.length];
 
 
       for (int index = 0; index < tuple.length; index++) {
-         PrimitiveValueWrapper convertedValue = new PrimitiveValueWrapper();
-         convertedValue.setPrimitiveValue(tuple[index]);
-         if (convertedValue.getPrimitiveValue() != null) {
-            convertedValue.setColumnDefinition(schema[index].getColumnDefinition());
-            convertedValue.setTableName(schema[index].getTableName());
-            convertedTuple[index] = convertedValue;
+          convertedValuein = new PrimitiveValueWrapper();
+          convertedValuein.setPrimitiveValue(tuple[index]);
+         if (convertedValuein.getPrimitiveValue() != null) {
+             convertedValuein.setColumnDefinition(schema[index].getColumnDefinition());
+             convertedValuein.setTableName(schema[index].getTableName());
+            convertedTuple[index] = convertedValuein;
          } else {
             //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
@@ -163,7 +163,7 @@ public class CommonLib
       return convertedTuple;
 
    }
-
+    String[] tupleArray;
 
    public PrimitiveValue[] covertTupleToPrimitiveValue(String tupleString,ColumnDefinition[] columnDefinitions) throws Exception
    {
@@ -171,9 +171,8 @@ public class CommonLib
       if (tupleString == null)
          return null;
 
-      String[] tupleArray = tupleString.split("\\|");
+      tupleArray = tupleString.split("\\|");
       PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
-
 
       for (int index = 0; index < tupleArray.length; index++) {
          PrimitiveValue convertedValue;

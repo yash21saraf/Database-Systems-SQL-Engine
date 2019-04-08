@@ -1,13 +1,7 @@
 package iterators;
 
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
 
 public interface RAIterator
 {

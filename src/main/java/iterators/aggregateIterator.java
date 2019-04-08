@@ -1,21 +1,13 @@
 package iterators;
 
 import helpers.CommonLib;
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-import net.sf.jsqlparser.statement.select.AllColumns;
-import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-import java.lang.reflect.Array;
 import java.util.*;
-
-import static helpers.CommonLib.castAs;
 
 public class aggregateIterator implements RAIterator {
     //region Variables

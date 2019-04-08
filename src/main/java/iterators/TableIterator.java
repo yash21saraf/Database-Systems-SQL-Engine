@@ -18,19 +18,22 @@ public class TableIterator implements RAIterator
    private CommonLib commonLib = CommonLib.getInstance();
 
 //   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/";
-   public static String extension = ".dat" ;
+   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
+//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+   public static String extension = ".csv" ;
 //   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
    private String tableAlias;
    private BufferedReader br;
+   private FileReader fileReader;
    private PrimitiveValue[] currentLine;
    private PrimitiveValue[] nextLine;
    private Schema[] schema ;
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
+   private int cnter = 0;
 
 
    //endregion
@@ -52,12 +55,11 @@ public class TableIterator implements RAIterator
 
       try {
          File file = new File(TABLE_DIRECTORY + tableName + extension) ;
-//         System.out.println("FILE LENGTH: " + file.length());
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + extension));
+         fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
+         br = new BufferedReader(fileReader, 1000);
 
 
       } catch (FileNotFoundException e) {
-         //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
       }
    }
@@ -104,24 +106,28 @@ public class TableIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
+//      if((cnter % 20000) == 0)
+//         System.out.println("asdfasf");
+
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
             if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions)) != null) {
+               cnter++;
                hasNextValue = true;
                return true;
             }
             hasNextValue = false;
+            fileReader.close();
+            br.close();
             return false;
          } else {
             return hasNextValue;
          }
       }
       catch (IOException e) {
-         //logger.error("IOException in hasNext() of table: {}.", tableName);
          throw e;
       } catch (Exception e) {
-         //logger.error("Error in table: {} " + e.getMessage(), tableName);
          throw e;
       }
    }
@@ -130,6 +136,7 @@ public class TableIterator implements RAIterator
    public PrimitiveValue[] next()
    {
       currentLine = nextLine;
+      nextLine = null;
       hasNextChecked = false;
       return currentLine;
    }
@@ -139,9 +146,13 @@ public class TableIterator implements RAIterator
    {
       nextLine = null;
       currentLine = null;
+      cnter = 0;
       try {
          br.close();
-         br = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + extension));
+         fileReader.close();
+         fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
+         br = new BufferedReader(fileReader, 1000);
+         cnter++;
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
          //logger.error("Exception in reading from file for table: {}.",tableName);

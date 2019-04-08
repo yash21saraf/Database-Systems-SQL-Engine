@@ -2,7 +2,6 @@ package iterators;
 
 import helpers.BasicEval;
 import helpers.CommonLib;
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;

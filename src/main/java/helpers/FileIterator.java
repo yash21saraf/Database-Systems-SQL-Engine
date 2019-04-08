@@ -28,51 +28,92 @@ public class FileIterator {
             file = new File(TABLE_DIRECTORY + mergedFilename);
             file.createNewFile();
             fileOutputStream = new FileOutputStream(file);
-            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream,1000);
             objectOutputStream = new ObjectOutputStream(bufferedOutputStream);
-
-            fileInputStream = new FileInputStream(file);
-            bufferedInputStream = new BufferedInputStream(fileInputStream);
 
 
         } catch (Exception e) {
         }
-
     }
 
-    public void writeDataDisk(List<PrimitiveValue[]> sortedData) throws Exception { // TODO: Does it append?
+    public void writeDataDisk(List<PrimitiveValue[]> sortedData) throws Exception {
 
         for (PrimitiveValue[] data : sortedData) {
             objectOutputStream.writeUnshared(data);
         }
-        objectOutputStream.writeObject(null);
+//        objectOutputStream.reset();
+        objectOutputStream.writeUnshared(null);
         objectOutputStream.close();
+        bufferedOutputStream.close();
+        fileOutputStream.close() ;
+
+        objectOutputStream = null ;
+        bufferedOutputStream = null ;
+        fileOutputStream= null ;
+
+        fileInputStream = new FileInputStream(file);
+        bufferedInputStream = new BufferedInputStream(fileInputStream);
     }
 
     public PrimitiveValue[] getNext() {
         PrimitiveValue[] primitiveValues = null;
         try {
+            if(fileInputStream == null)
+                fileInputStream = new FileInputStream(file);
+            if(bufferedInputStream == null)
+                bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
             if (objectInputStream == null)
                 objectInputStream = new ObjectInputStream(bufferedInputStream);
+
             primitiveValues = (PrimitiveValue[]) objectInputStream.readUnshared();
+
+            if (primitiveValues == null) {
+                objectInputStream.close();
+                bufferedInputStream.close();
+                fileInputStream.close() ;
+                objectInputStream = null ;
+                bufferedInputStream = null;
+                fileInputStream = null ;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             //return null;
         }
-        //objectInputStream.close();
         return primitiveValues;
     }
 
     public void reset() throws Exception {
-        if(fileInputStream!=null)
+        if (fileInputStream != null)
             fileInputStream.close();
-        if(bufferedInputStream!=null)
+        if (bufferedInputStream != null)
             bufferedInputStream.close();
-        if(objectInputStream != null)
+        if (objectInputStream != null)
             objectInputStream.close();
 
         fileInputStream = new FileInputStream(file);
-        bufferedInputStream = new BufferedInputStream(fileInputStream);
+        bufferedInputStream = new BufferedInputStream(fileInputStream, 1000);
         objectInputStream = new ObjectInputStream(bufferedInputStream);
+    }
+
+    public void clearAll() throws IOException {
+        if (fileInputStream != null)
+            fileInputStream.close();
+        if (bufferedInputStream != null)
+            bufferedInputStream.close();
+        if (objectInputStream != null)
+            objectInputStream.close();
+        if (objectOutputStream != null)
+            objectOutputStream.close();
+        if (fileOutputStream != null)
+            fileOutputStream.close();
+        if (bufferedOutputStream!= null)
+            bufferedOutputStream.close();
+
+        fileInputStream = null ;
+        bufferedInputStream= null;
+        objectInputStream = null;
+        objectOutputStream = null ;
+        fileOutputStream= null ;
+        bufferedOutputStream= null ;
     }
 }

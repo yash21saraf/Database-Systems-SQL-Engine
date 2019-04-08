@@ -13,6 +13,7 @@ import java.util.*;
 
 public class Sort {
 
+    PrimitiveValue[] newData = null;
     private List<Column> allColumns;
     private List<String> sortKeyColumns;
     private CommonLib commonLib = CommonLib.getInstance();
@@ -23,27 +24,21 @@ public class Sort {
     private String fileName = "";
     private String path = TableIterator.TABLE_DIRECTORY;
     private String writtenFileName;
-
     private ColumnDefinition[] columnDefinitions;
     private int rowCounter = 0;
-
-    private FileIterator[] fileIterators;
+    private List<FileIterator> fileIterators = new ArrayList<FileIterator>();
     private volatile int currFileIndex = 0;
-
-    private int N = commonLib.getN();
     private long blockSize = commonLib.blockSize;
     private List<Boolean> orderOfOrderByElements;
     private List<Integer> indexOfOrderByElements;
-    private Integer temppppp = 0 ;
-
+    private Integer temppppp = 0;
     private Boolean isSourceFile;
-
-    private int initialCapacity = 10000; // TODO: what's good number?
-
-
+    private int initialCapacity = 20; // TODO: what's good number?
     //////////////////////////////////////////////////////////
-    private List<Expression> expressions ;
-    private Schema[] childSchema ;
+    private List<Expression> expressions;
+    private Schema[] childSchema;
+    private int comp;
+    private List<Integer> listOfDeletedFiles = new ArrayList<Integer>() ;
 
     //region Priority Queue
     private PriorityQueue<HashMap<Integer, PrimitiveValue[]>> priorityQueue = new PriorityQueue<HashMap<Integer, PrimitiveValue[]>>(initialCapacity,
@@ -54,13 +49,11 @@ public class Sort {
                     PrimitiveValue[] primitiveValues2 = null;
 
                     for (Map.Entry<Integer, PrimitiveValue[]> entry1 : o1.entrySet()) {
-                        Integer key1 = entry1.getKey();
                         primitiveValues1 = entry1.getValue();
                         break;
                     }
 
                     for (Map.Entry<Integer, PrimitiveValue[]> entry2 : o2.entrySet()) {
-                        Integer key2 = entry2.getKey();
                         primitiveValues2 = entry2.getValue();
                         break;
                     }
@@ -72,25 +65,25 @@ public class Sort {
 
                             if (orderOfOrderByElements == null || orderOfOrderByElements.get(i)) {
                                 if (primitiveValues1[index] instanceof StringValue) {
-                                    int comp = primitiveValues1[index].toString().compareTo(primitiveValues2[index].toString());
+                                    comp = primitiveValues1[index].toString().compareTo(primitiveValues2[index].toString());
                                     if (comp != 0)
                                         return comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof LongValue) {
-                                    int comp = Long.valueOf(primitiveValues1[index].toLong()).compareTo(primitiveValues2[index].toLong());
+                                    comp = Long.valueOf(primitiveValues1[index].toLong()).compareTo(primitiveValues2[index].toLong());
                                     if (comp != 0)
                                         return comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof DoubleValue) {
-                                    int comp = Double.compare(primitiveValues1[index].toDouble(), primitiveValues2[index].toDouble());
+                                    comp = Double.compare(primitiveValues1[index].toDouble(), primitiveValues2[index].toDouble());
                                     if (comp != 0)
                                         return comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof DateValue) {
-                                    int comp = ((DateValue) primitiveValues1[index]).getValue().compareTo(((DateValue) primitiveValues2[index]).getValue());
+                                    comp = ((DateValue) primitiveValues1[index]).getValue().compareTo(((DateValue) primitiveValues2[index]).getValue());
                                     if (comp != 0)
                                         return comp;
                                     else
@@ -99,25 +92,25 @@ public class Sort {
 
                             } else {
                                 if (primitiveValues1[index] instanceof StringValue) {
-                                    int comp = primitiveValues1[index].toString().compareTo(primitiveValues2[index].toString());
+                                    comp = primitiveValues1[index].toString().compareTo(primitiveValues2[index].toString());
                                     if (comp != 0)
                                         return -1 * comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof LongValue) {
-                                    int comp = Long.valueOf(primitiveValues1[index].toLong()).compareTo(primitiveValues2[index].toLong());
+                                    comp = Long.valueOf(primitiveValues1[index].toLong()).compareTo(primitiveValues2[index].toLong());
                                     if (comp != 0)
                                         return -1 * comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof DoubleValue) {
-                                    int comp = Double.compare(primitiveValues1[index].toDouble(), primitiveValues2[index].toDouble());
+                                    comp = Double.compare(primitiveValues1[index].toDouble(), primitiveValues2[index].toDouble());
                                     if (comp != 0)
                                         return -1 * comp;
                                     else
                                         continue;
                                 } else if (primitiveValues1[index] instanceof DateValue) {
-                                    int comp = ((DateValue) primitiveValues1[index]).getValue().compareTo(((DateValue) primitiveValues2[index]).getValue());
+                                    comp = ((DateValue) primitiveValues1[index]).getValue().compareTo(((DateValue) primitiveValues2[index]).getValue());
                                     if (comp != 0)
                                         return -1 * comp;
                                     else
@@ -144,54 +137,51 @@ public class Sort {
                     PrimitiveValue[] primitiveValues2 = null;
 
                     for (Map.Entry<Integer, PrimitiveValue[]> entry1 : o1.entrySet()) {
-                        Integer key1 = entry1.getKey();
                         primitiveValues1 = entry1.getValue();
                         break;
                     }
 
                     for (Map.Entry<Integer, PrimitiveValue[]> entry2 : o2.entrySet()) {
-                        Integer key2 = entry2.getKey();
                         primitiveValues2 = entry2.getValue();
                         break;
                     }
-                    PrimitiveValue[] o1key = null ;
+                    PrimitiveValue[] o1key = null;
                     PrimitiveValue[] o2key = null;
 
                     try {
                         o1key = createKeyPrimitive(primitiveValues1);
-                        o2key = createKeyPrimitive(primitiveValues2) ;
+                        o2key = createKeyPrimitive(primitiveValues2);
 
 
-                    for (int i = 0; i < expressions.size(); i++) {
+                        for (int i = 0; i < expressions.size(); i++) {
 
-                                if (o1key[i] instanceof StringValue) {
-                                    int comp = o1key[i].toString().compareTo(o2key[i].toString());
-                                    if (comp != 0)
-                                        return comp;
-                                    else
-                                        continue;
-                                } else if (o1key[i] instanceof LongValue) {
-                                    int comp = Long.valueOf(o1key[i].toLong()).compareTo(o2key[i].toLong());
-                                    if (comp != 0)
-                                        return comp;
-                                    else
-                                        continue;
-                                } else if (o1key[i] instanceof DoubleValue) {
-                                    int comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
-                                    if (comp != 0)
-                                        return comp;
-                                    else
-                                        continue;
-                                } else if (o1key[i] instanceof DateValue) {
-                                    int comp = ((DateValue) o1key[i]).getValue().compareTo(((DateValue) o2key[i]).getValue());
-                                    if (comp != 0)
-                                        return comp;
-                                    else
-                                        continue;
-                                }
+                            if (o1key[i] instanceof StringValue) {
+                                comp = o1key[i].toString().compareTo(o2key[i].toString());
+                                if (comp != 0)
+                                    return comp;
+                                else
+                                    continue;
+                            } else if (o1key[i] instanceof LongValue) {
+                                comp = Long.valueOf(o1key[i].toLong()).compareTo(o2key[i].toLong());
+                                if (comp != 0)
+                                    return comp;
+                                else
+                                    continue;
+                            } else if (o1key[i] instanceof DoubleValue) {
+                                comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
+                                if (comp != 0)
+                                    return comp;
+                                else
+                                    continue;
+                            } else if (o1key[i] instanceof DateValue) {
+                                comp = ((DateValue) o1key[i]).getValue().compareTo(((DateValue) o2key[i]).getValue());
+                                if (comp != 0)
+                                    return comp;
+                                else
+                                    continue;
+                            }
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     return -1;
@@ -213,21 +203,20 @@ public class Sort {
 
     public Sort(RAIterator child, List<Expression> expressions) {
         this.child = child;
-        this.expressions = expressions ;
-        this.childSchema = child.getSchema() ;
-
+        this.expressions = expressions;
+        this.childSchema = child.getSchema();
         /////// Initialize filename
     }
 
-
+    PrimitiveValue[] key;
     private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple) throws Exception {
-        PrimitiveValue[] key = new PrimitiveValue[this.expressions.size()] ;
-        for(int i = 0 ; i < this.expressions.size() ; i++){
-            PrimitiveValueWrapper[] wrappedTuple ;
-            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.childSchema) ;
+        key = new PrimitiveValue[this.expressions.size()];
+        for (int i = 0; i < this.expressions.size(); i++) {
+            PrimitiveValueWrapper[] wrappedTuple;
+            wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.childSchema);
             key[i] = commonLib.eval(this.expressions.get(i), wrappedTuple).getPrimitiveValue();
         }
-        return key ;
+        return key;
     }
 
 
@@ -244,23 +233,22 @@ public class Sort {
             List<PrimitiveValue[]> sortedList = new ArrayList<PrimitiveValue[]>();
             PrimitiveValue[] line;
 
-            fileIterators = new FileIterator[N];
-            for (int i = 0; i < N; i++) {
-                writtenFileName = fileName + "_SORT_MERGE_" + commonLib.getSortMergeSeqNumber();
-                fileIterators[i] = new FileIterator(fileName, writtenFileName);
-            }
+            //fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
 
             BufferedReader br = new BufferedReader(new FileReader(path + fileName + ".csv"));
 
             while (true) {
                 if (rowCounter >= blockSize) {
                     sortList(sortedList);
-                    fileIterators[currFileIndex].writeDataDisk(sortedList);
+                    fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+                    fileIterators.get(currFileIndex).writeDataDisk(sortedList);
                     synchronized (this) {
                         currFileIndex++;
                     }
                     rowCounter = 0;
                     sortedList.clear();
+                    Runtime r = Runtime.getRuntime();
+                    r.gc();
                 }
 
                 if ((line = commonLib.covertTupleToPrimitiveValue(br.readLine(), columnDefinitions)) != null) {
@@ -269,12 +257,15 @@ public class Sort {
                 } else {
                     if (sortedList.size() > 0) {
                         sortList(sortedList);
-                        fileIterators[currFileIndex].writeDataDisk(sortedList);
+                        fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+                        fileIterators.get(currFileIndex).writeDataDisk(sortedList);
                         synchronized (this) {
                             currFileIndex++;
                         }
                         rowCounter = 0;
                         sortedList.clear();
+                        Runtime r = Runtime.getRuntime();
+                        r.gc();
                     }
                     break;
                 }
@@ -287,21 +278,18 @@ public class Sort {
             PrimitiveValue[] line;
             List<PrimitiveValue[]> sortedList = new ArrayList<PrimitiveValue[]>();
 
-            fileIterators = new FileIterator[N];
-            for (int i = 0; i < N; i++) {
-                writtenFileName = fileName + "_ORDER_BY_" + commonLib.getOrderBySeqNumber();
-                fileIterators[i] = new FileIterator(fileName, writtenFileName);
-            }
-
             while (child.hasNext()) {
                 if (rowCounter >= blockSize) {
                     sortList(sortedList);
-                    fileIterators[currFileIndex].writeDataDisk(sortedList);
+                    fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+                    fileIterators.get(currFileIndex).writeDataDisk(sortedList);
                     synchronized (this) {
                         currFileIndex++;
                     }
                     rowCounter = 0;
                     sortedList.clear();
+                    Runtime r = Runtime.getRuntime();
+                    r.gc();
                 }
 
                 if ((line = child.next()) != null) {
@@ -309,9 +297,10 @@ public class Sort {
                     rowCounter++;
                 }
             }
-            if(sortedList.size() > 0){
+            if (sortedList.size() > 0) {
                 sortList(sortedList);
-                fileIterators[currFileIndex].writeDataDisk(sortedList);
+                fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+                fileIterators.get(currFileIndex).writeDataDisk(sortedList);
                 synchronized (this) {
                     currFileIndex++;
                 }
@@ -328,36 +317,39 @@ public class Sort {
         PrimitiveValue[] line;
         List<PrimitiveValue[]> sortedList = new ArrayList<PrimitiveValue[]>();
 
-        fileIterators = new FileIterator[N];
-        for (int i = 0; i < N; i++) {
-            writtenFileName = fileName + "_ORDER_BY_" + commonLib.getOrderBySeqNumber();
-            fileIterators[i] = new FileIterator(fileName, writtenFileName);
-        }
+
+        fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
 
         while (child.hasNext()) {
             if (rowCounter >= blockSize) {
                 sortListNew(sortedList);
-                fileIterators[currFileIndex].writeDataDisk(sortedList);
+                fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+                fileIterators.get(currFileIndex).writeDataDisk(sortedList);
                 synchronized (this) {
                     currFileIndex++;
                 }
                 rowCounter = 0;
                 sortedList.clear();
+                Runtime r = Runtime.getRuntime();
+                r.gc();
             }
-            line = child.next() ;
-            if (line != null){
+            line = child.next();
+            if (line != null) {
                 sortedList.add(line);
                 rowCounter++;
             }
         }
-        if(sortedList.size() > 0){
+        if (sortedList.size() > 0) {
             sortListNew(sortedList);
-            fileIterators[currFileIndex].writeDataDisk(sortedList);
+            fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
+            fileIterators.get(currFileIndex).writeDataDisk(sortedList);
             synchronized (this) {
                 currFileIndex++;
             }
             rowCounter = 0;
             sortedList.clear();
+            Runtime r = Runtime.getRuntime();
+            r.gc();
         }
         newFillPriorityQueueWithFirstIndex();
     }
@@ -365,21 +357,23 @@ public class Sort {
     private void fillPriorityQueueWithFirstIndex() {
         HashMap<Integer, PrimitiveValue[]> hashMap;
         for (int i = 0; i < currFileIndex; i++) {
-            PrimitiveValue[] primitiveValues = fileIterators[i].getNext();
+            PrimitiveValue[] primitiveValues = fileIterators.get(i).getNext();
             hashMap = new HashMap<Integer, PrimitiveValue[]>();
             hashMap.put(i, primitiveValues);
             priorityQueue.add(hashMap);
         }
+
     }
 
     private void newFillPriorityQueueWithFirstIndex() {
         HashMap<Integer, PrimitiveValue[]> hashMap;
         for (int i = 0; i < currFileIndex; i++) {
-            PrimitiveValue[] primitiveValues = fileIterators[i].getNext();
+            PrimitiveValue[] primitiveValues = fileIterators.get(i).getNext();
             hashMap = new HashMap<Integer, PrimitiveValue[]>();
             hashMap.put(i, primitiveValues);
             priorityQueueNew.add(hashMap);
         }
+
     }
 
     private void initializeVariables() {
@@ -440,8 +434,15 @@ public class Sort {
                 hashMap = priorityQueue.poll();
         }
 
-        if (hashMap == null)
-            return null;
+        if (hashMap == null){
+            if(primitiveValues == null){
+                for (int i = 0; i < currFileIndex; i++) {
+                    fileIterators.get(i).clearAll();
+                }
+                fileIterators.clear();
+            }
+            return null ;
+        }
 
         for (Map.Entry<Integer, PrimitiveValue[]> entry : hashMap.entrySet()) {
             key = entry.getKey();
@@ -449,29 +450,46 @@ public class Sort {
             break;
         }
 
-        PrimitiveValue[] newData = fileIterators[key].getNext(); //TODO: Need to handle null or does above code in while loop handles?
+        newData = fileIterators.get(key).getNext(); //TODO: Need to handle null or does above code in while loop handles?
         if (newData != null) {
             HashMap<Integer, PrimitiveValue[]> newMap = new HashMap<Integer, PrimitiveValue[]>();
             newMap.put(key, newData);
             priorityQueue.add(newMap);
+        }else{
+            fileIterators.get(key).clearAll();
         }
 
+        if(primitiveValues == null){
+            for (int i = 0; i < currFileIndex; i++) {
+                fileIterators.get(i).clearAll();
+            }
+            fileIterators.clear();
+        }
         return primitiveValues;
     }
 
+
+    HashMap<Integer, PrimitiveValue[]> hashMap;
     public PrimitiveValue[] getTupleNew() throws Exception {
 
         PrimitiveValue[] primitiveValues = null;
         Integer key = null;
 
-        HashMap<Integer, PrimitiveValue[]> hashMap = priorityQueueNew.poll();
+        hashMap = priorityQueueNew.poll();
         if (hashMap == null && priorityQueueNew.size() > 0) {
             while (hashMap == null && priorityQueueNew.size() > 0)
                 hashMap = priorityQueueNew.poll();
         }
 
-        if (hashMap == null)
-            return null;
+        if (hashMap == null){
+            if(primitiveValues == null){
+                for (int i = 0; i < currFileIndex; i++) {
+                    fileIterators.get(i).clearAll();
+                }
+                fileIterators.clear();
+            }
+            return null ;
+        }
 
         for (Map.Entry<Integer, PrimitiveValue[]> entry : hashMap.entrySet()) {
             key = entry.getKey();
@@ -479,13 +497,22 @@ public class Sort {
             break;
         }
 
-        PrimitiveValue[] newData = fileIterators[key].getNext(); //TODO: Need to handle null or does above code in while loop handles?
+        PrimitiveValue[] newData = fileIterators.get(key).getNext(); //TODO: Need to handle null or does above code in while loop handles?
         if (newData != null) {
             HashMap<Integer, PrimitiveValue[]> newMap = new HashMap<Integer, PrimitiveValue[]>();
             newMap.put(key, newData);
             priorityQueueNew.add(newMap);
+        }else{
+            fileIterators.get(key).clearAll() ;
+            listOfDeletedFiles.add(key) ;
         }
 
+        if(primitiveValues == null){
+            for (int i = 0; i < currFileIndex; i++) {
+                fileIterators.get(i).clearAll();
+            }
+            fileIterators.clear();
+        }
         return primitiveValues;
     }
 
@@ -495,55 +522,49 @@ public class Sort {
             @Override
             public int compare(PrimitiveValue[] a, PrimitiveValue[] b) {
 
-                    PrimitiveValue[] o1key = null ;
-                    PrimitiveValue[] o2key = null;
+                PrimitiveValue[] o1key = null;
+                PrimitiveValue[] o2key = null;
 
-                    try {
-                        o1key = createKeyPrimitive(a);
-                        o2key = createKeyPrimitive(b) ;
+                try {
+                    o1key = createKeyPrimitive(a);
+                    o2key = createKeyPrimitive(b);
 
-//                        System.out.println(temppppp) ;
-//                        temppppp++ ;
-//                        System.out.println(Arrays.toString(o1key));
-//                        System.out.println(Arrays.toString(o2key));
-                        for (int i = 0; i < expressions.size(); i++) {
+                    for (int i = 0; i < expressions.size(); i++) {
 
-                            if (o1key[i] instanceof StringValue) {
-                                int comp = o1key[i].toString().compareTo(o2key[i].toString());
-                                if (comp != 0)
-                                    return comp;
-                                else
-                                    continue;
-                            } else if (o1key[i] instanceof LongValue) {
-                                int comp = Long.valueOf(o1key[i].toLong()).compareTo(o2key[i].toLong());
-                                if (comp != 0)
-                                    return comp;
-                                else
-                                    continue;
-                            } else if (o1key[i] instanceof DoubleValue) {
-                                int comp = Double.valueOf(o1key[i].toDouble()).compareTo(o2key[i].toDouble()) ;
+                        if (o1key[i] instanceof StringValue) {
+                            comp = o1key[i].toString().compareTo(o2key[i].toString());
+                            if (comp != 0)
+                                return comp;
+                            else
+                                continue;
+                        } else if (o1key[i] instanceof LongValue) {
+                            comp = Long.valueOf(o1key[i].toLong()).compareTo(o2key[i].toLong());
+                            if (comp != 0)
+                                return comp;
+                            else
+                                continue;
+                        } else if (o1key[i] instanceof DoubleValue) {
+                            comp = Double.valueOf(o1key[i].toDouble()).compareTo(o2key[i].toDouble());
 //                                int comp = Double.compare(o1key[i].toDouble(), o2key[i].toDouble());
-                                if (comp != 0)
-                                    return comp;
-                                else
-                                    continue;
-                            } else if (o1key[i] instanceof DateValue) {
-                                int comp = ((DateValue) o1key[i]).getValue().compareTo(((DateValue) o2key[i]).getValue());
-                                if (comp != 0)
-                                    return comp;
-                                else
-                                    continue;
-                            }
+                            if (comp != 0)
+                                return comp;
+                            else
+                                continue;
+                        } else if (o1key[i] instanceof DateValue) {
+                            comp = ((DateValue) o1key[i]).getValue().compareTo(((DateValue) o2key[i]).getValue());
+                            if (comp != 0)
+                                return comp;
+                            else
+                                continue;
                         }
                     }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return -1;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return -1;
             }
         });
     }
-
 
     private void sortList(List<PrimitiveValue[]> sortedData) {
         Collections.sort(sortedData, new Comparator<PrimitiveValue[]>() {
@@ -557,25 +578,25 @@ public class Sort {
                         if (orderOfOrderByElements == null || orderOfOrderByElements.get(i)) {
 
                             if (a[index] instanceof StringValue) {
-                                int comp = a[index].toString().compareTo(b[index].toString());
+                                comp = a[index].toString().compareTo(b[index].toString());
                                 if (comp != 0)
                                     return comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof LongValue) {
-                                int comp = Long.valueOf(a[index].toLong()).compareTo(Long.valueOf(b[index].toLong()));
+                                comp = Long.valueOf(a[index].toLong()).compareTo(Long.valueOf(b[index].toLong()));
                                 if (comp != 0)
                                     return comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof DoubleValue) {
-                                int comp = Double.valueOf(a[index].toDouble()).compareTo(Double.valueOf(b[index].toDouble()));
+                                comp = Double.valueOf(a[index].toDouble()).compareTo(Double.valueOf(b[index].toDouble()));
                                 if (comp != 0)
                                     return comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof DateValue) {
-                                int comp = ((DateValue) a[index]).getValue().compareTo(((DateValue) b[index]).getValue());
+                                comp = ((DateValue) a[index]).getValue().compareTo(((DateValue) b[index]).getValue());
                                 if (comp != 0)
                                     return comp;
                                 else
@@ -583,25 +604,25 @@ public class Sort {
                             }
                         } else {
                             if (a[index] instanceof StringValue) {
-                                int comp = a[index].toString().compareTo(b[index].toString());
+                                comp = a[index].toString().compareTo(b[index].toString());
                                 if (comp != 0)
                                     return -1 * comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof LongValue) {
-                                int comp = Long.valueOf(a[index].toLong()).compareTo(Long.valueOf(b[index].toLong()));
+                                comp = Long.valueOf(a[index].toLong()).compareTo(Long.valueOf(b[index].toLong()));
                                 if (comp != 0)
                                     return -1 * comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof DoubleValue) {
-                                int comp = Double.valueOf(a[index].toDouble()).compareTo(Double.valueOf(b[index].toDouble()));
+                                comp = Double.valueOf(a[index].toDouble()).compareTo(Double.valueOf(b[index].toDouble()));
                                 if (comp != 0)
                                     return -1 * comp;
                                 else
                                     continue;
                             } else if (a[index] instanceof DateValue) {
-                                int comp = ((DateValue) a[index]).getValue().compareTo(((DateValue) b[index]).getValue());
+                                comp = ((DateValue) a[index]).getValue().compareTo(((DateValue) b[index]).getValue());
                                 if (comp != 0)
                                     return -1 * comp;
                                 else
@@ -621,7 +642,7 @@ public class Sort {
     public void reset() throws Exception {
 
         for (int i = 0; i < currFileIndex; i++) {
-            fileIterators[i].reset();
+            fileIterators.get(i).reset();
         }
 
         fillPriorityQueueWithFirstIndex();

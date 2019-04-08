@@ -1,13 +1,8 @@
 package iterators;
 
-import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.Limit;
-import net.sf.jsqlparser.statement.select.OrderByElement;
-
-import java.util.*;
 
 public class LimitIterator implements RAIterator {
 

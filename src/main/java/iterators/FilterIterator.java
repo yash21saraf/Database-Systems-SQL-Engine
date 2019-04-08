@@ -7,12 +7,6 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
-
-import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 public class FilterIterator implements RAIterator

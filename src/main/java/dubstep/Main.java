@@ -18,8 +18,10 @@ import java.util.Arrays;
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = true ;
+    public static boolean inMem = false ;
     static boolean debugEnabled = false;
+
+    static Runtime r = Runtime.getRuntime();
 
 
     public static void main(String[] args) throws Exception
@@ -105,7 +107,7 @@ public class Main {
 //                "  LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
 //                "  AND ORDERS.ORDERDATE < DATE('1995-03-26')\n" +
 //                "  AND LINEITEM.SHIPDATE > DATE('1995-03-26');";
-        String q12 = "SELECT\n" +
+      /*  String q12 = "SELECT\n" +
                 "  SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE, \n" +
                 "  AVG(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS A, \n" +
                 "  MIN(LINEITEM.EXTENDEDPRICE) AS B, \n" +
@@ -189,7 +191,7 @@ public class Main {
                 "AND LINEITEM.SHIPDATE > DATE('1995-03-12')\n" +
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY REVENUE DESC, ORDERDATE\n" +
-                "LIMIT 10;";
+                "LIMIT 10;";*/
         String q20 = "SELECT\n" +
                 "LINEITEM.ORDERKEY,\n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
@@ -207,31 +209,26 @@ public class Main {
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY REVENUE DESC, ORDERDATE\n" +
                 "LIMIT 10;";
-        String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
+      /*  String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
-        String q30 = "SELECT LINEITEM.SHIPMODE,\n" +
-                "SUM(CASE\n" +
-                "WHEN ORDERPRIORITY ='1-URGENT'\n" +
-                "OR ORDERPRIORITY ='2-HIGH'\n" +
-                "THEN 1\n" +
-                "ELSE 0\n" +
-                "END) AS HIGH_LINE_COUNT,\n" +
-                "SUM(CASE\n" +
-                "WHEN ORDERPRIORITY <> '1-URGENT'\n" +
-                "AND ORDERPRIORITY <> '2-HIGH'\n" +
-                "THEN 1\n" +
-                "ELSE 0\n" +
-                "END) AS LOW_LINE_COUNT\n" +
-                "FROM LINEITEM, ORDERS\n" +
-                "WHERE ORDERS.ORDERKEY = LINEITEM.ORDERKEY\n" +
-                "  AND (LINEITEM.SHIPMODE='AIR' OR LINEITEM.SHIPMODE='RAIL')\n" +
-                "  AND LINEITEM.COMMITDATE < LINEITEM.RECEIPTDATE\n" +
-                "  AND LINEITEM.SHIPDATE < LINEITEM.COMMITDATE\n" +
-                "  AND LINEITEM.RECEIPTDATE >= DATE('1995-01-01')\n" +
-                "  AND LINEITEM.RECEIPTDATE < DATE('1996-01-01')\n" +
-                "GROUP BY LINEITEM.SHIPMODE\n" +
-                "ORDER BY LINEITEM.SHIPMODE;";
+        String q30 = "SELECT\n" +
+                "LINEITEM.ORDERKEY,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "ORDERS.ORDERDATE,\n" +
+                "ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "CUSTOMER,\n" +
+                "ORDERS,\n" +
+                "LINEITEM \n" +
+                "WHERE\n" +
+                "CUSTOMER.MKTSEGMENT = 'BUILDING' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "AND ORDERS.ORDERDATE < DATE('1995-03-29')\n" +
+                "AND LINEITEM.SHIPDATE > DATE('1995-03-29')\n" +
+                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+                "LIMIT 10;";*/
 
         String a = "SELECT * FROM REGION, NATION WHERE NATION.REGIONKEY = REGION.REGIONKEY AND REGION.NAME = 'ASIA';";
 //            String a = "SELECT * FROM NATION ORDER BY NATION.REGIONKEY;" ;
@@ -242,7 +239,25 @@ public class Main {
             }
         }
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q30};
+//
+//        Thread thread = new Thread(){
+//            public void run(){
+//                while (true) {
+//                    try {
+//                        sleep(300);
+//                        r.gc();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        };
+//
+//        thread.start();
+
+        //-Djava.util.Arrays.useLegacyMergeSort=true
+
+        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q20};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
@@ -271,7 +286,9 @@ public class Main {
                                 System.out.print("|");
                         }
                         System.out.print("\n");
+
                     }
+
                 }
                 if (debugEnabled) {
                     long endTime = System.nanoTime();
