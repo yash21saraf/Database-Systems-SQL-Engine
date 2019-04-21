@@ -1,24 +1,20 @@
 package dubstep;
 
 import builders.IteratorBuilder;
-import helpers.CommonLib;
-import helpers.PrimitiveValueWrapper;
-import helpers.Schema;
 import iterators.RAIterator;
+import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.parser.CCJSqlParser;
-import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 
-import java.io.File;
 import java.io.StringReader;
-import java.util.Arrays;
+import java.util.Date;
 
 public class Main {
 
     public static ColDataType colDataTypes[];
-    public static boolean inMem = false ;
+    public static boolean inMem = true ;
     static boolean debugEnabled = false;
 
     static Runtime r = Runtime.getRuntime();
@@ -30,7 +26,7 @@ public class Main {
          Stream<String> lines = Files.lines(Paths.get("file.txt"));
             String line32 = lines.skip(31).findFirst().get();
 */
-        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+        //System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         String q1 = "CREATE TABLE R(a int NOT NULL, b int, c int)";
         String q2 = "CREATE TABLE S(d int NOT NULL, e int, f int)";
         String q3 = "CREATE TABLE T(d int NOT NULL, e int, f int)" ;
@@ -198,9 +194,9 @@ public class Main {
                 "ORDERS.ORDERDATE,\n" +
                 "ORDERS.SHIPPRIORITY\n" +
                 "FROM\n" +
+                "LINEITEM, \n" +
                 "CUSTOMER,\n" +
-                "ORDERS,\n" +
-                "LINEITEM \n" +
+                "ORDERS \n" +
                 "WHERE\n" +
                 "CUSTOMER.MKTSEGMENT = 'AUTOMOBILE' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
                 "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
@@ -209,6 +205,24 @@ public class Main {
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY REVENUE DESC, ORDERDATE\n" +
                 "LIMIT 10;";
+
+        String q21 = "SELECT\n" +
+                "NATION.NAME,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
+                "FROM\n" +
+                "REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
+                "WHERE\n" +
+                "CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
+                "AND LINEITEM.SUPPKEY = SUPPLIER.SUPPKEY\n" +
+                "AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
+                "AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
+                "AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
+                "AND REGION.NAME = 'EUROPE'\n" +
+                "AND ORDERS.ORDERDATE >= DATE('1995-01-01')\n" +
+                "AND ORDERS.ORDERDATE < DATE('1996-01-01')\n" +
+                "GROUP BY NATION.NAME\n" +
+                "ORDER BY REVENUE DESC;" ;
       /*  String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
 
@@ -257,7 +271,10 @@ public class Main {
 
         //-Djava.util.Arrays.useLegacyMergeSort=true
 
-        String q[] = {q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q20};
+        String q33 = "CREATE TABLE LINEITEM (ORDERKEY INT , PARTKEY INT , SUPPKEY INT , LINENUMBER INT , QUANTITY DECIMAL , EXTENDEDPRICE DECIMAL , DISCOUNT DECIMAL , TAX DECIMAL , RETURNFLAG CHAR (1) , LINESTATUS CHAR (1) , SHIPDATE DATE , COMMITDATE DATE , RECEIPTDATE DATE , SHIPINSTRUCT CHAR (25) , SHIPMODE CHAR (10) , COMMENT VARCHAR (44) , PRIMARY KEY (ORDERKEY, LINENUMBER), INDEX (SHIPDATE) SHIPDATE, INDEX (RECEIPTDATE) RECEIPTDATE, INDEX (RETURNFLAG) RETURNFLAG)";
+
+//        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q21};
+        String q[] = {q33};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
@@ -273,7 +290,8 @@ public class Main {
                 e.printStackTrace();
             }
             if (rootIterator != null) {
-                long startTime = System.nanoTime();
+//                long startTime = System.nanoTime();
+                long startTime = System.currentTimeMillis();
                 rootIterator = rootIterator.optimize(rootIterator);
 
                 while (rootIterator.hasNext()) {
@@ -291,10 +309,11 @@ public class Main {
 
                 }
                 if (debugEnabled) {
-                    long endTime = System.nanoTime();
-                    System.out.println(endTime - startTime);
-                    long freemem = Runtime.getRuntime().freeMemory();
-                    System.out.println(freemem);
+                    long endTime = System.currentTimeMillis();
+                    System.out.println(startTime);
+                    System.out.println(endTime);
+                    //long freemem = Runtime.getRuntime().freeMemory();
+                    //System.out.println(freemem);
                 }
             }
             i++;

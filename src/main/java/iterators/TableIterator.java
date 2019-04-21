@@ -1,7 +1,6 @@
 package iterators;
 
 import builders.IteratorBuilder;
-import dubstep.Main;
 import helpers.CommonLib;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -18,8 +17,8 @@ public class TableIterator implements RAIterator
    private CommonLib commonLib = CommonLib.getInstance();
 
 //   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
-//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
+   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
    public static String extension = ".csv" ;
 //   public static final String TABLE_DIRECTORY = "data/";
 
@@ -34,7 +33,6 @@ public class TableIterator implements RAIterator
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
    private int cnter = 0;
-
 
    //endregion
 
@@ -56,7 +54,7 @@ public class TableIterator implements RAIterator
       try {
          File file = new File(TABLE_DIRECTORY + tableName + extension) ;
          fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
-         br = new BufferedReader(fileReader, 1000);
+         br = new BufferedReader(fileReader, 2000);
 
 
       } catch (FileNotFoundException e) {
@@ -151,14 +149,12 @@ public class TableIterator implements RAIterator
          br.close();
          fileReader.close();
          fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
-         br = new BufferedReader(fileReader, 1000);
+         br = new BufferedReader(fileReader, 2000);
          cnter++;
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
-         //logger.error("Exception in reading from file for table: {}.",tableName);
          throw e;
       } catch (IOException e) {
-         //logger.error("Exception in reading line from file for table: {}.",tableName);
          throw e;
       } catch (Exception e) {
          throw e;

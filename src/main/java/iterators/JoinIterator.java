@@ -10,8 +10,7 @@ import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 
 import java.util.*;
 
-public class JoinIterator implements RAIterator
-{
+public class JoinIterator implements RAIterator {
     //region Variables
 
     private CommonLib commonLib = CommonLib.getInstance();
@@ -22,18 +21,18 @@ public class JoinIterator implements RAIterator
 
     private PrimitiveValue[] leftTuple;
     private PrimitiveValue[] rightTuple;
-    private Schema[] schema ;
+    private Schema[] schema;
     private boolean first = true;
 
     ////////////////////////////////////////////////////
     //////// Hash Join Variables ///////////////////////
     ////////////////////////////////////////////////////
-    private Map<String, List<PrimitiveValue[]>> leftBucket = new HashMap<String, List<PrimitiveValue[]>>() ;
-    private List<Expression> leftExpList = null ;
-    private List<Expression> rightExpList = null ;
-    private boolean onePass = false ;
-    private PrimitiveValue[] currentRightTuple = null ;
-    private Integer leftBucketPointer = 0 ;
+    private Map<String, List<PrimitiveValue[]>> leftBucket = new HashMap<String, List<PrimitiveValue[]>>();
+    private List<Expression> leftExpList = null;
+    private List<Expression> rightExpList = null;
+    private boolean onePass = false;
+    private PrimitiveValue[] currentRightTuple = null;
+    private Integer leftBucketPointer = 0;
 
     ///////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////
@@ -52,20 +51,20 @@ public class JoinIterator implements RAIterator
     ///////////////////////////////////////////////////////
     //////// SORTED MERGE JOIN ALGORITHM ////////////////////////
     ///////////////////////////////////////////////////////
-    private Sort leftSort ;
-    private Sort rightSort ;
-    private PrimitiveValue[] smjRightTuple = null ;
-    private PrimitiveValue[] smjLeftTuple = null ;
-    private boolean smjHasNextFlag = true ;
-    private List<PrimitiveValue[]> smjBucket = new ArrayList<PrimitiveValue[]>() ;
-    private Integer smjBucketPointer = 0 ;
+    private Sort leftSort;
+    private Sort rightSort;
+    private PrimitiveValue[] smjRightTuple = null;
+    private PrimitiveValue[] smjLeftTuple = null;
+    private boolean smjHasNextFlag = true;
+    private List<PrimitiveValue[]> smjBucket = new ArrayList<PrimitiveValue[]>();
+    private Integer smjBucketPointer = 0;
 
 
     //////////////////////////////////////////////////////////////
     //////////// Global key logic /////////////////////////////////
     /////////////////////////////////////////////////////////////////
 
-    private PrimitiveValue[] o1key = null ;
+    private PrimitiveValue[] o1key = null;
     private PrimitiveValue[] o2key = null;
 
 
@@ -73,17 +72,16 @@ public class JoinIterator implements RAIterator
 
     //region Constructor
 
-    public JoinIterator(RAIterator leftChild,RAIterator rightChild,Expression onExpression)
-    {
+    public JoinIterator(RAIterator leftChild, RAIterator rightChild, Expression onExpression) {
 
         this.leftChild = leftChild;
         this.rightChild = rightChild;
         this.onExpression = onExpression;
-        this.schema = createSchema(leftChild.getSchema(), rightChild.getSchema()) ;
+        this.schema = createSchema(leftChild.getSchema(), rightChild.getSchema());
     }
 
     private Schema[] createSchema(Schema[] leftSchema, Schema[] rightSchema) {
-        return CommonLib.concatArrays(leftSchema, rightSchema) ;
+        return CommonLib.concatArrays(leftSchema, rightSchema);
     }
 
 
@@ -92,23 +90,22 @@ public class JoinIterator implements RAIterator
     //region Iterator methods
 
     @Override
-    public boolean hasNext() throws Exception
-    {
+    public boolean hasNext() throws Exception {
         // One pass Hash Join for In Memory
-        if(Main.inMem){
+        if (Main.inMem) {
 //      if(false){
-            if(this.first){
+            if (this.first) {
                 defineHashColumns();
             }
-            return hashHasNext() ;
+            return hashHasNext();
         }
 
         // Sorted Merge Join for On Disk
-        else{
-            if(this.first){
+        else {
+            if (this.first) {
                 defineHashColumns();
             }
-            return smjHasNext() ;
+            return smjHasNext();
         }
 
         // Nested Loop Join used for Checkpoint 1
@@ -126,16 +123,15 @@ public class JoinIterator implements RAIterator
     }
 
     @Override
-    public PrimitiveValue[] next() throws Exception
-    {
+    public PrimitiveValue[] next() throws Exception {
         // One pass Hash Join for In Memory Calculations
-        if(Main.inMem){
+        if (Main.inMem) {
 //      if(false){
-            return hashNext() ;
+            return hashNext();
         }
         // Sorted Merge Join for On Disk Calculations
-        else{
-            return smjNext() ;
+        else {
+            return smjNext();
         }
 
         // Nested Loop Join Logic used for Checkpoint 1
@@ -181,10 +177,10 @@ public class JoinIterator implements RAIterator
         // endregion
 
     }
+
     // region overridden methods
     @Override
-    public void reset() throws Exception
-    {
+    public void reset() throws Exception {
         leftChild.reset();
         rightChild.reset();
     }
@@ -196,25 +192,25 @@ public class JoinIterator implements RAIterator
 
     @Override
     public void setChild(RAIterator child) {
-        this.leftChild = child ;
+        this.leftChild = child;
     }
 
     @Override
     public Schema[] getSchema() {
-        return this.schema ;
+        return this.schema;
     }
 
     @Override
     public void setSchema(Schema[] schema) {
-        this.schema = schema ;
-    }
-
-    public void setRightChild(RAIterator rightChild) {
-        this.rightChild = rightChild;
+        this.schema = schema;
     }
 
     public RAIterator getRightChild() {
         return this.rightChild;
+    }
+
+    public void setRightChild(RAIterator rightChild) {
+        this.rightChild = rightChild;
     }
 
     public Expression getOnExpression() {
@@ -226,16 +222,15 @@ public class JoinIterator implements RAIterator
     }
 
     @Override
-    public RAIterator optimize(RAIterator iterator)
-    {
+    public RAIterator optimize(RAIterator iterator) {
         JoinIterator joinIterator;
 
-        if ((joinIterator = (JoinIterator) CommonLib.castAs(iterator,JoinIterator.class)) != null) {
+        if ((joinIterator = (JoinIterator) CommonLib.castAs(iterator, JoinIterator.class)) != null) {
             RAIterator leftChild = joinIterator.getChild();
             RAIterator rightChild = joinIterator.getRightChild();
             leftChild = leftChild.optimize(leftChild);
             rightChild = rightChild.optimize(rightChild);
-            iterator = new JoinIterator(leftChild,rightChild,joinIterator.getOnExpression());
+            iterator = new JoinIterator(leftChild, rightChild, joinIterator.getOnExpression());
         }
 
         return iterator;
@@ -244,12 +239,12 @@ public class JoinIterator implements RAIterator
     // endregion
 
 
-
     private boolean hashHasNext() throws Exception {
 
-        if(this.first) {
-            this.first = false ;
-            while (commonLib.memoryPending() && leftChild.hasNext()) {
+        if (this.first) {
+            this.first = false;
+            // while (commonLib.memoryPending() && leftChild.hasNext()) {
+            while (leftChild.hasNext()) {
                 onePassFillBuckets();
             }
             if (leftBucket.isEmpty() && !leftChild.hasNext()) {
@@ -267,146 +262,137 @@ public class JoinIterator implements RAIterator
                 }
             }
         }
-        if(this.onePass){
-            return onePassHashHasNext() ;
+        if (this.onePass) {
+            return onePassHashHasNext();
         }
-        return false ;
+        return false;
     }
 
     private PrimitiveValue[] hashNext() throws Exception {
-        if(this.onePass){
-            return onePassHashNext() ;
+        if (this.onePass) {
+            return onePassHashNext();
         }
-        return onePassHashNext() ;
+        return onePassHashNext();
     }
 
-    private  Boolean onePassHashHasNext() throws Exception {
+    private Boolean onePassHashHasNext() throws Exception {
 
-        if(rightChild.hasNext()){
-            return true ;
-        }
-        else if (this.currentRightTuple == null){
-            return false ;
-        }
-        else {
-            String rightKey = "" ;
-            rightKey = createKey(currentRightTuple, rightExpList, "right") ;
+        if (rightChild.hasNext()) {
+            return true;
+        } else if (this.currentRightTuple == null) {
+            return false;
+        } else {
+            String rightKey = "";
+            rightKey = createKey(currentRightTuple, rightExpList, "right");
 
-            if(leftBucket.containsKey(rightKey)){
-                if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
-                    return true ;
+            if (leftBucket.containsKey(rightKey)) {
+                if (leftBucket.get(rightKey).size() > this.leftBucketPointer) {
+                    return true;
                 }
             }
         }
-        return false ;
+        return false;
     }
 
     private PrimitiveValue[] onePassHashNext() throws Exception {
 
-        while(this.currentRightTuple == null){
-            this.currentRightTuple = rightChild.next() ;
-            this.leftBucketPointer = 0 ;
-            if(this.currentRightTuple == null && !rightChild.hasNext()){
-                return null ;
+        while (this.currentRightTuple == null) {
+            this.currentRightTuple = rightChild.next();
+            this.leftBucketPointer = 0;
+            if (this.currentRightTuple == null && !rightChild.hasNext()) {
+                return null;
             }
         }
 
-        String rightKey = "" ;
-        rightKey = createKey(currentRightTuple, rightExpList, "right") ;
+        String rightKey = "";
+        rightKey = createKey(currentRightTuple, rightExpList, "right");
 
-        if(leftBucket.containsKey(rightKey)){
-            if(leftBucket.get(rightKey).size() > this.leftBucketPointer){
-                PrimitiveValue[] leftTuple = leftBucket.get(rightKey).get(leftBucketPointer) ;
-                leftBucketPointer++ ;
-                return CommonLib.concatArrays(leftTuple,this.currentRightTuple);
+        if (leftBucket.containsKey(rightKey)) {
+            if (leftBucket.get(rightKey).size() > this.leftBucketPointer) {
+                PrimitiveValue[] leftTuple = leftBucket.get(rightKey).get(leftBucketPointer);
+                leftBucketPointer++;
+                return CommonLib.concatArrays(leftTuple, this.currentRightTuple);
+            } else {
+                this.currentRightTuple = rightChild.next();
+                this.leftBucketPointer = 0;
             }
-            else{
-                this.currentRightTuple = rightChild.next() ;
-                this.leftBucketPointer = 0 ;
-            }
+        } else {
+            this.currentRightTuple = rightChild.next();
+            this.leftBucketPointer = 0;
         }
-        else{
-            this.currentRightTuple = rightChild.next() ;
-            this.leftBucketPointer = 0 ;
-        }
-        return null ;
+        return null;
     }
 
     private Boolean smjHasNext() throws Exception {
-        if(this.first) {
-            this.first = false ;
-            if(leftChild.hasNext() &&
-                    rightChild.hasNext()){
-                leftSort = new Sort(leftChild, leftExpList) ;
+        if (this.first) {
+            this.first = false;
+            if (leftChild.hasNext() &&
+                    rightChild.hasNext()) {
+                leftSort = new Sort(leftChild, leftExpList);
                 rightSort = new Sort(rightChild, rightExpList);
                 leftSort.newSort();
                 rightSort.newSort();
                 this.smjRightTuple = rightSort.getTupleNew();
                 this.smjLeftTuple = leftSort.getTupleNew();
-                if(this.smjRightTuple == null || this.smjLeftTuple == null){
-                    smjHasNextFlag = false ;
-                    leftSort = null ;
-                    rightSort = null ;
+                if (this.smjRightTuple == null || this.smjLeftTuple == null) {
+                    smjHasNextFlag = false;
+                    leftSort = null;
+                    rightSort = null;
                     Runtime r = Runtime.getRuntime();
                     r.gc();
-                    return false ;
+                    return false;
                 }
                 SMJfillBuckets();
-                return smjHasNextFlag ;
+                return smjHasNextFlag;
+            } else {
+                return false;
             }
-            else{
-                return false ;
-            }
-        }
-        else{
-            return smjHasNextFlag ;
+        } else {
+            return smjHasNextFlag;
         }
     }
 
 
     private PrimitiveValue[] smjNext() throws Exception {
-        PrimitiveValue[] returnValue = null ;
-        if(smjBucketPointer < smjBucket.size()-1){
-            returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple) ;
-            smjBucketPointer++ ;
-        }
-        else if(smjBucketPointer == smjBucket.size()-1){
-            returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple) ;
-            smjBucketPointer = 0 ;
-            smjRightTuple = rightSort.getTupleNew() ;
-            if(smjRightTuple == null){
-                leftSort = null ;
-                rightSort = null ;
+        PrimitiveValue[] returnValue = null;
+        if (smjBucketPointer < smjBucket.size() - 1) {
+            returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple);
+            smjBucketPointer++;
+        } else if (smjBucketPointer == smjBucket.size() - 1) {
+            returnValue = commonLib.concatArrays(smjBucket.get(smjBucketPointer), smjRightTuple);
+            smjBucketPointer = 0;
+            smjRightTuple = rightSort.getTupleNew();
+            if (smjRightTuple == null) {
+                leftSort = null;
+                rightSort = null;
                 Runtime r = Runtime.getRuntime();
                 r.gc();
-                smjHasNextFlag = false ;
-            }
-            else if(newSortCompare(smjBucket.get(0), smjRightTuple) !=0){
+                smjHasNextFlag = false;
+            } else if (newSortCompare(smjBucket.get(0), smjRightTuple) != 0) {
                 smjBucket.clear();
-                if(this.smjLeftTuple != null){
+                if (this.smjLeftTuple != null) {
                     SMJfillBuckets();
-                }
-                else{
-                    leftSort = null ;
-                    rightSort = null ;
+                } else {
+                    leftSort = null;
+                    rightSort = null;
                     Runtime r = Runtime.getRuntime();
                     r.gc();
-                    smjHasNextFlag = false ;
+                    smjHasNextFlag = false;
                 }
             }
         }
-        return returnValue ;
+        return returnValue;
     }
 
     private void SMJfillBuckets() throws Exception {
 
-        while(this.smjHasNextFlag){
-            if(newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0){
+        while (this.smjHasNextFlag) {
+            if (newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0) {
                 iterateLeft();
-            }else if(newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0){
+            } else if (newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0) {
                 iterateRight();
-            }else{
-                break ;
+            } else {
+                break;
             }
         }
 
@@ -415,12 +401,12 @@ public class JoinIterator implements RAIterator
         // Make sure you don't change the value for righttuple until and unless the join with arraylist is complete
 
 
-        if(this.smjHasNextFlag){
-            while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) == 0){
-                this.smjBucket.add(this.smjLeftTuple) ;
-                this.smjLeftTuple = leftSort.getTupleNew() ;
-                if(this.smjLeftTuple == null){
-                    break ;
+        if (this.smjHasNextFlag) {
+            while (newSortCompare(this.smjLeftTuple, this.smjRightTuple) == 0) {
+                this.smjBucket.add(this.smjLeftTuple);
+                this.smjLeftTuple = leftSort.getTupleNew();
+                if (this.smjLeftTuple == null) {
+                    break;
                 }
             }
         }
@@ -435,15 +421,15 @@ public class JoinIterator implements RAIterator
     // While lefttuple < righttuple. Keep getting tuple from left until either
     // lefttuple > righttuple OR lefttuple = righttuple.
     private void iterateLeft() throws Exception {
-        while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0){
-            this.smjLeftTuple =leftSort.getTupleNew() ;
-            if(this.smjLeftTuple == null){
-                leftSort = null ;
-                rightSort = null ;
+        while (newSortCompare(this.smjLeftTuple, this.smjRightTuple) < 0) {
+            this.smjLeftTuple = leftSort.getTupleNew();
+            if (this.smjLeftTuple == null) {
+                leftSort = null;
+                rightSort = null;
                 Runtime r = Runtime.getRuntime();
                 r.gc();
-                this.smjHasNextFlag = false ;
-                break ;
+                this.smjHasNextFlag = false;
+                break;
             }
         }
     }
@@ -451,64 +437,69 @@ public class JoinIterator implements RAIterator
     // While lefttuple > righttuple. Keep getting tuple from left until either
     // lefttuple < righttuple OR lefttuple = righttuple.
     private void iterateRight() throws Exception {
-        while(newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0){
-            this.smjRightTuple = rightSort.getTupleNew() ;
-            if(this.smjRightTuple == null){
-                leftSort = null ;
-                rightSort = null ;
+        while (newSortCompare(this.smjLeftTuple, this.smjRightTuple) > 0) {
+            this.smjRightTuple = rightSort.getTupleNew();
+            if (this.smjRightTuple == null) {
+                leftSort = null;
+                rightSort = null;
                 Runtime r = Runtime.getRuntime();
                 r.gc();
-                this.smjHasNextFlag = false ;
-                break ;
+                this.smjHasNextFlag = false;
+                break;
             }
         }
     }
 
 
     private void onePassFillBuckets() throws Exception {
-        PrimitiveValue[] leftTuple = null ;
-        Integer leftBucketSize = 0 ;
-        try{
+        int cnt = 0;
+        PrimitiveValue[] leftTuple = null;
+        Integer leftBucketSize = 0;
+        try {
             while (leftChild.hasNext()) {
-                leftTuple = leftChild.next() ;
-                if(leftTuple != null){
+                leftTuple = leftChild.next();
+                if (leftTuple != null) {
 
-                    leftBucketSize++ ;
-                    String leftKey ;
+                    leftBucketSize++;
+                    String leftKey;
 
-                    leftKey = createKey(leftTuple, leftExpList , "left");
+                    leftKey = createKey(leftTuple, leftExpList, "left");
 
-                    List<PrimitiveValue[]> updatedList ;
+                    List<PrimitiveValue[]> updatedList;
                     List<PrimitiveValue[]> currentList = leftBucket.get(leftKey);
                     updatedList = (currentList != null) ? currentList : new LinkedList<PrimitiveValue[]>();
                     updatedList.add(leftTuple);
                     leftBucket.put(leftKey, updatedList);
 
-                    if(leftBucketSize == 100) break ;leftBucketSize++ ;
+                    if (leftBucketSize == 100)
+                        break;
+                    leftBucketSize++;
+                    cnt++;
+                    //if(cnt % 10000 == 0)
+                       // System.out.println(cnt);
 
                 }
             }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //logger.error("Error in JoinIterator.next() during rightChild.hasNext() check.");
             throw e;
         }
     }
 
-    private void defineHashColumns(){
-        if(onExpression != null){
+    private void defineHashColumns() {
+        if (onExpression != null) {
             List<Expression> expressionList = commonLib.getExpressionList(onExpression);
             Schema[] rightSchema = rightChild.getSchema();
 
 //         List<Column> leftColList = new ArrayList<Column>();
 //         List<Column> rightColList = new ArrayList<Column>()  ;
-            List<Expression> leftExpList = new ArrayList<Expression>() ;
-            List<Expression> rightExpList = new ArrayList<Expression>() ;
+            List<Expression> leftExpList = new ArrayList<Expression>();
+            List<Expression> rightExpList = new ArrayList<Expression>();
             EqualsTo equalsTo;
             for (Expression expressionItem : expressionList) {
-                if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem,EqualsTo.class)) != null) {
-                    if (commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(),rightSchema)) {
+                if ((equalsTo = (EqualsTo) CommonLib.castAs(expressionItem, EqualsTo.class)) != null) {
+                    if (commonLib.validateExpressionAgainstSchema(equalsTo.getRightExpression(), rightSchema)) {
                         // Functionality for getting Column Lists and Columns Indexes
                         // Uncomment later if required
 //                  if (equalsTo.getRightExpression() instanceof Column){
@@ -524,10 +515,9 @@ public class JoinIterator implements RAIterator
 //                  else if (equalsTo.getLeftExpression() instanceof Expression){
 //                     leftColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
 //                  }
-                        rightExpList.add(equalsTo.getRightExpression()) ;
-                        leftExpList.add(equalsTo.getLeftExpression()) ;
-                    }
-                    else {
+                        rightExpList.add(equalsTo.getRightExpression());
+                        leftExpList.add(equalsTo.getLeftExpression());
+                    } else {
 //                  if (equalsTo.getRightExpression() instanceof Column){
 //                     leftColList.add((Column) equalsTo.getRightExpression()) ;
 //                  }
@@ -542,8 +532,8 @@ public class JoinIterator implements RAIterator
 //                     rightColList.addAll(commonLib.getColumnList(equalsTo.getLeftExpression())) ;
 //                  }
 
-                        rightExpList.add(equalsTo.getLeftExpression()) ;
-                        leftExpList.add(equalsTo.getRightExpression()) ;
+                        rightExpList.add(equalsTo.getLeftExpression());
+                        leftExpList.add(equalsTo.getRightExpression());
                     }
                 }
             }
@@ -552,50 +542,50 @@ public class JoinIterator implements RAIterator
 //         this.rightColList = rightColList ;
 //         this.leftColIndexes = commonLib.ColToSchemaIndexes(leftColList,leftChild.getSchema()) ;
 //         this.rightColIndexes = commonLib.ColToSchemaIndexes(rightColList, rightSchema) ;
-            this.leftExpList = leftExpList ;
-            this.rightExpList = rightExpList ;
-            this.o1key = new PrimitiveValue[leftExpList.size()] ;
-            this.o2key = new PrimitiveValue[rightExpList.size()] ;
+            this.leftExpList = leftExpList;
+            this.rightExpList = rightExpList;
+            this.o1key = new PrimitiveValue[leftExpList.size()];
+            this.o2key = new PrimitiveValue[rightExpList.size()];
         }
     }
 
     private String createKey(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
-        String key = "" ;
-        if(expression ==  null){
-            return "crossJoin" ;
+        String key = "";
+        if (expression == null) {
+            return "crossJoin";
         }
-        for(int i = 0 ; i < expression.size() ; i++){
-            PrimitiveValueWrapper[] wrappedTuple ;
-            PrimitiveValue result ;
+        for (int i = 0; i < expression.size(); i++) {
+            PrimitiveValueWrapper[] wrappedTuple;
+            PrimitiveValue result;
 
-            if(side.equals("left")){
-                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema()) ;
-            }else{
-                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema()) ;
+            if (side.equals("left")) {
+                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema());
+            } else {
+                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema());
             }
             result = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
-            key = key + "|" + result.toRawString() ;
+            key = key + "|" + result.toRawString();
         }
-        return key ;
+        return key;
     }
 
     private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
-        if(expression == null){
-            PrimitiveValue[] key = new PrimitiveValue[1] ;
-            key[1] = new DoubleValue(1111) ;
-            return key ;
+        if (expression == null) {
+            PrimitiveValue[] key = new PrimitiveValue[1];
+            key[1] = new DoubleValue(1111);
+            return key;
         }
-        PrimitiveValue[] key = new PrimitiveValue[expression.size()] ;
-        for(int i = 0 ; i < expression.size() ; i++){
-            PrimitiveValueWrapper[] wrappedTuple ;
-            if(side.equals("left")){
-                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema()) ;
-            }else{
-                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema()) ;
+        PrimitiveValue[] key = new PrimitiveValue[expression.size()];
+        for (int i = 0; i < expression.size(); i++) {
+            PrimitiveValueWrapper[] wrappedTuple;
+            if (side.equals("left")) {
+                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, leftChild.getSchema());
+            } else {
+                wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema());
             }
             key[i] = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
         }
-        return key ;
+        return key;
     }
 
     // Made both o1
@@ -619,7 +609,7 @@ public class JoinIterator implements RAIterator
 //      try {
 //         o1key = createKeyPrimitive(a, leftExpList, "left");
 //         o2key = createKeyPrimitive(b, rightExpList, "right") ;
-        createKeyPrim(a,b);
+        createKeyPrim(a, b);
 
         for (int i = 0; i < leftExpList.size(); i++) {
 

@@ -25,12 +25,14 @@ public class FileIterator {
         this.mergedFilename = mergedFilename;
 
         try {
+
+//            file = new File("tempfolder/" + mergedFilename);
+//            file.createNewFile();
             file = new File(TABLE_DIRECTORY + mergedFilename);
             file.createNewFile();
             fileOutputStream = new FileOutputStream(file);
-            bufferedOutputStream = new BufferedOutputStream(fileOutputStream,1000);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream,500);
             objectOutputStream = new ObjectOutputStream(bufferedOutputStream);
-
 
         } catch (Exception e) {
         }
@@ -61,7 +63,7 @@ public class FileIterator {
             if(fileInputStream == null)
                 fileInputStream = new FileInputStream(file);
             if(bufferedInputStream == null)
-                bufferedInputStream = new BufferedInputStream(fileInputStream, 200);
+                bufferedInputStream = new BufferedInputStream(fileInputStream, 500);
             if (objectInputStream == null)
                 objectInputStream = new ObjectInputStream(bufferedInputStream);
 
@@ -91,7 +93,7 @@ public class FileIterator {
             objectInputStream.close();
 
         fileInputStream = new FileInputStream(file);
-        bufferedInputStream = new BufferedInputStream(fileInputStream, 1000);
+        bufferedInputStream = new BufferedInputStream(fileInputStream, 500);
         objectInputStream = new ObjectInputStream(bufferedInputStream);
     }
 

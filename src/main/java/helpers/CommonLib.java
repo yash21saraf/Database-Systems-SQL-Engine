@@ -164,27 +164,34 @@ public class CommonLib
 
    }
     String[] tupleArray;
+   PrimitiveValue[] convertedTuple1;
 
    public PrimitiveValue[] covertTupleToPrimitiveValue(String tupleString,ColumnDefinition[] columnDefinitions) throws Exception
    {
 
+      tupleArray = null;
+      convertedTuple1 = null;
+
       if (tupleString == null)
          return null;
 
+
       tupleArray = tupleString.split("\\|");
-      PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
+      //StringBuilder stringBuilder = new StringBuilder();
+
+      convertedTuple1 = new PrimitiveValue[tupleArray.length];
 
       for (int index = 0; index < tupleArray.length; index++) {
          PrimitiveValue convertedValue;
          convertedValue = convertToPrimitiveValue(tupleArray[index],columnDefinitions[index].getColDataType().getDataType());
          if (convertedValue != null) {
-            convertedTuple[index] = convertedValue;
+            convertedTuple1[index] = convertedValue;
          } else {
             //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
          }
       }
-      return convertedTuple;
+      return convertedTuple1;
 
    }
 
