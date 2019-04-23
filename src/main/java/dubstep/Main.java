@@ -282,8 +282,7 @@ public class Main {
                 "LINEITEM.SHIPDATE >= DATE('1994-01-01')\n" +
                 "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
-                "AND LINEITEM.QUANTITY < 24 \n" +
-                "order by LINEITEM.SHIPDATE";
+                "AND LINEITEM.QUANTITY < 24;";
         //String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
         String q[] = {q9 ,q44};
 //        String q[] = {q44};

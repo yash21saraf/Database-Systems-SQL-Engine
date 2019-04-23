@@ -53,7 +53,7 @@ public class Index {
 
         String indexes[] = indexMap.get(createTable.getTable().getName()).split("\\|");
 
-        boolean sorted = true;
+        boolean sorted = false; // TODO: change the flag
 
         for (int i = 0; i < indexes.length; i++) {
             buildIndex(createTable.getTable().getName(), indexes[i], sorted);
@@ -256,7 +256,8 @@ public class Index {
     }
 
     private static void init() {
-        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
+        //indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
+        indexMap.put("LINEITEM", "SHIPDATE");
         indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
         indexMap.put("PART", "PARTKEY");
         indexMap.put("CUSTOMER", "CUSTKEY|MKTSEGMENT");
@@ -286,11 +287,11 @@ public class Index {
 
     public List<String> getIndexList(String tableName, String indexColumnName) {
 
-        indexFileLists.add("INDEX_LINEITEM_SHIPDATE_100064");
-        indexFileLists.add("INDEX_LINEITEM_RECEIPTDATE_100051");
-        indexFileLists.add("INDEX_LINEITEM_RETURNFLAG_100038");
-        indexFileLists.add("INDEX_LINEITEM_LINENUMBER_100025");
-        indexFileLists.add("INDEX_LINEITEM_ORDERKEY_100012");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100012");
+//        indexFileLists.add("INDEX_LINEITEM_RECEIPTDATE_100051");
+//        indexFileLists.add("INDEX_LINEITEM_RETURNFLAG_100038");
+//        indexFileLists.add("INDEX_LINEITEM_LINENUMBER_100025");
+//        indexFileLists.add("INDEX_LINEITEM_ORDERKEY_100012");
 
         String col[] = null;
         String indexFileName = "";
@@ -305,7 +306,7 @@ public class Index {
         }
 
         for(String filename : indexFileLists){
-            String file = filename.substring(0, filename. lastIndexOf("_"));
+            String file = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("_"));
             if(indexFileName.equals(file))
                 list.add(filename);
         }
@@ -313,7 +314,7 @@ public class Index {
         BufferedReader br = null;
         String line = null;
         try {
-            br = new BufferedReader(new FileReader(CommonLib.TABLE_DIRECTORY + list.get(0)));
+            br = new BufferedReader(new FileReader( list.get(0)));
 
             while((line = br.readLine()) != null)
                 filelist.add(line);
@@ -326,7 +327,7 @@ public class Index {
 
         //list.remove(0);
 
-        indexFileLists.clear();
+        //indexFileLists.clear();
         return filelist;
     }
 

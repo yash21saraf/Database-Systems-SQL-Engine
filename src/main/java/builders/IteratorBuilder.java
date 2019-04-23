@@ -54,7 +54,7 @@ public class IteratorBuilder {
             buildCreateTable(createTable);
 
             saveCreateStatement(createTable);
-            //createIndex(createTable);
+            createIndex(createTable);
 
             return null;
 
