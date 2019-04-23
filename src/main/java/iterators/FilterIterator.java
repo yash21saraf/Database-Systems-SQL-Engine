@@ -127,7 +127,8 @@ public class FilterIterator implements RAIterator {
 
                     e.printStackTrace();
                 }
-            } else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
+            }
+            else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
                 try {
                     Schema[] schemas = filterIterator.getSchema();
                     String table = schemas[0].getTableName();
@@ -142,7 +143,8 @@ public class FilterIterator implements RAIterator {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
+            }
+            else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
                 List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
                 Schema[] leftSchema = joinIterator.getChild().getSchema();
                 Schema[] rightSchema = joinIterator.getRightChild().getSchema();

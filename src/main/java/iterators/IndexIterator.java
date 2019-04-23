@@ -31,7 +31,7 @@ public class IndexIterator implements RAIterator {
     private Schema[] schema;
     private Expression expression;
     List<Expression> expressionList;
-    private List<String> fileNameList = new ArrayList<String>();
+    private List<String> finalFileNameList = new ArrayList<String>();
 
     public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, Expression expression) throws Exception {
         this.columnDefinitions = columnDefinitions;
@@ -83,8 +83,8 @@ public class IndexIterator implements RAIterator {
 
     private BufferedReader getBufferedReader() throws Exception {
 
-        if (currentFileIndex < fileNameList.size()) {
-            String file = fileNameList.get(currentFileIndex);
+        if (currentFileIndex < finalFileNameList.size()) {
+            String file = finalFileNameList.get(currentFileIndex);
 
             br = new BufferedReader(new FileReader(new File(file)));
 
@@ -164,8 +164,8 @@ public class IndexIterator implements RAIterator {
 
             if (temp.size() < min) {
                 min = temp.size();
-                fileNameList.clear();
-                fileNameList.addAll(temp);
+                finalFileNameList.clear();
+                finalFileNameList.addAll(temp);
                 temp.clear();
             }
         }
@@ -324,6 +324,7 @@ public class IndexIterator implements RAIterator {
 
 
     private List<String> getFiles(Expression expression) {
+        List<String> fileNameList = new ArrayList<String>();
         Index index = new Index();
 
         String indexColumnName = "";
@@ -403,6 +404,13 @@ public class IndexIterator implements RAIterator {
 
                 if (indexRow[1].compareTo(indexColumnValue) <= 0 )
                     fileNameList.add(indexRow[2]);
+
+                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
+                    fileNameList.add(indexRow[2]);
+                    break;
+                }
+
+
             }
 
         } else if (expression instanceof MinorThanEquals) {
@@ -427,6 +435,10 @@ public class IndexIterator implements RAIterator {
 
                 if (indexRow[1].compareTo(indexColumnValue) <= 0 )
                     fileNameList.add(indexRow[2]);
+                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
+                    fileNameList.add(indexRow[2]);
+                    break;
+                }
             }
 
         } else if (expression instanceof EqualsTo) {
