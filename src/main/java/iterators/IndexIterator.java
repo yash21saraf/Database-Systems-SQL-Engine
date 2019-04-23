@@ -52,8 +52,14 @@ public class IndexIterator implements RAIterator {
 
     }
 
+    int cnt = 0;
     @Override
     public boolean hasNext() throws Exception {
+
+//        cnt++;
+//
+//        if(cnt >=99999)
+//            System.out.println(cnt);
 
         try {
             if (hasNext)
@@ -67,12 +73,12 @@ public class IndexIterator implements RAIterator {
             else if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(), columnDefinitions)) != null) {
                 hasNext = true;
                 return true;
+            } else if (nextLine == null){
+                br = getBufferedReader();
+                return this.hasNext();
             }
 
             hasNext = false;
-
-            br.close();
-            br = null;
 
             return false;
 

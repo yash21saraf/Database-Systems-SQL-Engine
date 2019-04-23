@@ -295,6 +295,7 @@ public class Index {
         String col[] = null;
         String indexFileName = "";
         List<String> list = new ArrayList<String>();
+        List<String> filelist = new ArrayList<String>();
 
         if(indexColumnName.contains(".")){
             col = indexColumnName.split("\\.");
@@ -308,13 +309,14 @@ public class Index {
             if(indexFileName.equals(file))
                 list.add(filename);
         }
+
         BufferedReader br = null;
         String line = null;
         try {
             br = new BufferedReader(new FileReader(CommonLib.TABLE_DIRECTORY + list.get(0)));
 
             while((line = br.readLine()) != null)
-                list.add(line);
+                filelist.add(line);
 
             br.close();
             br = null;
@@ -322,10 +324,10 @@ public class Index {
             e.printStackTrace();
         }
 
-        list.remove(0);
+        //list.remove(0);
 
         indexFileLists.clear();
-        return list;
+        return filelist;
     }
 
     private void getRowSize(String table, String column) {

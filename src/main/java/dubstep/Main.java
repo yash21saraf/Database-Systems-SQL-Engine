@@ -274,7 +274,7 @@ public class Main {
 
         String q33 = "CREATE TABLE LINEITEM (ORDERKEY INT , PARTKEY INT , SUPPKEY INT , LINENUMBER INT , QUANTITY DECIMAL , EXTENDEDPRICE DECIMAL , DISCOUNT DECIMAL , TAX DECIMAL , RETURNFLAG CHAR (1) , LINESTATUS CHAR (1) , SHIPDATE DATE , COMMITDATE DATE , RECEIPTDATE DATE , SHIPINSTRUCT CHAR (25) , SHIPMODE CHAR (10) , COMMENT VARCHAR (44) , PRIMARY KEY (ORDERKEY, LINENUMBER));";
 
-        String  q44 = "SELECT\n" +
+        String  q44 = "SELECT \n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*LINEITEM.DISCOUNT) AS REVENUE\n" +
                 "FROM\n" +
                 "LINEITEM\n" +
@@ -282,7 +282,8 @@ public class Main {
                 "LINEITEM.SHIPDATE >= DATE('1994-01-01')\n" +
                 "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
-                "AND LINEITEM.QUANTITY < 24;";
+                "AND LINEITEM.QUANTITY < 24 \n" +
+                "order by LINEITEM.SHIPDATE";
         //String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
         String q[] = {q9 ,q44};
 //        String q[] = {q44};
