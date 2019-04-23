@@ -1,6 +1,5 @@
 package helpers;
 
-import dubstep.Main;
 import net.sf.jsqlparser.eval.Eval;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
@@ -11,7 +10,6 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.sql.SQLException;
@@ -23,16 +21,24 @@ import java.util.List;
 public class CommonLib
 {
 
+    public volatile int fileSequenceNumber = 100000;
     public static volatile int sortFileSeqNumber = 1000;
     public static volatile int mergeFileSeqNumber = 10000;
     private static CommonLib commonLib = CommonLib.getInstance();
-    public static long blockSize = 5000;
+    public static long blockSize = 1600000;
 
-   public static final int N = 200;
+   public static final int N = 50;
    public static List<String> listOfSortedFiles = new ArrayList<String>();
    public static HashMap<String, Sort> mapOfSortedFileObjects = new HashMap<String, Sort>();
    public volatile int sortMergeSeqNumber = 50000;
    public volatile int orderBySeqNumber = 70000;
+
+   //   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
+      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
+//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+   public static final String extension = ".csv" ;
+   //   public static final String TABLE_DIRECTORY = "data/";
+
 
    //region Variables
 
@@ -352,6 +358,10 @@ public class CommonLib
 
    public synchronized static int getsortFileSeqNumber() {
       return sortFileSeqNumber++;
+   }
+
+   public synchronized int getFileSequenceNumber() {
+       return fileSequenceNumber++;
    }
 
    public synchronized int getSortMergeSeqNumber() {

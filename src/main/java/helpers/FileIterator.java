@@ -5,13 +5,14 @@ import net.sf.jsqlparser.expression.PrimitiveValue;
 import java.io.*;
 import java.util.List;
 
-import static iterators.TableIterator.TABLE_DIRECTORY;
+import static helpers.CommonLib.TABLE_DIRECTORY;
 
 public class FileIterator {
 
     private String mergedFilename;
     private String tableName;
     private File file;
+
     private FileOutputStream fileOutputStream;
     private BufferedOutputStream bufferedOutputStream;
     private ObjectOutputStream objectOutputStream;
@@ -31,7 +32,7 @@ public class FileIterator {
             file = new File(TABLE_DIRECTORY + mergedFilename);
             file.createNewFile();
             fileOutputStream = new FileOutputStream(file);
-            bufferedOutputStream = new BufferedOutputStream(fileOutputStream,500);
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             objectOutputStream = new ObjectOutputStream(bufferedOutputStream);
 
         } catch (Exception e) {
@@ -63,7 +64,7 @@ public class FileIterator {
             if(fileInputStream == null)
                 fileInputStream = new FileInputStream(file);
             if(bufferedInputStream == null)
-                bufferedInputStream = new BufferedInputStream(fileInputStream, 500);
+                bufferedInputStream = new BufferedInputStream(fileInputStream);
             if (objectInputStream == null)
                 objectInputStream = new ObjectInputStream(bufferedInputStream);
 
@@ -93,7 +94,7 @@ public class FileIterator {
             objectInputStream.close();
 
         fileInputStream = new FileInputStream(file);
-        bufferedInputStream = new BufferedInputStream(fileInputStream, 500);
+        bufferedInputStream = new BufferedInputStream(fileInputStream);
         objectInputStream = new ObjectInputStream(bufferedInputStream);
     }
 

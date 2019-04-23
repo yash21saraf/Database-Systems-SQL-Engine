@@ -1,7 +1,6 @@
 package helpers;
 
 import iterators.RAIterator;
-import iterators.TableIterator;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -22,8 +21,7 @@ public class Sort {
     private List<PrimitiveValue> sortKey;
     private List<Integer> indexOfSortKey;
     private String fileName = "";
-    private String path = TableIterator.TABLE_DIRECTORY;
-    private String writtenFileName;
+    private String path = CommonLib.TABLE_DIRECTORY;
     private ColumnDefinition[] columnDefinitions;
     private int rowCounter = 0;
     private List<FileIterator> fileIterators = new ArrayList<FileIterator>();
@@ -205,7 +203,7 @@ public class Sort {
         this.child = child;
         this.expressions = expressions;
         this.childSchema = child.getSchema();
-        /////// Initialize filename
+
     }
 
     PrimitiveValue[] key;
@@ -316,7 +314,6 @@ public class Sort {
 
         PrimitiveValue[] line;
         List<PrimitiveValue[]> sortedList = new ArrayList<PrimitiveValue[]>();
-
 
         fileIterators.add(new FileIterator(fileName, fileName + "SORT_MERGE" + commonLib.getSortMergeSeqNumber()));
 

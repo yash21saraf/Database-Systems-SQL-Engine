@@ -8,19 +8,13 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.io.*;
 
+//import static helpers.CommonLib.*;
+
 public class TableIterator implements RAIterator
 {
 
    //region Variables
 
-   //private static final Logger logger = LogManager.getLogger();
-   private CommonLib commonLib = CommonLib.getInstance();
-
-//   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
-//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
-   public static String extension = ".csv" ;
-//   public static final String TABLE_DIRECTORY = "data/";
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
@@ -33,6 +27,7 @@ public class TableIterator implements RAIterator
    private boolean hasNextChecked = false;
    private boolean hasNextValue = false;
    private int cnter = 0;
+   private CommonLib commonLib = CommonLib.getInstance();
 
    //endregion
 
@@ -52,9 +47,9 @@ public class TableIterator implements RAIterator
       }
 
       try {
-         File file = new File(TABLE_DIRECTORY + tableName + extension) ;
-         fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
-         br = new BufferedReader(fileReader, 2000);
+         File file = new File(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension) ;
+         fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
+         br = new BufferedReader(fileReader);
 
 
       } catch (FileNotFoundException e) {
@@ -148,8 +143,8 @@ public class TableIterator implements RAIterator
       try {
          br.close();
          fileReader.close();
-         fileReader = new FileReader(TABLE_DIRECTORY + tableName + extension);
-         br = new BufferedReader(fileReader, 2000);
+         fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
+         br = new BufferedReader(fileReader);
          cnter++;
          nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
       } catch (FileNotFoundException e) {
