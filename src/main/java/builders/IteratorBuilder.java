@@ -1,7 +1,6 @@
 package builders;
 
 import helpers.CommonLib;
-import helpers.Index;
 import helpers.Schema;
 import iterators.*;
 import net.sf.jsqlparser.expression.Function;
@@ -16,7 +15,6 @@ import java.io.*;
 import java.util.*;
 
 import static helpers.Index.createIndex;
-
 
 public class IteratorBuilder {
 
@@ -54,7 +52,7 @@ public class IteratorBuilder {
             buildCreateTable(createTable);
 
             saveCreateStatement(createTable);
-            createIndex(createTable);
+            //createIndex(createTable);
 
             return null;
 

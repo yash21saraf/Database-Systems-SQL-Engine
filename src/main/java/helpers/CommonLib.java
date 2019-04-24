@@ -25,7 +25,7 @@ public class CommonLib
     public static volatile int sortFileSeqNumber = 1000;
     public static volatile int mergeFileSeqNumber = 10000;
     private static CommonLib commonLib = CommonLib.getInstance();
-    public static long blockSize = 1600000;
+    public static long blockSize = 50000;
 
    public static final int N = 50;
    public static List<String> listOfSortedFiles = new ArrayList<String>();
@@ -34,8 +34,8 @@ public class CommonLib
    public volatile int orderBySeqNumber = 70000;
 
    //   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
-      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
-//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+//      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
+   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
    public static final String extension = ".csv" ;
    //   public static final String TABLE_DIRECTORY = "data/";
 

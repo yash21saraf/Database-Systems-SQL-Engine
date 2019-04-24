@@ -15,7 +15,7 @@ public class Main {
 
     public static ColDataType colDataTypes[];
     public static boolean inMem = true ;
-    static boolean debugEnabled = false;
+    static boolean debugEnabled = true;
 
     static Runtime r = Runtime.getRuntime();
 
@@ -284,6 +284,7 @@ public class Main {
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
                 "AND LINEITEM.QUANTITY < 24;";
         //String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
+        String  q45 = "SELECT * from LINEITEM";
         String q[] = {q9 ,q44};
 //        String q[] = {q44};
         int i = 0;
@@ -317,12 +318,11 @@ public class Main {
                         System.out.print("\n");
 
                     }
-
                 }
                 if (debugEnabled) {
                     long endTime = System.currentTimeMillis();
-                    System.out.println(startTime);
-                    System.out.println(endTime);
+                    //System.out.println(startTime);
+                    System.out.println(endTime - startTime);
                     //long freemem = Runtime.getRuntime().freeMemory();
                     //System.out.println(freemem);
                 }
