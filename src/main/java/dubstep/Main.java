@@ -283,9 +283,9 @@ public class Main {
                 "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
                 "AND LINEITEM.QUANTITY < 24;";
-        //String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
-        String  q45 = "SELECT * from LINEITEM";
-        String q[] = {q9 ,q44};
+        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
+//        String  q45 = "SELECT * from LINEITEM";
+//        String q[] = {q9 ,q44};
 //        String q[] = {q44};
         int i = 0;
 

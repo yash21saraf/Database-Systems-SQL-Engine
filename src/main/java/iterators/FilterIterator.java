@@ -128,22 +128,22 @@ public class FilterIterator implements RAIterator {
                     e.printStackTrace();
                 }
             }
-//            else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
-//                try {
-//                    Schema[] schemas = filterIterator.getSchema();
-//                    String table = schemas[0].getTableName();
-//                    ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
-//                    int i = 0;
-//                    for (Schema schema : schemas) {
-//                        columnDefinitions[i++] = schema.getColumnDefinition();
-//                    }
-//                    //Expression exp = commonLib.getExpressionList(filterIterator.getExpression()).get(0);
-//                    filterIterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
+                try {
+                    Schema[] schemas = filterIterator.getSchema();
+                    String table = schemas[0].getTableName();
+                    ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
+                    int i = 0;
+                    for (Schema schema : schemas) {
+                        columnDefinitions[i++] = schema.getColumnDefinition();
+                    }
+                    //Expression exp = commonLib.getExpressionList(filterIterator.getExpression()).get(0);
+                    filterIterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
                 List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
                 Schema[] leftSchema = joinIterator.getChild().getSchema();

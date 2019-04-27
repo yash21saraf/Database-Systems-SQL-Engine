@@ -52,7 +52,9 @@ public class IteratorBuilder {
             buildCreateTable(createTable);
 
             saveCreateStatement(createTable);
-            //createIndex(createTable);
+            System.out.println(createTable.getTable().getName() + "*********");
+            if(!createTable.getTable().getName().equals("NATION") && !createTable.getTable().getName().equals("REGION"))
+                createIndex(createTable);
 
             return null;
 

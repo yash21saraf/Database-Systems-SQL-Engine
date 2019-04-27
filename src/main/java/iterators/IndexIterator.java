@@ -14,6 +14,8 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import java.io.*;
 import java.util.*;
 
+import static helpers.Index.isNumber;
+
 public class IndexIterator implements RAIterator {
 
     //region Variables
@@ -50,6 +52,121 @@ public class IndexIterator implements RAIterator {
         expressionList = commonLib.getExpressionList(expression);
         createFileNameList();
 
+        finalFileList();
+
+    }
+
+    private void finalFileList() throws Exception {
+
+        String colName = null;
+        Set<String> set = new HashSet<String>();
+
+        for(String path : finalFileNameList){
+            String filename = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("_"));
+
+            colName = filename.substring(filename.indexOf("_") + 1);
+            //System.out.println(filename);
+            if(!isPrimaryKey(tableName, colName)){
+                BufferedReader br = new BufferedReader(new FileReader(path));
+                String line = null;
+                while((line = br.readLine())!= null){
+                    String tuple[] = line.split("\\|");
+                    set.add(tuple[1]);
+                }
+            }
+        }
+
+        List<String> temp = new ArrayList<String>(set);
+
+//        Collections.sort(temp, new Comparator<String>() {
+//            @Override
+//            public int compare(String o1, String o2) {
+//
+//                String a[] = o1.split("\\|");
+//                String b[] = o2.split("\\|");
+//
+//                if (isNumber(a[0])) {
+//
+//                    double pv1 = Double.parseDouble(a[0]);
+//                    double pv2 = Double.parseDouble(b[0]);
+//
+//                    if (pv1 < pv2)
+//                        return -1;
+//                    else if (pv1 > pv2)
+//                        return 1;
+//
+//                } else {
+//
+//                    return a[0].compareTo(b[0]);
+//                }
+//
+//                return 0;
+//            }
+//        });
+
+
+        finalFileNameList = getPrimaryKeyFiles(temp, colName);
+
+    }
+
+    private List<String> getPrimaryKeyFiles(List<String> list, String colName) {
+
+        Set<String> primaryKeyFiles = new HashSet<String>();
+
+        Index index = new Index();
+
+        primaryKeyFiles.addAll(index.getIndexList(tableName, index.getPK(tableName)));
+
+        Set<String> set = new HashSet<String>();
+
+        for(String key : list) {
+            for (String str : primaryKeyFiles) {
+
+                if (isKeyInRange(str, key)){
+                    set.add(CommonLib.TABLE_DIRECTORY + str.substring(str.indexOf("_") + 1));
+                    break;
+                }
+            }
+        }
+
+        List<String> ret = new ArrayList(set);
+        return ret;
+    }
+
+    private boolean isKeyInRange(String file, String key) {
+
+
+        String start = file.substring(0, file.indexOf("|"));
+        String end = file.substring(file.indexOf("|") + 1, file.lastIndexOf("|"));
+
+        if(isNumber(key)){
+
+            int first = Integer.parseInt(start);
+            int last = Integer.parseInt(end);
+
+            int k = Integer.parseInt(key);
+
+            if(k > first && k < last)
+                return true;
+            else
+                return false;
+
+        } else {
+            if (key.compareTo(start) >= 0 && key.compareTo(end) <= 0)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    private String getFiles(String secondaryIndex, String colName) {
+        Index index = new Index();
+
+        List<String> indexFileList = index.getIndexList(tableName, index.getPK(tableName));
+
+        //System.out.println(indexFileList);
+
+        return "";
     }
 
     int cnt = 0;
@@ -177,7 +294,31 @@ public class IndexIterator implements RAIterator {
         }
     }
 
-    private Collection<? extends String> intersect(List<String> leftFiles, List<String> rightFiles) {
+
+    private static boolean isPrimaryKey(String table, String columnName) {
+
+        if (table.equals("LINEITEM") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PART") && columnName.equals("PARTKEY"))
+            return true;
+        if (table.equals("CUSTOMER") && columnName.equals("CUSTKEY"))
+            return true;
+        if (table.equals("SUPPLIER") && columnName.equals("SUPPKEY"))
+            return true;
+        if (table.equals("NATION") && columnName.equals("NATIONKEY"))
+            return true;
+        if (table.equals("REGION") && columnName.equals("REGIONKEY"))
+            return true;
+        if (table.equals("ORDERS") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PARTSUPP") && columnName.equals("PARTKEY"))
+            return true;
+
+        return false;
+
+    }
+
+    private List<String> intersect(List<String> leftFiles, List<String> rightFiles) {
 
         if(leftFiles == null || leftFiles.size() == 0)
             return null;

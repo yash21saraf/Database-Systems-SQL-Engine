@@ -1,7 +1,5 @@
 package helpers;
 
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 
@@ -9,26 +7,47 @@ import java.io.*;
 import java.util.*;
 
 import static builders.IteratorBuilder.schemas;
-import static helpers.CommonLib.TABLE_DIRECTORY;
-import static helpers.CommonLib.blockSize;
+
 
 public class Index {
 
+
     final static Map<String, List<BufferedReader>> bufferedReaderMap = new HashMap<String, List<BufferedReader>>();
     final static Map<String, List<String>> tempFileMap = new HashMap<String, List<String>>();
+    //    final static String TABLE_DIRECTORY = path + "/";
+    final static String TABLE_DIRECTORY = CommonLib.TABLE_DIRECTORY;
     public static List<String> indexFileLists = new ArrayList<String>();
     public static Map<String, String> indexMap = new HashMap<String, String>();
     static IndexSort sort = null;
     static List<String> fullFile = new ArrayList<String>();
+    static String path = System.getProperty("user.dir");
+    static HashMap<String, TreeMap<String, List<String>>> tableColTreeMap = new HashMap<String, TreeMap<String, List<String>>>();
+    static Map<String, Integer> indexOfIndexKey = new HashMap<String, Integer>();
+    static TreeMap<String, List<String>> LINEITEM_ORDERKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> LINEITEM_LINENUMBER_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> LINEITEM_RETURNFLAG_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> LINEITEM_RECEIPTDATE_TREEMAP = new TreeMap<String, List<String>>();
 
+    //endregion
+    static TreeMap<String, List<String>> LINEITEM_SHIPDATE_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> PART_PARTKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> CUSTOMER_CUSTKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> CUSTOMER_MKTSEGMENT_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> SUPPLIER_SUPPKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> SUPPLIER_NATIONKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> PARTSUPP_PARTKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> PARTSUPP_SUPPKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> ORDERS_ORDERKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> ORDERS_ORDERDATE_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> NATION_NATIONKEY_TREEMAP = new TreeMap<String, List<String>>();
+    static TreeMap<String, List<String>> REGION_REGIONKEY_TREEMAP = new TreeMap<String, List<String>>();
+
+    static Map<String, TreeMap> colIndexMap = new HashMap<String, TreeMap>();
     private static CommonLib commonLib = CommonLib.getInstance();
     private static int indexBlockSize = 0;
     private static LineNumberReader br = null;
     private static int initialCapacity = 20;
-
-
     private static List<Integer> pqSortIndex = new ArrayList<Integer>();
-
     //region Priority Queue
     private static PriorityQueue<HashMap<BufferedReader, String>> priorityQueue = new PriorityQueue<HashMap<BufferedReader, String>>(initialCapacity,
             new Comparator<HashMap<BufferedReader, String>>() { //TODO: Keep NULL values at the end in PQ.
@@ -78,24 +97,33 @@ public class Index {
                 }
             });
 
-    //endregion
-
-    String path = System.getProperty("user.dir");
+    static private boolean oncePK = true;
     String fileName = "/createTableTeam3.sql";
     HashMap<String, Integer> hashMap = new HashMap();
     private List<String> indexList = new ArrayList<String>();
-
-
     public Index() {
         init();
     }
 
+    public static void setIndexFileLists(List<String> indexFileLists) {
+        Index.indexFileLists = indexFileLists;
+    }
 
     public static void createIndex(CreateTable createTable) {
-        init();
+
+        // region variables
+        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
+//        indexMap.put("LINEITEM", "RECEIPTDATE");
+        indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
+        indexMap.put("PART", "PARTKEY");
+        indexMap.put("CUSTOMER", "CUSTKEY|MKTSEGMENT");
+        indexMap.put("SUPPLIER", "SUPPKEY|NATIONKEY");
+        indexMap.put("PARTSUPP", "PARTKEY|SUPPKEY");
+        indexMap.put("NATION", "NATIONKEY");
+        indexMap.put("REGION", "REGIONKEY");
 
         if (createTable.getTable().getName().equals("LINEITEM"))
-            indexBlockSize = 100000;
+            indexBlockSize = 5000;
         else if (createTable.getTable().getName().equals("ORDERS"))
             indexBlockSize = 50000;
         else if (createTable.getTable().getName().equals("PART"))
@@ -111,27 +139,110 @@ public class Index {
         else
             indexBlockSize = 50000;
 
+        String tableName = createTable.getTable().getName();
+
+        if (tableName.equals("LINEITEM")) {
+
+            colIndexMap.put("LINEITEM_ORDERKEY", LINEITEM_ORDERKEY_TREEMAP);
+            colIndexMap.put("LINEITEM_LINENUMBER", LINEITEM_LINENUMBER_TREEMAP);
+            colIndexMap.put("LINEITEM_RETURNFLAG", LINEITEM_RETURNFLAG_TREEMAP);
+            colIndexMap.put("LINEITEM_RECEIPTDATE", LINEITEM_RECEIPTDATE_TREEMAP);
+            colIndexMap.put("LINEITEM_SHIPDATE", LINEITEM_SHIPDATE_TREEMAP);
+
+        } else if (tableName.equals("PART")) {
+
+            colIndexMap.put("PART_PARTKEY", PART_PARTKEY_TREEMAP);
+
+        } else if (tableName.equals("ORDERS")) {
+
+            colIndexMap.put("ORDERS_ORDERKEY", ORDERS_ORDERKEY_TREEMAP);
+            colIndexMap.put("ORDERS_ORDERDATE", ORDERS_ORDERDATE_TREEMAP);
+
+        } else if (tableName.equals("CUSTOMER")) {
+
+            colIndexMap.put("CUSTOMER_CUSTKEY", CUSTOMER_CUSTKEY_TREEMAP);
+            colIndexMap.put("CUSTOMER_MKTSEGMENT", CUSTOMER_MKTSEGMENT_TREEMAP);
+
+        } else if (tableName.equals("SUPPLIER")) {
+
+            colIndexMap.put("SUPPLIER_SUPPKEY", SUPPLIER_SUPPKEY_TREEMAP);
+            colIndexMap.put("SUPPLIER_NATIONKEY", SUPPLIER_NATIONKEY_TREEMAP);
+
+        } else if (tableName.equals("PARTSUPP")) {
+
+            colIndexMap.put("PARTSUPP_PARTKEY", PARTSUPP_PARTKEY_TREEMAP);
+            colIndexMap.put("PARTSUPP_SUPPKEY", PARTSUPP_SUPPKEY_TREEMAP);
+
+        } else if (tableName.equals("NATION")) {
+
+            colIndexMap.put("NATION_NATIONKEY", NATION_NATIONKEY_TREEMAP);
+
+        } else if (tableName.equals("REGION")) {
+
+            colIndexMap.put("REGION_REGIONKEY", REGION_REGIONKEY_TREEMAP);
+
+        }
+
+        indexFileLists.clear();
+        //indexMap.clear();
+        indexOfIndexKey.clear();
+        tableColTreeMap.clear();
+
+        // endregion variables
+
         String indexes[] = indexMap.get(createTable.getTable().getName()).split("\\|");
 
-        boolean sorted = false; // TODO: change the flag
 
-//        for (int i = 0; i < indexes.length; i++) {
-//            buildIndex(createTable.getTable().getName(), indexes[i], sorted);
-//            sorted = false;
-//            //buildIndex(createTable.getTable().getName(), indexes[i], isPrimaryKey(createTable, indexes[i]));
-//        }
+        List<String> l = Arrays.asList(indexes);
 
-        buildIndex(createTable.getTable().getName(), "dummy", sorted);
+
+        /**
+         * Save index of index-column.
+         */
+
+
+        int i = 0;
+        for (ColumnDefinition columnDefinition : createTable.getColumnDefinitions()) {
+
+            if (l.contains(columnDefinition.getColumnName())) {
+                indexOfIndexKey.put(columnDefinition.getColumnName(), i);
+            }
+
+            i++;
+        }
+
+        /**
+         * Create list of TreeMap, one TreeMap for each indexes.
+         */
+
+
+        buildIndex(createTable.getTable().getName(), "dummy", true);
+
+        try {
+            writeDataDisk(indexFileLists, "INDEX", "ALL", CommonLib.TABLE_DIRECTORY + createTable.getTable().getName() + "_INDEX_LIST");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private static boolean isPrimaryKey(CreateTable createTable, String columnName) {
+    private static boolean isPrimaryKey(String table, String columnName) {
 
-        List<net.sf.jsqlparser.statement.create.table.Index> indexList = createTable.getIndexes();
-
-        for (String indexColumns : indexList.get(0).getColumnsNames()) {
-            if (indexColumns.equals(columnName))
-                return true;
-        }
+        if (table.equals("LINEITEM") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PART") && columnName.equals("PARTKEY"))
+            return true;
+        if (table.equals("CUSTOMER") && columnName.equals("CUSTKEY"))
+            return true;
+        if (table.equals("SUPPLIER") && columnName.equals("SUPPKEY"))
+            return true;
+        if (table.equals("NATION") && columnName.equals("NATIONKEY"))
+            return true;
+        if (table.equals("REGION") && columnName.equals("REGIONKEY"))
+            return true;
+        if (table.equals("ORDERS") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PARTSUPP") && columnName.equals("PARTKEY"))
+            return true;
 
         return false;
 
@@ -141,170 +252,413 @@ public class Index {
 
         String[] indexList = indexMap.get(table).split("\\|");
 
+        long position = 0;
         String line1;
         try {
-            br = new LineNumberReader(new FileReader(TABLE_DIRECTORY + table + CommonLib.extension));
+            br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + table + CommonLib.extension));
 
-            // starts for lineitem
 
-            if (table.equals("LINEITEM")) {
+                Integer pkIndex = getPrimarykeyIndex(table);
+
+                List<String> pkFileNameList = new ArrayList<String>();
+
+                List<String> indexDataListpk = new ArrayList<String>();
 
                 while ((line1 = br.readLine()) != null) {
 
-                    if ((br.getLineNumber() + 1) % blockSize == 0) {
+                    if ((br.getLineNumber() + 1) % indexBlockSize == 0) {
+                        String pkFileName = table + "_" + getPK(table) + "_" + commonLib.getFileSequenceNumber();
+                        pkFileNameList.add(CommonLib.TABLE_DIRECTORY + pkFileName);
 
-                        boolean sortedd = true;
-                        for (int i = 0; i < indexList.length; i++) {
-                            System.out.println("building Index for " + table + " " + indexList[i]);
-                            if (!sortedd)
-                                sortList(table, indexList[i]);
-                            saveData(table, indexList[i]);
-                            sortedd = false;
+                        writeDataDisk(fullFile, table, column, CommonLib.TABLE_DIRECTORY + pkFileName);
+                        fullFile.clear();
+
+                        TreeMap<String, List<String>> pkMap = getPkMap(table);
+                        List<String> tt = new ArrayList<String>();
+                        for (Map.Entry<String, List<String>> entry : pkMap.entrySet()) {
+                            for (String val : entry.getValue())
+                                tt.add(entry.getKey() + "|" + val);
                         }
 
-                        fullFile.clear();
+                        Collections.sort(tt, new Comparator<String>() {
+                            @Override
+                            public int compare(String o1, String o2) {
+
+                                String a[] = o1.split("\\|");
+                                String b[] = o2.split("\\|");
+
+                                if (isNumber(a[0])) {
+
+                                    double pv1 = Double.parseDouble(a[0]);
+                                    double pv2 = Double.parseDouble(b[0]);
+
+                                    if (pv1 < pv2)
+                                        return -1;
+                                    else if (pv1 > pv2)
+                                        return 1;
+
+                                } else {
+
+                                    return a[0].compareTo(b[0]);
+                                }
+
+                                return 0;
+                            }
+                        });
+
+
+                        String startKeyValue = tt.get(0).split("\\|")[0];
+                        String endKeyValue = tt.get(tt.size() - 1).split("\\|")[0];
+
+                        indexDataListpk.add(startKeyValue + "|" + endKeyValue + "|" + CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
+
+                        writeDataDisk(tt, table, column, CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
+                        pkMap.clear();
+
                     }
 
-                    fullFile.add(line1);
+                    String tuple[] = line1.split("\\|");
+
+                    for (Map.Entry<String, Integer> entry : indexOfIndexKey.entrySet()) {
+
+                        List<String> list;
+                        if (colIndexMap.get(table + "_" + entry.getKey()).containsKey(tuple[entry.getValue()])) {
+                            list = (List<String>) colIndexMap.get(table + "_" + entry.getKey()).get(tuple[entry.getValue()]);
+                        } else {
+                            list = new ArrayList<String>();
+                        }
+
+                        list.add(Long.toString(position));
+                        colIndexMap.get(table + "_" + entry.getKey()).put(tuple[entry.getValue()], list);
+
+                    }
+
+                    if(table.equals("LINEITEM")){
+                        tuple[tuple.length - 1] = "d";
+                        tuple[tuple.length - 3] = "d";
+                        line1 = "";
+
+                        for (int i = 0; i < tuple.length; i++) {
+                            line1 += "|" + tuple[i];
+                        }
+
+                        fullFile.add(line1.substring(1));
+                    } else {
+                        fullFile.add(line1);
+                    }
+
+                    position += line1.length() + 1;
                 }
 
-                // Process last set of data in fullFile List.
+
+                /**
+                 * Process remaining files
+                 */
+
                 if (fullFile.size() != 0) {
-                    boolean sortedd = true;
-                    for (int i = 0; i < indexList.length; i++) {
-                        System.out.println("building Index for " + table + " " + indexList[i]);
-                        if (!sortedd)
-                            sortList(table, indexList[i]);
-                        saveData(table, indexList[i]);
-                        sortedd = false;
+                    String pkFileName = table + "_" + getPK(table) + "_" + commonLib.getFileSequenceNumber();
+                    pkFileNameList.add(CommonLib.TABLE_DIRECTORY + pkFileName);
+
+                    writeDataDisk(fullFile, table, column, CommonLib.TABLE_DIRECTORY + pkFileName);
+                    fullFile.clear();
+
+                    TreeMap<String, List<String>> pkMap = getPkMap(table);
+                    List<String> tt = new ArrayList<String>();
+                    for (Map.Entry<String, List<String>> entry : pkMap.entrySet()) {
+                        for (String val : entry.getValue())
+                            tt.add(entry.getKey() + "|" + val);
                     }
 
-                    fullFile.clear();
+                    Collections.sort(tt, new Comparator<String>() {
+                        @Override
+                        public int compare(String o1, String o2) {
+
+                            String a[] = o1.split("\\|");
+                            String b[] = o2.split("\\|");
+
+                            if (isNumber(a[0])) {
+
+                                double pv1 = Double.parseDouble(a[0]);
+                                double pv2 = Double.parseDouble(b[0]);
+
+                                if (pv1 < pv2)
+                                    return -1;
+                                else if (pv1 > pv2)
+                                    return 1;
+
+                            } else {
+
+                                return a[0].compareTo(b[0]);
+                            }
+
+                            return 0;
+                        }
+                    });
+
+
+                    String startKeyValue = tt.get(0).split("\\|")[0];
+                    String endKeyValue = tt.get(tt.size() - 1).split("\\|")[0];
+
+                    indexDataListpk.add(startKeyValue + "|" + endKeyValue + "|" + CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
+
+                    writeDataDisk(tt, table, column, CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
+                    pkMap.clear();
                 }
 
-                // index creation
-                for (int i = 0; i < indexList.length; i++) {
-                    makeIndexOfLineItem(table, indexList[i]);
+                String indexFileName = TABLE_DIRECTORY + "INDEX_" + table + "_" + getPK(table) + "_" + commonLib.getFileSequenceNumber();
+                indexFileLists.add(indexFileName);
+
+                writeDataDisk(indexDataListpk, table, column, indexFileName);
+
+                /**
+                 * Removing PK entry from the colIndexMap as pk is already sorted and stored.
+                 */
+
+                colIndexMap.remove(table + "_" + getPK(table));
+
+                /**
+                 * writing index
+                 */
+
+                List<String> indexFiles = new ArrayList<String>();
+
+                for (Map.Entry<String, TreeMap> entry : colIndexMap.entrySet()) {
+
+                    String filename = entry.getKey();
+
+
+                    indexFiles.add(filename);
+                    TreeMap<String, List<String>> treeMap = entry.getValue();
+
+                    try {
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(CommonLib.TABLE_DIRECTORY + filename));
+
+                        for (Map.Entry<String, List<String>> treeMapEntry : treeMap.entrySet()) {
+                            String key = treeMapEntry.getKey();
+                            for (String val : treeMapEntry.getValue()) {
+                                bufferedWriter.write(key + "|" + val + "\n");
+                            }
+                        }
+
+                        bufferedWriter.close();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
-                return;
-            }
+                LINEITEM_LINENUMBER_TREEMAP.clear();
+                LINEITEM_RETURNFLAG_TREEMAP.clear();
+                LINEITEM_RECEIPTDATE_TREEMAP.clear();
+                LINEITEM_SHIPDATE_TREEMAP.clear();
+                LINEITEM_ORDERKEY_TREEMAP.clear();
+                PART_PARTKEY_TREEMAP.clear();
+                SUPPLIER_SUPPKEY_TREEMAP.clear();
+                SUPPLIER_NATIONKEY_TREEMAP.clear();
+                NATION_NATIONKEY_TREEMAP.clear();
+                REGION_REGIONKEY_TREEMAP.clear();
+                CUSTOMER_CUSTKEY_TREEMAP.clear();
+                CUSTOMER_MKTSEGMENT_TREEMAP.clear();
+                PARTSUPP_PARTKEY_TREEMAP.clear();
+                PARTSUPP_SUPPKEY_TREEMAP.clear();
 
+                colIndexMap.clear();
 
-            // ends here
+                oncePK = true;
 
+                /**
+                 * sorting written index files
+                 */
 
-            while ((line1 = br.readLine()) != null) {
-
-                if ((br.getLineNumber() + 1) % blockSize == 0) { // TODO: only lineitem table will get in this condition
-
-                    for (int i = 0; i < indexList.length; i++) {
-                        //sortList(table, indexList[i]);
-                        makeIndex(table, indexList[i]);
+                for (String file : indexFiles) {
+                    LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + file));
+                    List<String> data = new ArrayList<String>();
+                    String line;
+                    while ((line = lineNumberReader.readLine()) != null) {
+                        data.add(line);
                     }
 
-                    System.out.println("LIST SIZE " + fullFile.size());
-                    fullFile.clear();
+                    lineNumberReader.close();
+                    lineNumberReader = null;
+
+                    long start = System.currentTimeMillis();
+                    //if (isPrimaryKey(file.substring(0, file.indexOf("_")), file.substring(file.indexOf("_") + 1))) {
+
+                    Collections.sort(data, new Comparator<String>() {
+                        @Override
+                        public int compare(String o1, String o2) {
+
+                            String a[] = o1.split("\\|");
+                            String b[] = o2.split("\\|");
+
+                            if (isNumber(a[0])) {
+
+                                double pv1 = Double.parseDouble(a[0]);
+                                double pv2 = Double.parseDouble(b[0]);
+
+                                if (pv1 < pv2)
+                                    return -1;
+                                else if (pv1 > pv2)
+                                    return 1;
+
+                            } else {
+
+                                return a[0].compareTo(b[0]);
+                            }
+
+                            return 0;
+                        }
+                    });
+                    // }
+
+                    long end = System.currentTimeMillis();
+                    long t = (end - start);
+                    System.out.println("Sorting took " + t + " " + table + " " );
+
+
+                    /**
+                     * Writing sorted index files
+                     */
+
+                    start = System.currentTimeMillis();
+
+                    try {
+                        //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(CommonLib.TABLE_DIRECTORY + "INDEX_" + file + "_" + commonLib.getFileSequenceNumber()));
+
+                        List<String> temp = new ArrayList<String>(); // TODO Might be an overhead
+                        List<String> indexDataList = new ArrayList<String>();
+
+                        int linenumber = 0;
+                        String startKeyValue = "";
+                        String endKeyValue = "";
+                        String prev = "";
+
+                        String[] tuple;
+                        for (String val : data) {
+
+                            if (linenumber == 0) {
+                                //tuple = val.split("\\|");
+                                startKeyValue = val.substring(0, val.indexOf("|"));
+                            }
+
+                            if (linenumber == indexBlockSize) {
+                                //tuple = val.split("\\|");
+                                endKeyValue = val.substring(0, val.indexOf("|"));
+                            }
+
+                            if (linenumber == indexBlockSize) {
+                                String splitFileName = TABLE_DIRECTORY + file + "_" + commonLib.getFileSequenceNumber();
+                                writeDataDisk(temp, table, column, splitFileName);
+                                linenumber = 0;
+                                temp.clear();
+
+                                indexDataList.add(startKeyValue + "|" + endKeyValue + "|" + splitFileName);
+                                continue;
+                            }
+
+                            temp.add(val);
+                            linenumber++;
+
+                            prev = val;
+                        }
+
+                        if (linenumber != 0) {
+
+                            //tuple = prev.split("\\|");
+                            endKeyValue = prev.substring(0, prev.indexOf("|"));
+
+                            String splitFileName = TABLE_DIRECTORY + file + "_" + commonLib.getFileSequenceNumber();
+                            writeDataDisk(temp, table, column, splitFileName);
+                            temp.clear();
+
+                            indexDataList.add(startKeyValue + "|" + endKeyValue + "|" + splitFileName);
+                        }
+
+                        /**
+                         * Writing list of index files.
+                         */
+
+                        indexFileName = TABLE_DIRECTORY + "INDEX_" + file + "_" + commonLib.getFileSequenceNumber();
+                        indexFileLists.add(indexFileName);
+
+                        writeDataDisk(indexDataList, table, column, indexFileName);
+
+                        data.clear();
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    end = System.currentTimeMillis();
+                    t = (end - start);
+                    System.out.println("Writing took " + t);
+
                 }
 
-                fullFile.add(line1);
-            }
-
-
-            boolean sortedd = true;
-            for (int i = 0; i < indexList.length; i++) {
-                System.out.println("building Index for " + table + " " + indexList[i]);
-                if (!sortedd)
-                    sortList(table, indexList[i]);
-                makeIndex(table, indexList[i]);
-                sortedd = false;
-            }
-
-            fullFile.clear();
-
-            System.out.println("asdf");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void makeIndexOfLineItem(String table, String column) {
+    private static TreeMap<String, List<String>> getPkMap(String table) { // TODO : DEFINE OTHER MAPS
 
-        String line;
-        int cnt = 0;
-        fullFile.clear();
-        //    /Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/TEMP_LINEITEM_RETURNFLAG_100007
-        // Open bufferedReaders for all sorted files
+        if (table.equals("LINEITEM"))
+            return LINEITEM_ORDERKEY_TREEMAP;
+        if (table.equals("ORDERS"))
+            return ORDERS_ORDERKEY_TREEMAP;
+        if (table.equals("CUSTOMER"))
+            return CUSTOMER_CUSTKEY_TREEMAP;
+        if (table.equals("PART"))
+            return PART_PARTKEY_TREEMAP;
+        if (table.equals("SUPPLIER"))
+            return SUPPLIER_SUPPKEY_TREEMAP;
+        if (table.equals("PARTSUPP"))
+            return PARTSUPP_PARTKEY_TREEMAP;
+        if (table.equals("NATION"))
+            return NATION_NATIONKEY_TREEMAP;
+        if (table.equals("REGION"))
+            return REGION_REGIONKEY_TREEMAP;
 
-        List<String> fileList = tempFileMap.get(table + "_" + column);
+        return null;
+    }
 
-        pqSortIndex.clear();
-        pqSortIndex.add(getIndexOfColumn(table, column));
+    public static String getPK(String table) {
 
-        try {
+        if (table.equals("LINEITEM"))
+            return "ORDERKEY";
+        if (table.equals("PART"))
+            return "PARTKEY";
+        if (table.equals("CUSTOMER"))
+            return "CUSTKEY";
+        if (table.equals("SUPPLIER"))
+            return "SUPPKEY";
+        if (table.equals("NATION"))
+            return "NATIONKEY";
+        if (table.equals("PARTSUPP"))
+            return "PARTKEY";
+        if (table.equals("ORDERS"))
+            return "ORDERKEY";
+        if (table.equals("REGION"))
+            return "REGIONKEY";
 
-            for (String files : fileList) {
-                //String file = files.substring(files.lastIndexOf("/") + 1);
-                BufferedReader br = new BufferedReader(new FileReader(files));
+        return "";
+    }
 
-                List<BufferedReader> newList;
 
-                if (bufferedReaderMap.containsKey(table + "_" + column))
-                    newList = bufferedReaderMap.get(table + "_" + column);
-                else
-                    newList = new ArrayList<BufferedReader>();
+    private static Integer getPrimarykeyIndex(String table) {
 
-                newList.add(br);
+        List<net.sf.jsqlparser.statement.create.table.Index> indexList = schemas.get(table).getIndexes();
 
-                bufferedReaderMap.put(table + "_" + column, newList);
-
-                // fill priority queue for first time
-
-                HashMap<BufferedReader, String> map = new HashMap<BufferedReader, String>();
-                map.put(br, br.readLine());
-                priorityQueue.add(map);
-
+        int i = 0;
+        for (String indexColumns : indexList.get(0).getColumnsNames()) {
+            for (ColumnDefinition columnDefinition : schemas.get(table).getColumnDefinitions()) {
+                if (indexColumns.equals(columnDefinition.getColumnName()))
+                    return i;
+                i++;
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-        // make indexes
-
-       // String indexFileName = TABLE_DIRECTORY +  "INDEX_" + table + "_" + column + "_" + commonLib.getFileSequenceNumber();
-
-        try {
-            while ((line = getDataFromFiles(table, column)) != null) {
-
-                if ((cnt + 1) % indexBlockSize == 0) {
-
-//                    writeDataDisk(fullFile, table, column, indexFileName);
-//
-                    cnt = 0;
-                    makeIndex(table, column);
-                    fullFile.clear();
-                }
-
-                cnt++;
-
-                fullFile.add(line); // ToDo : can we use fullfile here? Used FULLFILE list coz makeIndex uses this.
-            }
-
-            if (cnt != 0) {
-
-               // writeDataDisk(fullFile, table, column, indexFileName);
-                makeIndex(table, column);
-
-                cnt = 0;
-                fullFile.clear();
-            }
-
-            //indexFileLists.add(indexFileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        return i;
     }
 
     private static String getDataFromFiles(String table, String column) {
@@ -347,159 +701,6 @@ public class Index {
         return null;
     }
 
-    private static void saveData(String table, String column) {
-
-        String fileName = TABLE_DIRECTORY + "TEMP_" + table + "_" + column + "_" + commonLib.getFileSequenceNumber();
-
-        String key = table + "_" + column;
-        List<String> value;
-        if (tempFileMap.containsKey(key))
-            value = tempFileMap.get(key);
-        else
-            value = new ArrayList<String>();
-
-        value.add(fileName);
-
-        tempFileMap.put(table + "_" + column, value);
-
-        try {
-            writeDataDisk(fullFile, table, column, fileName);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void makeIndex(String table, String column) {
-
-        String tuple[];
-
-        int indexOfColumn = getIndexOfColumn(table, column);
-
-        try {
-
-            List<String> data = new ArrayList<String>(); // TODO Might be an overhead
-            List<String> indexDataList = new ArrayList<String>();
-
-            int linenumber = 0;
-            String startKeyValue = "";
-            String endKeyValue = "";
-            String prev = "";
-
-            for (String line : fullFile) {
-
-                if (linenumber == 0) {
-                    tuple = line.split("\\|");
-                    startKeyValue = tuple[indexOfColumn];
-                }
-
-                if (linenumber == indexBlockSize) {
-                    tuple = line.split("\\|");
-                    endKeyValue = tuple[indexOfColumn];
-                }
-
-                if (linenumber == indexBlockSize) {
-                    String splitFileName = TABLE_DIRECTORY + table + "_" + column + "_" + commonLib.getFileSequenceNumber();
-                    writeDataDisk(data, table, column, splitFileName);
-                    linenumber = 0;
-                    data.clear();
-
-                    indexDataList.add(startKeyValue + "|" + endKeyValue + "|" + splitFileName);
-                    continue;
-                }
-
-                data.add(line);
-                linenumber++;
-
-                prev = line;
-            }
-
-            if (linenumber != 0) {
-
-                tuple = prev.split("\\|");
-                endKeyValue = tuple[indexOfColumn];
-
-                String splitFileName = TABLE_DIRECTORY + table + "_" + column + "_" + commonLib.getFileSequenceNumber();
-                writeDataDisk(data, table, column, splitFileName);
-                data.clear();
-
-                indexDataList.add(startKeyValue + "|" + endKeyValue + "|" + splitFileName);
-            }
-
-            String indexFileName = TABLE_DIRECTORY + "INDEX_" + table + "_" + column + "_" + commonLib.getFileSequenceNumber();
-            indexFileLists.add(indexFileName);
-
-            writeDataDisk(indexDataList, table, column, indexFileName);
-
-            data.clear();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private static List<Integer> getIndexOfSortKey(String table, int indexOfColumn) {
-        List<Integer> list = new ArrayList<Integer>();
-
-        List<ColumnDefinition> columnDefinitionList = schemas.get(table).getColumnDefinitions();
-
-
-        return list;
-    }
-
-    private static String getLine(boolean sorted, String table) {
-
-        String value = null;
-
-        if (!sorted) {
-            try {
-                value = sort.getTuple();
-                if (value == null)
-                    return null;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            String values[] = value.split("\\|");
-            String ret = "";
-            for (int i = 0; i < values.length; i++)
-                ret = ret + "|" + values[i];
-
-            return ret.substring(1);
-        } else {
-
-            try {
-                if (br == null)
-                    br = new LineNumberReader(new FileReader(TABLE_DIRECTORY + table + CommonLib.extension));
-
-                return br.readLine();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return "";
-    }
-
-    private static List<Column> getColumnList(CreateTable createTable, String col) {
-        List<Column> columnList = new ArrayList<Column>();
-
-//        for (ColumnDefinition columnDefinition : createTable.getColumnDefinitions()) {
-//            Column column = new Column();
-//            column.setColumnName(columnDefinition.getColumnName());
-//            column.setTable(new Table(createTable.getTable().getName()));
-//            columnList.add(column);
-//        }
-
-        Column column = new Column();
-        column.setColumnName(col);
-        column.setTable(new Table(createTable.getTable().getName()));
-        columnList.add(column);
-        return columnList;
-
-    }
-
     public static void writeDataDisk(List<String> data, String table, String column, String filename) throws Exception {
 
         File file = new File(filename);
@@ -517,22 +718,10 @@ public class Index {
 
     }
 
-    private static int getIndexOfColumn(String table, String column) {
-        int index = 0;
-        CreateTable createTable = schemas.get(table.toUpperCase());
-
-        for (ColumnDefinition columnDefinition : createTable.getColumnDefinitions()) {
-            if (columnDefinition.getColumnName().equals(column))
-                return index;
-            index++;
-        }
-
-        return index;
-    }
-
     private static void init() {
-//        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
-        indexMap.put("LINEITEM", "ORDERKEY|SHIPDATE");
+
+        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
+//        indexMap.put("LINEITEM", "RECEIPTDATE");
         indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
         indexMap.put("PART", "PARTKEY");
         indexMap.put("CUSTOMER", "CUSTKEY|MKTSEGMENT");
@@ -540,6 +729,7 @@ public class Index {
         indexMap.put("PARTSUPP", "PARTKEY|SUPPKEY");
         indexMap.put("NATION", "NATIONKEY");
         indexMap.put("REGION", "REGIONKEY");
+
     }
 
     public static boolean isNumber(String str) {
@@ -551,92 +741,33 @@ public class Index {
         }
     }
 
-    private static void sortList(String table, String column) {
-
-        List<ColumnDefinition> columnDefinitionList = schemas.get(table).getColumnDefinitions();
-        final List<Integer> indexOfSortKey = new ArrayList<Integer>();
-
-        int i = 0;
-        for (ColumnDefinition columnDefinition : columnDefinitionList) {
-            if (columnDefinition.getColumnName().equals(column)) {
-                indexOfSortKey.add(i);
-                break;
-            }
-            i++;
-        }
-
-
-        Collections.sort(fullFile, new Comparator<String>() {
-            @Override
-            public int compare(String a1, String b1) {
-
-                String a[] = a1.split("\\|");
-                String b[] = b1.split("\\|");
-
-                for (int i = 0; i < indexOfSortKey.size(); i++) {
-                    int index = indexOfSortKey.get(i);
-
-                    try {
-
-                        if (isNumber(a[index])) {
-
-                            double pv1 = Double.parseDouble(a[index]);
-                            double pv2 = Double.parseDouble(b[index]);
-
-                            if (pv1 < pv2)
-                                return -1;
-                            else if (pv1 > pv2)
-                                return 1;
-                            else {
-                                continue;
-                            }
-
-                        } else {
-
-                            return a[index].compareTo(b[index]);
-                        }
-
-                    } catch (Exception e) {
-
-                    }
-                }
-                return -1;
-            }
-        });
+    public List<String> getIndexList() {
+        return indexList;
     }
 
     public List<String> getIndexList(String tableName, String indexColumnName) {
 
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100012");
-//        indexFileLists.add("INDEX_LINEITEM_RECEIPTDATE_100051");
-//        indexFileLists.add("INDEX_LINEITEM_RETURNFLAG_100038");
-//        indexFileLists.add("INDEX_LINEITEM_LINENUMBER_100025");
-//        indexFileLists.add("INDEX_LINEITEM_ORDERKEY_100012");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_CUSTKEY_100001");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_MKTSEGMENT_100003");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_SUPPKEY_100005");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_NATIONKEY_100007");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_PARTKEY_100012");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_SUPPKEY_100017");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100042");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_RETURNFLAG_100067");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100092");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_LINENUMBER_100117");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_RECEIPTDATE_100142");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERKEY_100150");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERDATE_100157");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PART_PARTKEY_100159");
 
-       /* indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100049");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100051");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100053");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100055");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100057");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100059");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100061");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100063");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100065");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100067");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100069");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100071");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100073");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100075");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100077");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100079");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100081");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100083");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100085");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100087");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100089");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100091");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100093");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100095");*/
+        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_ORDERKEY_101201");
+        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RETURNFLAG_102403");
+        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_SHIPDATE_103605");
+        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_LINENUMBER_104807");
+        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RECEIPTDATE_106009");
+
 
         String col[] = null;
         String indexFileName = "";
@@ -650,6 +781,20 @@ public class Index {
             indexFileName = "INDEX_" + tableName + "_" + indexColumnName;
         }
 
+
+        try {
+            if (indexFileLists.size() == 0) {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(TABLE_DIRECTORY + tableName + "_INDEX_LIST"));
+
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    indexFileLists.add(line);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         for (String filename : indexFileLists) {
             String file = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("_"));
             if (indexFileName.equals(file))
@@ -659,7 +804,7 @@ public class Index {
         BufferedReader br = null;
         String line = null;
         try {
-            for(int i =0; i < list.size(); i++) {
+            for (int i = 0; i < list.size(); i++) {
                 br = new BufferedReader(new FileReader(list.get(i)));
 
                 while ((line = br.readLine()) != null)
@@ -674,7 +819,7 @@ public class Index {
 
         //list.remove(0);
 
-        //indexFileLists.clear();
+        indexFileLists.clear();
         return filelist;
     }
 
