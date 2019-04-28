@@ -12,6 +12,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static helpers.Index.isNumber;
@@ -23,17 +24,22 @@ public class IndexIterator implements RAIterator {
     boolean hasNext = false;
     int currentFileIndex = 0;
     List<String> tableIndexList = new ArrayList<String>();
+    List<Expression> expressionList;
+    int cnt = 0;
     private CommonLib commonLib = CommonLib.getInstance();
     private ColumnDefinition[] columnDefinitions;
     private String tableName;
     private String tableAlias;
-    private BufferedReader br;
+    private LineNumberReader br;
     private PrimitiveValue[] currentLine;
     private PrimitiveValue[] nextLine;
     private Schema[] schema;
     private Expression expression;
-    List<Expression> expressionList;
     private List<String> finalFileNameList = new ArrayList<String>();
+    private List<Long> positionList = new ArrayList<Long>();
+    private int currentPositionToRead = 0;
+    private RandomAccessFile randomAccessFile = null;
+
 
     public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, Expression expression) throws Exception {
         this.columnDefinitions = columnDefinitions;
@@ -54,6 +60,46 @@ public class IndexIterator implements RAIterator {
 
         finalFileList();
 
+//        randomAccessFile = new RandomAccessFile(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension, "r");
+        br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension));
+
+
+        Collections.sort(positionList);
+
+        next = positionList.get(currentPositionToRead++);
+
+
+
+//                , new Comparator<Long>() {
+//            @Override
+//            public int compare(Long o1, Long o2) {
+//                return o1.compareTo(o2);
+//            }
+//        });
+
+    }
+
+    private static boolean isPrimaryKey(String table, String columnName) {
+
+        if (table.equals("LINEITEM") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PART") && columnName.equals("PARTKEY"))
+            return true;
+        if (table.equals("CUSTOMER") && columnName.equals("CUSTKEY"))
+            return true;
+        if (table.equals("SUPPLIER") && columnName.equals("SUPPKEY"))
+            return true;
+        if (table.equals("NATION") && columnName.equals("NATIONKEY"))
+            return true;
+        if (table.equals("REGION") && columnName.equals("REGIONKEY"))
+            return true;
+        if (table.equals("ORDERS") && columnName.equals("ORDERKEY"))
+            return true;
+        if (table.equals("PARTSUPP") && columnName.equals("PARTKEY"))
+            return true;
+
+        return false;
+
     }
 
     private void finalFileList() throws Exception {
@@ -61,15 +107,15 @@ public class IndexIterator implements RAIterator {
         String colName = null;
         Set<String> set = new HashSet<String>();
 
-        for(String path : finalFileNameList){
+        for (String path : finalFileNameList) {
             String filename = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("_"));
 
             colName = filename.substring(filename.indexOf("_") + 1);
             //System.out.println(filename);
-            if(!isPrimaryKey(tableName, colName)){
+            if (!isPrimaryKey(tableName, colName)) {
                 BufferedReader br = new BufferedReader(new FileReader(path));
                 String line = null;
-                while((line = br.readLine())!= null){
+                while ((line = br.readLine()) != null) {
                     String tuple[] = line.split("\\|");
                     set.add(tuple[1]);
                 }
@@ -78,34 +124,13 @@ public class IndexIterator implements RAIterator {
 
         List<String> temp = new ArrayList<String>(set);
 
-//        Collections.sort(temp, new Comparator<String>() {
-//            @Override
-//            public int compare(String o1, String o2) {
-//
-//                String a[] = o1.split("\\|");
-//                String b[] = o2.split("\\|");
-//
-//                if (isNumber(a[0])) {
-//
-//                    double pv1 = Double.parseDouble(a[0]);
-//                    double pv2 = Double.parseDouble(b[0]);
-//
-//                    if (pv1 < pv2)
-//                        return -1;
-//                    else if (pv1 > pv2)
-//                        return 1;
-//
-//                } else {
-//
-//                    return a[0].compareTo(b[0]);
-//                }
-//
-//                return 0;
-//            }
-//        });
 
+        //finalFileNameList = getPrimaryKeyFiles(temp, colName);
+        for (String str : temp) {
+            long val = Long.valueOf(str);
+            positionList.add(val);  // TODO : position list can be stored and read back in second phase
+        }
 
-        finalFileNameList = getPrimaryKeyFiles(temp, colName);
 
     }
 
@@ -119,10 +144,10 @@ public class IndexIterator implements RAIterator {
 
         Set<String> set = new HashSet<String>();
 
-        for(String key : list) {
+        for (String key : list) {
             for (String str : primaryKeyFiles) {
 
-                if (isKeyInRange(str, key)){
+                if (isKeyInRange(str, key)) {
                     set.add(CommonLib.TABLE_DIRECTORY + str.substring(str.indexOf("_") + 1));
                     break;
                 }
@@ -139,14 +164,14 @@ public class IndexIterator implements RAIterator {
         String start = file.substring(0, file.indexOf("|"));
         String end = file.substring(file.indexOf("|") + 1, file.lastIndexOf("|"));
 
-        if(isNumber(key)){
+        if (isNumber(key)) {
 
             int first = Integer.parseInt(start);
             int last = Integer.parseInt(end);
 
             int k = Integer.parseInt(key);
 
-            if(k > first && k < last)
+            if (k > first && k < last)
                 return true;
             else
                 return false;
@@ -169,7 +194,6 @@ public class IndexIterator implements RAIterator {
         return "";
     }
 
-    int cnt = 0;
     @Override
     public boolean hasNext() throws Exception {
 
@@ -182,21 +206,12 @@ public class IndexIterator implements RAIterator {
             if (hasNext)
                 return true;
 
-            if (br == null)
-                br = getBufferedReader();
-
-            if (br == null)
-                return false;
-            else if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(), columnDefinitions)) != null) {
+            if ((nextLine = getDataFromFile()) != null) {
                 hasNext = true;
                 return true;
-            } else if (nextLine == null){
-                br = getBufferedReader();
-                return this.hasNext();
             }
 
             hasNext = false;
-
             return false;
 
         } catch (Exception e) {
@@ -204,12 +219,71 @@ public class IndexIterator implements RAIterator {
         }
     }
 
+    long start = System.currentTimeMillis();
+    long current = 0 ; //positionList.get(currentPositionToRead++);
+    long next = 0;
+    String val = null;
+
+    private PrimitiveValue[] getDataFromFile() {
+        try {
+
+            if(currentPositionToRead >= positionList.size()) {
+                hasNext = false;
+                return null;
+            }
+            //
+//
+//            long pos = positionList.get(currentPositionToRead++);
+//            randomAccessFile.seek(pos);
+//
+//            String randomAccessFileLine = randomAccessFile.readUTF();
+//
+
+//            long end;
+//            if(currentPositionToRead % 10000 == 0) {
+//                end = System.currentTimeMillis();
+//                System.out.println(currentPositionToRead);
+//                long res = end - start;
+//                System.out.println("time " +res);
+//                start = end;
+//            }
+
+            //br = null;
+
+            //br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension));
+
+
+
+
+            br.skip(next - current);
+            val = br.readLine();
+            //System.out.println("VAL " + val );
+            //System.out.println("LEN " + val.length());
+            if ((nextLine = commonLib.covertTupleToPrimitiveValue(val, columnDefinitions)) != null) {
+               // System.out.println(Arrays.toString(nextLine));
+                hasNext = true;
+                current = next + val.length() + 1;
+                if(currentPositionToRead == 950000)
+                    return nextLine;
+                next = positionList.get(currentPositionToRead++);
+                return nextLine;
+            }
+
+
+//            next = current - next;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private BufferedReader getBufferedReader() throws Exception {
 
         if (currentFileIndex < finalFileNameList.size()) {
             String file = finalFileNameList.get(currentFileIndex);
 
-            br = new BufferedReader(new FileReader(new File(file)));
+            br = new LineNumberReader(new FileReader(new File(file)));
 
             currentFileIndex++;
             return br;
@@ -218,8 +292,11 @@ public class IndexIterator implements RAIterator {
         return null;
     }
 
+    int cntr = 1;
     @Override
     public PrimitiveValue[] next() {
+        //System.out.println(cntr++);
+
         currentLine = nextLine;
         nextLine = null;
         hasNext = false;
@@ -231,7 +308,8 @@ public class IndexIterator implements RAIterator {
         nextLine = null;
         currentLine = null;
         hasNext = false;
-        currentFileIndex = 0;
+        currentPositionToRead = 0;
+        currentFileIndex = 0; // TODO : NOT using anymore
     }
 
     @Override
@@ -243,12 +321,12 @@ public class IndexIterator implements RAIterator {
     public void setChild(RAIterator child) {
     }
 
+    //endregion
+
     @Override
     public Schema[] getSchema() {
         return this.schema;
     }
-
-    //endregion
 
     @Override
     public void setSchema(Schema[] schema) {
@@ -294,36 +372,12 @@ public class IndexIterator implements RAIterator {
         }
     }
 
-
-    private static boolean isPrimaryKey(String table, String columnName) {
-
-        if (table.equals("LINEITEM") && columnName.equals("ORDERKEY"))
-            return true;
-        if (table.equals("PART") && columnName.equals("PARTKEY"))
-            return true;
-        if (table.equals("CUSTOMER") && columnName.equals("CUSTKEY"))
-            return true;
-        if (table.equals("SUPPLIER") && columnName.equals("SUPPKEY"))
-            return true;
-        if (table.equals("NATION") && columnName.equals("NATIONKEY"))
-            return true;
-        if (table.equals("REGION") && columnName.equals("REGIONKEY"))
-            return true;
-        if (table.equals("ORDERS") && columnName.equals("ORDERKEY"))
-            return true;
-        if (table.equals("PARTSUPP") && columnName.equals("PARTKEY"))
-            return true;
-
-        return false;
-
-    }
-
     private List<String> intersect(List<String> leftFiles, List<String> rightFiles) {
 
-        if(leftFiles == null || leftFiles.size() == 0)
+        if (leftFiles == null || leftFiles.size() == 0)
             return null;
 
-        if(rightFiles == null || rightFiles.size() == 0)
+        if (rightFiles == null || rightFiles.size() == 0)
             return leftFiles;
 
         leftFiles.retainAll(rightFiles);
@@ -343,16 +397,21 @@ public class IndexIterator implements RAIterator {
             tableIndexList.add(tableName + "." + indexes[i]);
         }
 
+        //tableIndexList.add(indexList);
+
         List<Expression> expList = getIndexExpression();
 
         return expList;
     }
+
 
     private List<Expression> getIndexExpression() {
 
         String indexColumnName = "";
 
         List<Expression> returnList = new ArrayList<Expression>();
+
+        List<Expression> expressionList = commonLib.getExpressionList(expression);
 
         for (Expression expression : expressionList) {
 
@@ -481,15 +540,14 @@ public class IndexIterator implements RAIterator {
 
             indexColumnName = ((GreaterThan) expression).getLeftExpression().toString();
 
-            if(((GreaterThan) expression).getRightExpression() instanceof Function) {
+            if (((GreaterThan) expression).getRightExpression() instanceof Function) {
                 indexColumnValue = ((Function) ((GreaterThan) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
 
-                char [] ch = indexColumnValue.toCharArray();
+                char[] ch = indexColumnValue.toCharArray();
                 indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
+                for (int i = 1; i < ch.length - 1; i++) // TODO: did workaround for DATE
                     indexColumnValue += ch[i];
-            }
-            else
+            } else
                 indexColumnValue = ((GreaterThan) expression).getRightExpression().toString();
 
             List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
@@ -507,15 +565,14 @@ public class IndexIterator implements RAIterator {
 
             indexColumnName = ((GreaterThanEquals) expression).getLeftExpression().toString();
 
-            if(((GreaterThanEquals) expression).getRightExpression() instanceof Function) {
+            if (((GreaterThanEquals) expression).getRightExpression() instanceof Function) {
                 indexColumnValue = ((Function) ((GreaterThanEquals) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
 
-                char [] ch = indexColumnValue.toCharArray();
+                char[] ch = indexColumnValue.toCharArray();
                 indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
+                for (int i = 1; i < ch.length - 1; i++) // TODO: did workaround for DATE
                     indexColumnValue += ch[i];
-            }
-            else
+            } else
                 indexColumnValue = ((GreaterThanEquals) expression).getRightExpression().toString();
 
             List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
@@ -533,15 +590,14 @@ public class IndexIterator implements RAIterator {
 
             indexColumnName = ((MinorThan) expression).getLeftExpression().toString();
 
-            if(((MinorThan) expression).getRightExpression() instanceof Function) {
+            if (((MinorThan) expression).getRightExpression() instanceof Function) {
                 indexColumnValue = ((Function) ((MinorThan) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
 
-                char [] ch = indexColumnValue.toCharArray();
+                char[] ch = indexColumnValue.toCharArray();
                 indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
+                for (int i = 1; i < ch.length - 1; i++) // TODO: did workaround for DATE
                     indexColumnValue += ch[i];
-            }
-            else
+            } else
                 indexColumnValue = ((MinorThan) expression).getRightExpression().toString();
 
             List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
@@ -549,10 +605,10 @@ public class IndexIterator implements RAIterator {
             for (String ind : indexFileList) {
                 String indexRow[] = ind.split("\\|");
 
-                if (indexRow[1].compareTo(indexColumnValue) <= 0 )
+                if (indexRow[1].compareTo(indexColumnValue) <= 0)
                     fileNameList.add(indexRow[2]);
 
-                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
+                else if (indexRow[0].compareTo(indexColumnValue) <= 0) {
                     fileNameList.add(indexRow[2]);
                     break;
                 }
@@ -564,15 +620,14 @@ public class IndexIterator implements RAIterator {
 
             indexColumnName = ((MinorThanEquals) expression).getLeftExpression().toString();
 
-            if(((MinorThanEquals) expression).getRightExpression() instanceof Function) {
+            if (((MinorThanEquals) expression).getRightExpression() instanceof Function) {
                 indexColumnValue = ((Function) ((MinorThanEquals) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
 
-                char [] ch = indexColumnValue.toCharArray();
+                char[] ch = indexColumnValue.toCharArray();
                 indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
+                for (int i = 1; i < ch.length - 1; i++) // TODO: did workaround for DATE
                     indexColumnValue += ch[i];
-            }
-            else
+            } else
                 indexColumnValue = ((MinorThanEquals) expression).getRightExpression().toString();
 
             List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
@@ -580,9 +635,9 @@ public class IndexIterator implements RAIterator {
             for (String ind : indexFileList) {
                 String indexRow[] = ind.split("\\|");
 
-                if (indexRow[1].compareTo(indexColumnValue) <= 0 )
+                if (indexRow[1].compareTo(indexColumnValue) <= 0)
                     fileNameList.add(indexRow[2]);
-                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
+                else if (indexRow[0].compareTo(indexColumnValue) <= 0) {
                     fileNameList.add(indexRow[2]);
                     break;
                 }

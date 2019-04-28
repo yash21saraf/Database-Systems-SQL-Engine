@@ -1,12 +1,14 @@
 package iterators;
 
 import helpers.CommonLib;
+import helpers.Index;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
 import java.util.List;
@@ -127,24 +129,24 @@ public class FilterIterator implements RAIterator {
 
                     e.printStackTrace();
                 }
-            }
-            else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
-                try {
-                    Schema[] schemas = filterIterator.getSchema();
-                    String table = schemas[0].getTableName();
-                    ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
-                    int i = 0;
-                    for (Schema schema : schemas) {
-                        columnDefinitions[i++] = schema.getColumnDefinition();
-                    }
-                    //Expression exp = commonLib.getExpressionList(filterIterator.getExpression()).get(0);
-                    filterIterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
+            } else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
+                if (hasIndexOnExpression(expression, tableIterator.getTableName())) {
+                    try {
+                        Schema[] schemas = filterIterator.getSchema();
+                        String table = schemas[0].getTableName();
+                        ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
+                        int i = 0;
+                        for (Schema schema : schemas) {
+                            columnDefinitions[i++] = schema.getColumnDefinition();
+                        }
+                        //Expression exp = commonLib.getExpressionList(filterIterator.getExpression()).get(0);
+                        filterIterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
+            } else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
                 List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
                 Schema[] leftSchema = joinIterator.getChild().getSchema();
                 Schema[] rightSchema = joinIterator.getRightChild().getSchema();
@@ -226,6 +228,22 @@ public class FilterIterator implements RAIterator {
         child = child.optimize(child);
         iterator.setChild(child);
         return iterator;
+    }
+
+    private boolean hasIndexOnExpression(Expression expression, String tableName) {
+        List<Expression> expressionList = commonLib.getExpressionList(expression);
+
+        String[] indexes = Index.indexMap.get(tableName).split("\\|");
+
+
+        for (String str : indexes)
+            for(Expression expression1 : expressionList)
+                for(Column column : commonLib.getColumnList(expression1))
+                    if (column.getColumnName().equals(str))
+                        return true;
+
+
+        return false;
     }
 
     //endregion

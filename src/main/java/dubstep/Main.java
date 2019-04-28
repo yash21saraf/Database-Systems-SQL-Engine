@@ -1,6 +1,7 @@
 package dubstep;
 
 import builders.IteratorBuilder;
+import helpers.CommonLib;
 import iterators.RAIterator;
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.PrimitiveValue;
@@ -8,6 +9,9 @@ import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.util.Date;
 
@@ -226,7 +230,7 @@ public class Main {
                 "ORDER BY REVENUE DESC;" ;
       /*  String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
-
+*/
         String q30 = "SELECT\n" +
                 "LINEITEM.ORDERKEY,\n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
@@ -243,7 +247,7 @@ public class Main {
                 "AND LINEITEM.SHIPDATE > DATE('1995-03-29')\n" +
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY REVENUE DESC, ORDERDATE\n" +
-                "LIMIT 10;";*/
+                "LIMIT 10;";
 
         String a = "SELECT * FROM REGION, NATION WHERE NATION.REGIONKEY = REGION.REGIONKEY AND REGION.NAME = 'ASIA';";
 //            String a = "SELECT * FROM NATION ORDER BY NATION.REGIONKEY;" ;
@@ -274,7 +278,7 @@ public class Main {
 
         String q33 = "CREATE TABLE LINEITEM (ORDERKEY INT , PARTKEY INT , SUPPKEY INT , LINENUMBER INT , QUANTITY DECIMAL , EXTENDEDPRICE DECIMAL , DISCOUNT DECIMAL , TAX DECIMAL , RETURNFLAG CHAR (1) , LINESTATUS CHAR (1) , SHIPDATE DATE , COMMITDATE DATE , RECEIPTDATE DATE , SHIPINSTRUCT CHAR (25) , SHIPMODE CHAR (10) , COMMENT VARCHAR (44) , PRIMARY KEY (ORDERKEY, LINENUMBER));";
 
-        String  q44 = "SELECT \n" +
+        String  q44 = "SELECT  \n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*LINEITEM.DISCOUNT) AS REVENUE\n" +
                 "FROM\n" +
                 "LINEITEM\n" +
@@ -283,14 +287,16 @@ public class Main {
                 "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
                 "AND LINEITEM.QUANTITY < 24;";
-        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
+        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q30};
 //        String  q45 = "SELECT * from LINEITEM";
-//        String q[] = {q9 ,q44};
+//        String q[] = {q9 ,q30};
 //        String q[] = {q44};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
         RAIterator rootIterator = null;
+
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(CommonLib.TABLE_DIRECTORY + "OUTPUT.csv")));
 
         while (i < q.length) {
             StringReader input = new StringReader(q[i]);
@@ -307,18 +313,25 @@ public class Main {
                 rootIterator = rootIterator.optimize(rootIterator);
 
                 while (rootIterator.hasNext()) {
+                    String out = "";
                     PrimitiveValue[] tuple = rootIterator.next();
                     if (tuple != null) {
+
                         for (int index = 0; index < tuple.length; index++) {
-//                            printResult(tuple, index);
+                            out += "|" + tuple[index].toRawString();
                             System.out.print(tuple[index].toRawString());
                             if (index != (tuple.length - 1))
                                 System.out.print("|");
                         }
+
+                        bufferedWriter.write(out.substring(1) + "\n");
+
                         System.out.print("\n");
 
                     }
                 }
+                bufferedWriter.close();
+
                 if (debugEnabled) {
                     long endTime = System.currentTimeMillis();
                     //System.out.println(startTime);

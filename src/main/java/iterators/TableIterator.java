@@ -181,6 +181,10 @@ public class TableIterator implements RAIterator
       return iterator;
    }
 
+   public String getTableName(){
+      return this.tableName;
+   }
+
    //endregion
 
 }
