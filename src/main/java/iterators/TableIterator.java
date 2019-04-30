@@ -101,8 +101,6 @@ public class TableIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
-//      if((cnter % 20000) == 0)
-//         System.out.println("asdfasf");
 
       try {
          if (!hasNextChecked) {

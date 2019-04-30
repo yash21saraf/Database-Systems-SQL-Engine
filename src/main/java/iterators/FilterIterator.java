@@ -272,8 +272,10 @@ public class FilterIterator implements RAIterator {
             }
         }
         RAIterator child = iterator.getChild();
-        child = child.optimize(child);
-        iterator.setChild(child);
+        if(child != null){
+            child = child.optimize(child);
+            iterator.setChild(child);
+        }
         return iterator;
     }
 

@@ -240,6 +240,7 @@ public class IndexIterator implements RAIterator {
                 positions = intersectLists(positions, currentPositions) ;
             }
         }
+        positions.add(positions.size(), 0L);
     }
 
     private ArrayList<Long> intersectLists(ArrayList<Long> leftFiles, ArrayList<Long> rightFiles) {

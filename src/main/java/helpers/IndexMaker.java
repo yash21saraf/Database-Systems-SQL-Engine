@@ -225,13 +225,18 @@ public class IndexMaker {
                 lineNumber +=1 ;
             }
         }
-        PrimitiveValue[] currentItemForMasterIndex = new PrimitiveValue[3];
-        currentItemForMasterIndex[0] = firstKey ;
-        currentItemForMasterIndex[1] = CommonLib.convertToPrimitiveValue(currentIndex.lastKey(), colDataType) ;
-        currentItemForMasterIndex[2] = CommonLib.convertToPrimitiveValue(indexFileName, "STRING") ;
-        currentMapForMasterIndex.add(currentItemForMasterIndex);
 
-        indexBW.writeUnshared(currentItemForMasterIndex);
+        if(!lineNumber.equals(indexBlockSize+1)){
+            PrimitiveValue[] currentItemForMasterIndex = new PrimitiveValue[3];
+            currentItemForMasterIndex[0] = firstKey ;
+            currentItemForMasterIndex[1] = CommonLib.convertToPrimitiveValue(currentIndex.lastKey(), colDataType) ;
+            currentItemForMasterIndex[2] = CommonLib.convertToPrimitiveValue(indexFileName, "STRING") ;
+            indexBW.writeUnshared(currentItemForMasterIndex);
+
+            currentMapForMasterIndex.add(currentItemForMasterIndex);
+        }
+
+
         indexBW.writeUnshared(null);
         indexBW.close();
 

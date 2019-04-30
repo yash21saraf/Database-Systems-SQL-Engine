@@ -22,7 +22,7 @@ public class Main {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static Map<String, ArrayList<String>> globalIndex = new HashMap<String, ArrayList<String>>();
     public static Map<String, String> globalPrimaryIndex = new HashMap<String, String>() ;
-    public static Map<String, ArrayList<PrimitiveValue[]>> masterIndex = new HashMap<String, ArrayList<PrimitiveValue[]>>(); // TODO: Change back to string[]
+    public static Map<String, ArrayList<PrimitiveValue[]>> masterIndex = new HashMap<String, ArrayList<PrimitiveValue[]>>();
     public static boolean isPhase1 = true ;
     public static BufferedWriter globalIndexWriter = null ;
     public static boolean closedFlag = false ;
@@ -78,25 +78,44 @@ public class Main {
         String a6 = "CREATE TABLE PARTSUPP (PARTKEY INT , SUPPKEY INT , AVAILQTY INT , SUPPLYCOST DECIMAL , COMMENT VARCHAR (199) , PRIMARY KEY (PARTKEY, SUPPKEY)) ;" ;
         String a7 = "CREATE TABLE NATION (NATIONKEY INT , NAME CHAR (25) , REGIONKEY INT , COMMENT VARCHAR (152) , PRIMARY KEY (NATIONKEY)) ;" ;
         String a8 = "CREATE TABLE REGION (REGIONKEY INT , NAME CHAR (25) , COMMENT VARCHAR (152) , PRIMARY KEY (REGIONKEY)) ;" ;
-//        String q22 ="SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21') GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS; ";
-        String q22 = "SELECT COUNT(*) FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21');" ;
+        String q22 ="SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21') GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS; ";
+//        String q22 ="SELECT COUNT(*) FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21') ;";
+//        String q22 = "SELECT COUNT(*) FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21');" ;
+//        String q30 = "SELECT\n" +
+//                "LINEITEM.ORDERKEY,\n" +
+//                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+//                "ORDERS.ORDERDATE,\n" +
+//                "ORDERS.SHIPPRIORITY\n" +
+//                "FROM\n" +
+//                "CUSTOMER,\n" +
+//                "ORDERS,\n" +
+//                "LINEITEM \n" +
+//                "WHERE\n" +
+//                "CUSTOMER.MKTSEGMENT = 'BUILDING' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+//                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+//                "AND ORDERS.ORDERDATE < DATE('1995-03-29')\n" +
+//                "AND LINEITEM.SHIPDATE > DATE('1995-03-29')\n" +
+//                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+//                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+//                "LIMIT 10;";
+//        String q30 = "SELECT COUNT(*) FROM CUSTOMER WHERE CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' ;" ;
         String q30 = "SELECT\n" +
-                "LINEITEM.ORDERKEY,\n" +
-                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
-                "ORDERS.ORDERDATE,\n" +
-                "ORDERS.SHIPPRIORITY\n" +
+                "NATION.NAME,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
                 "FROM\n" +
-                "CUSTOMER,\n" +
-                "ORDERS,\n" +
-                "LINEITEM \n" +
+                "REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
                 "WHERE\n" +
-                "CUSTOMER.MKTSEGMENT = 'BUILDING' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
-                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
-                "AND ORDERS.ORDERDATE < DATE('1995-03-29')\n" +
-                "AND LINEITEM.SHIPDATE > DATE('1995-03-29')\n" +
-                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
-                "ORDER BY REVENUE DESC, ORDERDATE\n" +
-                "LIMIT 10;";
+                "CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
+                "AND LINEITEM.SUPPKEY = SUPPLIER.SUPPKEY\n" +
+                "AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
+                "AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
+                "AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
+                "AND REGION.NAME = 'EUROPE'\n" +
+                "AND ORDERS.ORDERDATE >= DATE('1996-01-01')\n" +
+                "AND ORDERS.ORDERDATE < DATE('1997-01-01')\n" +
+                "GROUP BY NATION.NAME\n" +
+                "ORDER BY REVENUE DESC;" ;
         String  q44 = "SELECT \n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*LINEITEM.DISCOUNT) AS REVENUE\n" +
                 "FROM\n" +
@@ -106,29 +125,28 @@ public class Main {
                 "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
                 "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
                 "AND LINEITEM.QUANTITY < 24;";
+        String q46 = "SELECT\n" +
+                "LINEITEM.ORDERKEY,\n" +
+                "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
+                "ORDERS.ORDERDATE,\n" +
+                "ORDERS.SHIPPRIORITY\n" +
+                "FROM\n" +
+                "CUSTOMER,\n" +
+                "ORDERS, \n" +
+                "LINEITEM \n" +
+                "WHERE\n" +
+                "CUSTOMER.MKTSEGMENT = 'HOUSEHOLD' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
+                "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
+                "AND ORDERS.ORDERDATE < DATE('1995-03-01')\n" +
+                "AND LINEITEM.SHIPDATE > DATE('1995-03-01')\n" +
+                "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
+                "ORDER BY REVENUE DESC, ORDERDATE\n" +
+                "LIMIT 10;";
 
         if(isPhase1){
             a = new String[]{a1, a2, a3, a4, a5, a6, a7, a8, q44, q22, q30};
         }else{
-//            String q22 ="SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21') GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS; ";
-//            String q30 = "SELECT\n" +
-//                    "LINEITEM.ORDERKEY,\n" +
-//                    "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
-//                    "ORDERS.ORDERDATE,\n" +
-//                    "ORDERS.SHIPPRIORITY\n" +
-//                    "FROM\n" +
-//                    "CUSTOMER,\n" +
-//                    "ORDERS,\n" +
-//                    "LINEITEM \n" +
-//                    "WHERE\n" +
-//                    "CUSTOMER.MKTSEGMENT = 'BUILDING' AND CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
-//                    "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY \n" +
-//                    "AND ORDERS.ORDERDATE < DATE('1995-03-29')\n" +
-//                    "AND LINEITEM.SHIPDATE > DATE('1995-03-29')\n" +
-//                    "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
-//                    "ORDER BY REVENUE DESC, ORDERDATE\n" +
-//                    "LIMIT 10;";
-            a = new String[]{q44, q22, q30};
+            a = new String[]{q46};
         }
 
 // endregion queries
