@@ -4,6 +4,7 @@ import dubstep.Main;
 import helpers.CommonLib;
 import helpers.Schema;
 import helpers.Sort;
+import helpers.Tuple;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
 import net.sf.jsqlparser.schema.Column;
@@ -50,6 +51,8 @@ public class GroupByIterator implements RAIterator {
     private HashMap<Integer, String> AggTypeToIndexMap = new HashMap<Integer, String>();
     //endregion
 
+    private Tuple tupleClass;
+
     //region Constructor
 
     public GroupByIterator(RAIterator child, List<SelectItem> selectItems, String tableAlias, List<Column> groupByColumnReferences) {
@@ -60,11 +63,13 @@ public class GroupByIterator implements RAIterator {
         this.groupByColumnReferences = groupByColumnReferences;
         this.schema = child.getSchema();
 
-
         indexOfGroupByCols = getIndexOfGroupByCols(selectItems, "groupby");
         indexOfNonGroupByCols = getIndexOfGroupByCols(selectItems, "nongroupby");
         aggTypeOfSelectItems = getAggTypeOfSelectItems(selectItems);
         keyColDef = getKeyColDef(indexOfNonGroupByCols);
+
+        tupleClass = new Tuple(keyColDef, null);
+
         mapAggtypeToIndex();
 
 
@@ -228,7 +233,8 @@ public class GroupByIterator implements RAIterator {
             for (Map.Entry<String, List<PrimitiveValue>> entry : groupByMap.entrySet()) {
                 String pv = entry.getKey();
 
-                PrimitiveValue key[] = commonLib.covertTupleToPrimitiveValue(pv.substring(0, pv.length() - 1), keyColDef);
+                PrimitiveValue key[] = tupleClass.covertTupleToPrimitiveValue(pv.substring(0, pv.length() - 1));
+
                 PrimitiveValue[] value = new PrimitiveValue[entry.getValue().size()];
 
                 for (int i = 0; i < value.length; i++) {
@@ -282,7 +288,7 @@ public class GroupByIterator implements RAIterator {
             for (Map.Entry<String, List<PrimitiveValue>> entry : groupByMap.entrySet()) {
                 String pv = entry.getKey();
 
-                PrimitiveValue key[] = commonLib.covertTupleToPrimitiveValue(pv.substring(0, pv.length() - 1), keyColDef);
+                PrimitiveValue key[] = tupleClass.covertTupleToPrimitiveValue(pv.substring(0, pv.length() - 1));
                 PrimitiveValue[] value = new PrimitiveValue[entry.getValue().size()];
                 for (int i = 0; i < value.length; i++) {
                     value[i] = entry.getValue().get(i);
@@ -386,7 +392,7 @@ public class GroupByIterator implements RAIterator {
         }
         return true;
     }
- // todo: FIX HERE
+    // todo: FIX HERE
     private PrimitiveValue[] groupByAccumulator(PrimitiveValue[] currentTuple, PrimitiveValue[] aggPrimitiveValues) throws PrimitiveValue.InvalidPrimitive {
 
         if (aggPrimitiveValues != null) {
@@ -396,15 +402,15 @@ public class GroupByIterator implements RAIterator {
             for (int index = 0; index < currentTuple.length; index++) {
                 if(indexOfNonGroupByCols.contains(index)) {
                     aggPrimitiveValues[k] = currentTuple[index];
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("count")) {
+                } else if (AggTypeToIndexMap.get(index).equals("COUNT")) {
                     aggPrimitiveValues[k] = new LongValue(aggPrimitiveValues[k].toLong() + 1);
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("sum")) {
+                } else if (AggTypeToIndexMap.get(index).equals("SUM")) {
                     aggPrimitiveValues[k] = commonLib.PrimitiveValueComparator(aggPrimitiveValues[k], currentTuple[index], "sum");
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("min")) {
+                } else if (AggTypeToIndexMap.get(index).equals("MIN")) {
                     aggPrimitiveValues[k] = commonLib.PrimitiveValueComparator(aggPrimitiveValues[k], currentTuple[index], "min");
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("max")) {
+                } else if (AggTypeToIndexMap.get(index).equals("MAX")) {
                     aggPrimitiveValues[k] = commonLib.PrimitiveValueComparator(aggPrimitiveValues[k], currentTuple[index], "max");
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("avg")) {
+                } else if (AggTypeToIndexMap.get(index).equals("AVG")) {
                     hasAvg = true;
                     aggPrimitiveValues[k] = new DoubleValue(aggPrimitiveValues[k].toDouble() + 1);
                     k++;
@@ -421,15 +427,15 @@ public class GroupByIterator implements RAIterator {
 
                 if(indexOfNonGroupByCols.contains(index)) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("count")) {
+                } else if (AggTypeToIndexMap.get(index).equals("COUNT")) {
                     aggPrimitiveValues[index] = new LongValue(1);
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("sum")) {
+                } else if (AggTypeToIndexMap.get(index).equals("SUM")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("min")) {
+                } else if (AggTypeToIndexMap.get(index).equals("MIN")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("max")) {
+                } else if (AggTypeToIndexMap.get(index).equals("MAX")) {
                     aggPrimitiveValues[index] = currentTuple[k++];
-                } else if (AggTypeToIndexMap.get(index).toLowerCase().equals("avg")) {
+                } else if (AggTypeToIndexMap.get(index).equals("AVG")) {
                     hasAvg = true;
                     aggPrimitiveValues[index] = new DoubleValue(1);
                     index++;
@@ -443,7 +449,7 @@ public class GroupByIterator implements RAIterator {
     private int getCountofAvg() {
         int cnt = 0;
         for (int i = 0; i < aggTypeOfSelectItems.size(); i++) {
-            if (aggTypeOfSelectItems.get(i).toLowerCase().equals("avg"))
+            if (aggTypeOfSelectItems.get(i).equals("AVG"))
                 cnt++;
         }
         return cnt;
@@ -458,7 +464,7 @@ public class GroupByIterator implements RAIterator {
         }
         int k = 0;
         for (int j = 0; j < aggTypeOfSelectItems.size(); j++) {
-            if (aggTypeOfSelectItems.get(j).toLowerCase().equals("avg")) {
+            if (aggTypeOfSelectItems.get(j).equals("AVG")) {
                 double count = value[k].toDouble();
                 k++;
                 double sum = value[k].toDouble();
@@ -484,15 +490,15 @@ public class GroupByIterator implements RAIterator {
             int j = 0;
             for (int index = 0; index < currentValues.size(); index++) {
 
-                if (aggType.get(j).toLowerCase().equals("count")) {
+                if (aggType.get(j).equals("COUNT")) {
                     newValues.add(new LongValue(currentValues.get(index).toLong() + 1));
-                } else if (aggType.get(j).toLowerCase().equals("sum")) {
+                } else if (aggType.get(j).equals("SUM")) {
                     newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "sum"));
-                } else if (aggType.get(j).toLowerCase().equals("min")) {
+                } else if (aggType.get(j).equals("MIN")) {
                     newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "min"));
-                } else if (aggType.get(j).toLowerCase().equals("max")) {
+                } else if (aggType.get(j).equals("MAX")) {
                     newValues.add(commonLib.PrimitiveValueComparator(currentValues.get(index), tuple[indexOfGroupByCols.get(j)], "max"));
-                } else if (aggType.get(j).toLowerCase().equals("avg")) {
+                } else if (aggType.get(j).equals("AVG")) {
                     hasAvg = true;
                     PrimitiveValue count = new DoubleValue(currentValues.get(index).toDouble() + 1);
                     newValues.add(count);
@@ -506,19 +512,19 @@ public class GroupByIterator implements RAIterator {
         } else {
             for (int index = 0; index < aggType.size(); index++) {
                 PrimitiveValue temp;
-                if (aggType.get(index).toLowerCase().equals("count")) {
+                if (aggType.get(index).equals("COUNT")) {
                     temp = new LongValue(1);
                     newValues.add(temp);
-                } else if (aggType.get(index).toLowerCase().equals("sum")) {
+                } else if (aggType.get(index).equals("SUM")) {
                     temp = tuple[indexOfGroupByCols.get(index)];
                     newValues.add(temp);
-                } else if (aggType.get(index).toLowerCase().equals("min")) {
+                } else if (aggType.get(index).equals("MIN")) {
                     temp = tuple[indexOfGroupByCols.get(index)];
                     newValues.add(temp);
-                } else if (aggType.get(index).toLowerCase().equals("max")) {
+                } else if (aggType.get(index).equals("MAX")) {
                     temp = tuple[indexOfGroupByCols.get(index)];
                     newValues.add(temp);
-                } else if (aggType.get(index).toLowerCase().equals("avg")) {
+                } else if (aggType.get(index).equals("AVG")) {
                     hasAvg = true;
                     PrimitiveValue count = new DoubleValue(1);
                     PrimitiveValue sum = tuple[indexOfGroupByCols.get(index)];
@@ -612,7 +618,7 @@ public class GroupByIterator implements RAIterator {
                             LongValue expression = new LongValue(1);
                             temp.setExpression(expression);
                             temp.setAlias(selectExpressionItem.getExpression().toString());
-                            aggColMap.put(temp.getAlias(), "count");
+                            aggColMap.put(temp.getAlias(), "COUNT");
                         }
                     }
                 } else {

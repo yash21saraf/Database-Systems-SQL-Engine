@@ -399,7 +399,7 @@ public class Sort {
         }
 
         /**
-         *  Index of sort keys in the current schema.
+         *  IndexMaker of sort keys in the current schema.
          */
 
         for (int position = 0; position < sortKeyColumns.size(); position++) {

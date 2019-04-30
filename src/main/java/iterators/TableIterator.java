@@ -3,6 +3,7 @@ package iterators;
 import builders.IteratorBuilder;
 import helpers.CommonLib;
 import helpers.Schema;
+import helpers.Tuple;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
@@ -14,7 +15,6 @@ public class TableIterator implements RAIterator
 {
 
    //region Variables
-
 
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
@@ -29,6 +29,7 @@ public class TableIterator implements RAIterator
    private int cnter = 0;
    private CommonLib commonLib = CommonLib.getInstance();
 
+   private Tuple tupleClass ;
    //endregion
 
    //region Constructor
@@ -39,6 +40,7 @@ public class TableIterator implements RAIterator
       this.tableName = tableName;
       this.tableAlias = tableAlias;
 
+      this.tupleClass = new Tuple(columnDefinitions, tableName);
       if(this.tableAlias == null)
          this.schema = createSchema(columnDefinitions, tableName);
       else{
@@ -105,7 +107,7 @@ public class TableIterator implements RAIterator
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
-            if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions)) != null) {
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine())) != null) {
                cnter++;
                hasNextValue = true;
                return true;
@@ -146,7 +148,7 @@ public class TableIterator implements RAIterator
          fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
          br = new BufferedReader(fileReader);
          cnter++;
-         nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
+         nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine());
       } catch (FileNotFoundException e) {
          throw e;
       } catch (IOException e) {
@@ -179,6 +181,18 @@ public class TableIterator implements RAIterator
    public RAIterator optimize(RAIterator iterator)
    {
       return iterator;
+   }
+
+   public String getTableAlias(){
+      return this.tableAlias;
+   }
+
+   public ColumnDefinition[] getColumnDefinitions(){
+      return this.columnDefinitions ;
+   }
+
+   public String getTableName(){
+      return  tableName ;
    }
 
    //endregion
