@@ -29,17 +29,19 @@ public class Tuple {
 
         String[] tupleArray = tupleString.split("\\|");
 
-        if(table.equals("LINEITEM")){
-            tupleArray[13] = null;
-            tupleArray[15] = null;
-        } else if(table.equals("ORDERS")){
-            tupleArray[6] = null;
-            tupleArray[8] = null;
-        } else if(table.equals("SUPPLIER")){
-            tupleArray[2] = null;
-            tupleArray[6] = null;
-        } else if(table.equals("PARTSUPP")){
-            tupleArray[4] = null;
+        if(table != null) {
+            if (table.equals("LINEITEM")) {
+                tupleArray[13] = null;
+                tupleArray[15] = null;
+            } else if (table.equals("ORDERS")) {
+                tupleArray[6] = null;
+                tupleArray[8] = null;
+            } else if (table.equals("SUPPLIER")) {
+                tupleArray[2] = null;
+                tupleArray[6] = null;
+            } else if (table.equals("PARTSUPP")) {
+                tupleArray[4] = null;
+            }
         }
 
         PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
@@ -64,14 +66,18 @@ public class Tuple {
     public PrimitiveValue convertToPrimitiveValue(String value, String dataType) {
 
         switch (types.valueOf(dataType)) {
-            case DATE:
-                return new DateValue(value);
+
+            case STRING:
+                return new StringValue(value);
 
             case INT:
                 return new LongValue(value);
 
             case DECIMAL:
                 return new DoubleValue(value);
+
+            case DATE:
+                return new DateValue(value);
 
             default:
                 return new StringValue(value);

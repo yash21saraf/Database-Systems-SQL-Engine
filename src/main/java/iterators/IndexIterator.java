@@ -78,7 +78,6 @@ public class IndexIterator implements RAIterator {
         }
 
         if(positionList.size() != 0) {
-
             Collections.sort(positionList);
             next = positionList.get(currentPositionToRead++);
         }

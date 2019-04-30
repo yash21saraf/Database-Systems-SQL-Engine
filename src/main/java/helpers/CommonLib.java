@@ -452,14 +452,14 @@ public class CommonLib
 
    public PrimitiveValue PrimitiveValueComparator(PrimitiveValue first, PrimitiveValue second, String operator) throws PrimitiveValue.InvalidPrimitive {
 
-      if(operator.toLowerCase().equals("sum")){
+      if(operator.equals("sum")){
          if(first instanceof LongValue){
             return new LongValue(first.toLong() + second.toLong()) ;
          }else{
             return new DoubleValue(first.toDouble() + second.toDouble()) ;
          }
       }
-      else if(operator.toLowerCase().equals("min")){
+      else if(operator.equals("min")){
          if(first instanceof LongValue){
               return new LongValue(Math.min(first.toLong(), second.toLong()));
          }

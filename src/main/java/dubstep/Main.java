@@ -277,7 +277,7 @@ public class Main {
 //        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
 //        String  q45 = "SELECT * from LINEITEM";
 //        String q[] = {q9 ,q30};
-        String q[] = {q22};
+        String q[] = {q44};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
