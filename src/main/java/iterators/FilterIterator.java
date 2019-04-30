@@ -1,5 +1,6 @@
 package iterators;
 
+import dubstep.Main;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
@@ -7,9 +8,10 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
+import net.sf.jsqlparser.schema.Column;
 
-import java.util.List;
+import java.util.*;
 
 public class FilterIterator implements RAIterator {
     //region Variables
@@ -109,7 +111,6 @@ public class FilterIterator implements RAIterator {
         EqualsTo equalsTo;
         OrderByIterator orderByIterator;
         TableIterator tableIterator;
-        IndexIterator indexIterator;
 
         if ((filterIterator = (FilterIterator) CommonLib.castAs(iterator, FilterIterator.class)) != null) {
             if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.getChild(), MapIterator.class)) != null) {
@@ -130,16 +131,64 @@ public class FilterIterator implements RAIterator {
             }
             else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
                 try {
-                    Schema[] schemas = filterIterator.getSchema();
-                    String table = schemas[0].getTableName();
-                    ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
-                    int i = 0;
-                    for (Schema schema : schemas) {
-                        columnDefinitions[i++] = schema.getColumnDefinition();
-                    }
-                    //Expression exp = commonLib.getExpressionList(filterIterator.getExpression()).get(0);
-                    filterIterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
+                    List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
+                    Expression remainingExpression = null;
+                    String tableName = tableIterator.getTableName();
+                    Map<String, Expression> indexExp = new HashMap<String, Expression>();
+                    Map<String, String> comparatorType = new HashMap<String, String>();
 
+                    for(Expression expression : expressionList){
+                        List<Column> columnList = commonLib.getColumnList(expression);
+                        boolean validity = true;
+                        for(Column column : columnList){
+                            if(columnList.size() > 1){
+                                if (remainingExpression != null) {
+                                    remainingExpression = new AndExpression(remainingExpression, expression);
+                                } else {
+                                    remainingExpression = expression;
+                                }
+                                validity = false;
+                                break ;
+                            }
+                            else if(!Main.globalIndex.get(tableName).contains(column.getColumnName())){
+                                if (remainingExpression != null) {
+                                    remainingExpression = new AndExpression(remainingExpression, expression);
+                                } else {
+                                    remainingExpression = expression;
+                                }
+                                validity = false;
+                                break ;
+                            }
+                        }
+                        if(validity){
+                            if(expression instanceof EqualsTo){
+                                comparatorType.put(columnList.get(0).getColumnName(), "EQUALS");
+                            }
+                            else if(!comparatorType.containsKey(columnList.get(0).getColumnName())) {
+                                comparatorType.put(columnList.get(0).getColumnName(), "OTHERS");
+                            }
+                            if(indexExp.containsKey(columnList.get(0).getColumnName())) {
+                                indexExp.put(columnList.get(0).getColumnName(), new AndExpression(indexExp.get(columnList.get(0).getColumnName()), expression));
+                            } else{
+                                indexExp.put(columnList.get(0).getColumnName(), expression);
+                            }
+                        }
+                    }
+
+                    if(indexExp.size() != 0){
+                        ArrayList<Expression> indexExpression = new ArrayList<Expression>(indexExp.values());
+                        ArrayList<String> columnNames = new ArrayList<String>(indexExp.keySet());
+                        ArrayList<String> conditionTypes = new ArrayList<String>(comparatorType.values()) ;
+                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes);
+                        if(remainingExpression != null){
+                            filterIterator.setChild(iterator);
+                            filterIterator.setExpression(remainingExpression);
+                            return filterIterator;
+                        }else{
+                            return iterator ;
+                        }
+
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

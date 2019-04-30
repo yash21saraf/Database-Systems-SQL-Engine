@@ -1,10 +1,11 @@
 package builders;
 
+import dubstep.Main;
 import helpers.CommonLib;
+import helpers.IndexMaker;
 import helpers.Schema;
 import iterators.*;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -14,15 +15,9 @@ import net.sf.jsqlparser.statement.select.*;
 import java.io.*;
 import java.util.*;
 
-import static helpers.Index.createIndex;
-
 public class IteratorBuilder {
 
     public static Map<String, Schema[]> iteratorSchemas = new HashMap();
-    //    String path = TableIterator.TABLE_DIRECTORY;
-    //    String path = "tempfolder/";
-    private String path = System.getProperty("user.dir");
-    private String fileName = "/createTableTeam3.sql";
 
     private FileReader fileReader;
     private BufferedWriter writer = null;
@@ -50,88 +45,20 @@ public class IteratorBuilder {
 
         if ((createTable = (CreateTable) CommonLib.castAs(statement, CreateTable.class)) != null) {
             buildCreateTable(createTable);
+            if(Main.isPhase1){
+                System.out.println(createTable.getTable().getName() + "*********");
+                IndexMaker.createIndex(createTable);
 
-            saveCreateStatement(createTable);
-            System.out.println(createTable.getTable().getName() + "*********");
-            if(!createTable.getTable().getName().equals("NATION") && !createTable.getTable().getName().equals("REGION"))
-                createIndex(createTable);
-
+            }
             return null;
 
         } else if ((select = (Select) CommonLib.castAs(statement, Select.class)) != null) {
-
-            if (schemas == null || schemas.size() == 0)
-                createSchema();
-
-            //select = rebuildSelect(select);
             return buildSelect(select);
 
         }
         throw new Exception("Invalid statement");
-
     }
 
-    private void createSchema() {
-
-        BufferedReader reader = null;
-        String line;
-        String in = "";
-        CreateTable createTable = null;
-
-        try {
-
-            fileReader = new FileReader(path + fileName);
-            reader = new BufferedReader(fileReader);
-
-            while ((line = reader.readLine()) != null) {
-                in += line + " ";
-                if (line.charAt(line.length() - 1) == ';') {
-
-                    StringReader input = new StringReader(in);
-                    CCJSqlParser parser = new CCJSqlParser(input);
-
-                    createTable = (CreateTable) parser.Statement();
-
-                    buildCreateTable(createTable);
-
-                    in = "";
-                }
-                //System.out.println(in);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private synchronized void saveCreateStatement(CreateTable createTable) {
-
-        try {
-
-            file = new File(path + fileName);
-            file.createNewFile();
-
-            if (writer == null)
-                writer = new BufferedWriter(new FileWriter(path + fileName, true));
-
-
-            CreateTable ct = new CreateTable();
-
-            ct.setTable(createTable.getTable());
-            ct.setColumnDefinitions(createTable.getColumnDefinitions());
-
-
-            writer.write(ct.toString() + ";");
-            writer.write("\n");
-
-            writer.close();
-            writer = null;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Method to parse the SelectBody interface which can be a PlainSelect object or Union object
@@ -192,7 +119,6 @@ public class IteratorBuilder {
          schemas.put(createTable.getTable().getAlias(),createTable);
       else*/
         schemas.put(createTable.getTable().getName().toUpperCase(), createTable);
-
     }
 
     /**

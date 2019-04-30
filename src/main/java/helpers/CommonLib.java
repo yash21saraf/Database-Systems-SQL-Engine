@@ -33,9 +33,9 @@ public class CommonLib
    public volatile int sortMergeSeqNumber = 50000;
    public volatile int orderBySeqNumber = 70000;
 
-   //   public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/";
+      public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHDATA/";
 //      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
    public static final String extension = ".csv" ;
    //   public static final String TABLE_DIRECTORY = "data/";
 
@@ -143,11 +143,11 @@ public class CommonLib
       return convertedTuple;
 
    }
-    PrimitiveValueWrapper[] convertedTuple;
-    PrimitiveValueWrapper convertedValuein;
+
    public PrimitiveValueWrapper[] convertTuplePrimitiveValueToPrimitiveValueWrapperArray(PrimitiveValue[] tuple,Schema[] schema) throws Exception
    {
-
+      PrimitiveValueWrapper[] convertedTuple;
+      PrimitiveValueWrapper convertedValuein;
       if (tuple == null)
          return null;
 
@@ -169,12 +169,12 @@ public class CommonLib
       return convertedTuple;
 
    }
-    String[] tupleArray;
-   PrimitiveValue[] convertedTuple1;
+
 
    public PrimitiveValue[] covertTupleToPrimitiveValue(String tupleString,ColumnDefinition[] columnDefinitions) throws Exception
    {
-
+      String[] tupleArray;
+      PrimitiveValue[] convertedTuple1;
       tupleArray = null;
       convertedTuple1 = null;
 
@@ -201,16 +201,16 @@ public class CommonLib
 
    }
 
-   public PrimitiveValue convertToPrimitiveValue(String value,String dataType)
+   public static PrimitiveValue convertToPrimitiveValue(String value, String dataType)
    {
+      if (("INT").equals(dataType.toUpperCase()))
+         return new LongValue(value);
       if (("STRING").equals(dataType.toUpperCase()))
          return new StringValue(value);
       if (("VARCHAR").equals(dataType.toUpperCase()))
          return new StringValue(value);
       if (("CHAR").equals(dataType.toUpperCase()))
          return new StringValue(value);
-      if (("INT").equals(dataType.toUpperCase()))
-         return new LongValue(value);
       if (("DECIMAL").equals(dataType.toUpperCase()))
          return new DoubleValue(value);
       if (("DATE").equals(dataType.toUpperCase()))
@@ -441,13 +441,6 @@ public class CommonLib
       return result;
    }
 
-   public boolean memoryPending(){
-      long freemem = Runtime.getRuntime().freeMemory();
-      if(freemem - 75000000 > 0){
-         return true ;
-      }
-      return  false ;
-   }
 
    public PrimitiveValue PrimitiveValueComparator(PrimitiveValue first, PrimitiveValue second, String operator) throws PrimitiveValue.InvalidPrimitive {
 
@@ -504,8 +497,14 @@ public class CommonLib
       return null ;
    }
 
-
-
+   public static boolean isNumber(String str) {
+      try {
+         Double.parseDouble(str);
+         return true;
+      } catch (NumberFormatException e) {
+         return false;
+      }
+   }
    //endregion
 
 }

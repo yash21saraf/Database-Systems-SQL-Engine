@@ -1,202 +1,286 @@
 package iterators;
 
 import builders.IteratorBuilder;
+import dubstep.Main;
 import helpers.CommonLib;
-import helpers.Index;
+import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
-import net.sf.jsqlparser.expression.DateValue;
+import helpers.Tuple;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.PrimitiveValue;
-import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
+import javax.swing.text.Position;
 import java.io.*;
-import java.util.*;
-
-import static helpers.Index.isNumber;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class IndexIterator implements RAIterator {
 
-    //region Variables
-
     boolean hasNext = false;
-    int currentFileIndex = 0;
-    List<String> tableIndexList = new ArrayList<String>();
     private CommonLib commonLib = CommonLib.getInstance();
     private ColumnDefinition[] columnDefinitions;
     private String tableName;
     private String tableAlias;
-    private BufferedReader br;
+    private Schema[] schema;
     private PrimitiveValue[] currentLine;
     private PrimitiveValue[] nextLine;
-    private Schema[] schema;
-    private Expression expression;
-    List<Expression> expressionList;
-    private List<String> finalFileNameList = new ArrayList<String>();
+    private ArrayList<Expression> expressions;
+    private Expression completeExpression ;
+    private ArrayList<String> columnNames ;
+    private ArrayList<ColumnDefinition> columnIndices = new ArrayList<ColumnDefinition>() ;
+    private ArrayList<String> conditionTypes ;
+    private ArrayList<Long> positions= new ArrayList<Long>() ;
 
-    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, Expression expression) throws Exception {
+    //////////////////////////////////////////////////////////
+    private int currentPositionToRead = 0;
+    long currentPosition = 0;
+    long nextPosition = 0;
+    private LineNumberReader br;
+    String val = null;
+
+    //////////////////////////////////////////////////////////
+    private Tuple tupleClass;
+
+    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, ArrayList<Expression> expression, Schema[] schema, ArrayList<String> columnNames, ArrayList<String> conditionTypes) throws Exception {
         this.columnDefinitions = columnDefinitions;
         this.tableName = tableName;
         this.tableAlias = tableAlias;
+        this.schema = schema;
+        this.expressions = expression;
+        this.columnNames = columnNames ;
+        this.conditionTypes = conditionTypes;
 
-        this.expression = expression;
+        tupleClass = new Tuple(columnDefinitions, tableName);
 
-        if (this.tableAlias == null)
-            this.schema = createSchema(columnDefinitions, tableName);
-        else {
-            this.schema = createSchema(columnDefinitions, this.tableAlias);
-            addOriginalSchema(columnDefinitions, tableName);
+        completeExpression = this.expressions.get(0);
+        for(int i = 1; i < this.expressions.size(); i++){
+            completeExpression = new AndExpression(completeExpression, this.expressions.get(i)) ;
         }
 
-        expressionList = commonLib.getExpressionList(expression);
-        createFileNameList();
+        preProcessIndex();
+        br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension));
 
-        finalFileList();
+
+        if(positions.size() != 0) {
+            nextPosition = positions.get(currentPositionToRead++);
+        }
+
+
 
     }
 
-    private void finalFileList() throws Exception {
+    private void preProcessIndex() throws IOException, ClassNotFoundException, SQLException {
 
-        String colName = null;
-        Set<String> set = new HashSet<String>();
-
-        for(String path : finalFileNameList){
-            String filename = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("_"));
-
-            colName = filename.substring(filename.indexOf("_") + 1);
-            //System.out.println(filename);
-            if(!isPrimaryKey(tableName, colName)){
-                BufferedReader br = new BufferedReader(new FileReader(path));
-                String line = null;
-                while((line = br.readLine())!= null){
-                    String tuple[] = line.split("\\|");
-                    set.add(tuple[1]);
+        for(String colName: columnNames){
+            for(ColumnDefinition colDefinition : columnDefinitions){
+                if(colDefinition.getColumnName().equals(colName)){
+                    columnIndices.add(colDefinition);
+                    break ;
                 }
             }
         }
-
-        List<String> temp = new ArrayList<String>(set);
-
-//        Collections.sort(temp, new Comparator<String>() {
-//            @Override
-//            public int compare(String o1, String o2) {
-//
-//                String a[] = o1.split("\\|");
-//                String b[] = o2.split("\\|");
-//
-//                if (isNumber(a[0])) {
-//
-//                    double pv1 = Double.parseDouble(a[0]);
-//                    double pv2 = Double.parseDouble(b[0]);
-//
-//                    if (pv1 < pv2)
-//                        return -1;
-//                    else if (pv1 > pv2)
-//                        return 1;
-//
-//                } else {
-//
-//                    return a[0].compareTo(b[0]);
-//                }
-//
-//                return 0;
-//            }
-//        });
+        ArrayList<ArrayList<PrimitiveValue>> listOfFinalFileList = new ArrayList<ArrayList<PrimitiveValue>>() ;
 
 
-        finalFileNameList = getPrimaryKeyFiles(temp, colName);
+        for(int i = 0; i <expressions.size(); i++){
+            if(!Main.masterIndex.containsKey(tableName + "|" + columnNames.get(i))){
+                String indexListName = tableName + "_" + columnNames.get(i) ;
+                File indexFile = new File(CommonLib.TABLE_DIRECTORY + indexListName);
+                FileInputStream indexFileInputStream = new FileInputStream(indexFile);
+                BufferedInputStream indexBufferedInputStream = new BufferedInputStream(indexFileInputStream);
+                ObjectInputStream indexBW = new ObjectInputStream(indexBufferedInputStream);
 
-    }
+                ArrayList<PrimitiveValue[]> currentMapForMasterIndex = new ArrayList<PrimitiveValue[]>();
 
-    private List<String> getPrimaryKeyFiles(List<String> list, String colName) {
-
-        Set<String> primaryKeyFiles = new HashSet<String>();
-
-        Index index = new Index();
-
-        primaryKeyFiles.addAll(index.getIndexList(tableName, index.getPK(tableName)));
-
-        Set<String> set = new HashSet<String>();
-
-        for(String key : list) {
-            for (String str : primaryKeyFiles) {
-
-                if (isKeyInRange(str, key)){
-                    set.add(CommonLib.TABLE_DIRECTORY + str.substring(str.indexOf("_") + 1));
-                    break;
+                PrimitiveValue[] currentRow =(PrimitiveValue[]) indexBW.readUnshared() ;
+                while(currentRow != null){
+                    currentMapForMasterIndex.add(currentRow);
+                    currentRow = (PrimitiveValue[]) indexBW.readUnshared() ;
                 }
+                Main.masterIndex.put(tableName + "|" + columnNames.get(i), currentMapForMasterIndex);
+                indexFileInputStream.close();
+                indexBufferedInputStream.close();
+                indexBW.close();
+                indexFileInputStream = null;
+                indexBufferedInputStream = null;
+                indexBW = null;
+
+            }
+
+            ArrayList<PrimitiveValue> listOfFileNames = new ArrayList<PrimitiveValue>();
+            PrimitiveValueWrapper[] start_end = new PrimitiveValueWrapper[1];
+            PrimitiveValueWrapper convertedRow = new PrimitiveValueWrapper();
+            PrimitiveValueWrapper result_start ;
+            PrimitiveValueWrapper result_end ;
+
+            if(conditionTypes.get(i).equals("OTHERS")){
+                for(PrimitiveValue[] currentRow: Main.masterIndex.get(tableName + "|" + columnNames.get(i))){
+
+                    convertedRow.setPrimitiveValue(currentRow[0]);
+                    convertedRow.setColumnDefinition(columnIndices.get(i));
+                    convertedRow.setTableName(this.tableName);
+                    start_end[0] = convertedRow ;
+                    result_start = (PrimitiveValueWrapper) commonLib.eval(expressions.get(i), start_end);
+                    if(result_start.getPrimitiveValue().toBool()){
+                        listOfFileNames.add(currentRow[2]) ;
+                        continue ;
+                    }
+
+                    convertedRow.setPrimitiveValue(currentRow[1]);
+                    convertedRow.setColumnDefinition(columnIndices.get(i));
+                    convertedRow.setTableName(this.tableName);
+                    start_end[0] = convertedRow ;
+                    result_end = (PrimitiveValueWrapper) commonLib.eval(expressions.get(i), start_end);
+                    if(result_end.getPrimitiveValue().toBool()){
+                        listOfFileNames.add(currentRow[2]) ;
+                    }
+                }
+
+            }else if(conditionTypes.get(i).equals("EQUALS")){
+                ArrayList<Expression> expBreakdown = (ArrayList<Expression>) commonLib.getExpressionList(expressions.get(i));
+                for(Expression exp : expBreakdown){
+                    if(exp instanceof EqualsTo){
+                        if(columnIndices.get(i).getColDataType().getDataType().equals("STRING") || columnIndices.get(i).getColDataType().getDataType().equals("CHAR") ||columnIndices.get(i).getColDataType().getDataType().equals("VARCHAR")){
+                            List<Column> leftCol = commonLib.getColumnList(((EqualsTo) exp).getLeftExpression());
+                            List<Column> rightCol = commonLib.getColumnList(((EqualsTo) exp).getRightExpression());
+                            String comparisonValue ;
+                            if (leftCol == null || leftCol.size() == 0){
+                                comparisonValue = (((EqualsTo) exp).getLeftExpression()).toString() ;
+                            }else{
+                                comparisonValue = (((EqualsTo) exp).getRightExpression()).toString() ;
+                            }
+                            comparisonValue = comparisonValue.substring(1, comparisonValue.length() - 1);
+                            for(PrimitiveValue[] currentRow: Main.masterIndex.get(tableName + "|" + columnNames.get(i))){
+                                String leftVal = currentRow[0].toRawString() ;
+                                String rightVal = currentRow[1].toRawString() ;
+                                if(leftVal.compareTo(comparisonValue) <= 0){
+                                    if(rightVal.compareTo(comparisonValue) >= 0){
+                                        listOfFileNames.add(currentRow[2]) ;
+                                    }
+                                }
+                            }
+                        }else{
+                            for(PrimitiveValue[] currentRow: Main.masterIndex.get(tableName + "|" + columnNames.get(i))){
+                                Expression leftEval = new GreaterThanEquals(((EqualsTo) exp).getRightExpression(), ((EqualsTo) exp).getLeftExpression());
+                                convertedRow.setPrimitiveValue(currentRow[0]);
+                                convertedRow.setColumnDefinition(columnIndices.get(i));
+                                convertedRow.setTableName(this.tableName);
+                                start_end[0] = convertedRow ;
+                                result_start = (PrimitiveValueWrapper) commonLib.eval(leftEval, start_end);
+
+                                Expression rightEval = new GreaterThanEquals(((EqualsTo) exp).getLeftExpression(), ((EqualsTo) exp).getRightExpression());
+                                convertedRow.setPrimitiveValue(currentRow[1]);
+                                convertedRow.setColumnDefinition(columnIndices.get(i));
+                                convertedRow.setTableName(this.tableName);
+                                start_end[0] = convertedRow ;
+                                result_end = (PrimitiveValueWrapper) commonLib.eval(rightEval, start_end);
+
+                                if(result_end.getPrimitiveValue().toBool() && result_start.getPrimitiveValue().toBool()) {
+                                    listOfFileNames.add(currentRow[2]) ;
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            listOfFinalFileList.add(listOfFileNames) ;
+        }
+
+
+
+        PrimitiveValueWrapper[] convertedRowForEval = new PrimitiveValueWrapper[1];
+        PrimitiveValueWrapper convertedRow = new PrimitiveValueWrapper();
+        PrimitiveValueWrapper result ;
+
+        for(int i = 0; i < listOfFinalFileList.size(); i++){
+
+            ArrayList<Long> currentPositions = new ArrayList<Long>() ;
+
+            for(int j = 0; j < listOfFinalFileList.get(i).size(); j++){
+                File File = new File(CommonLib.TABLE_DIRECTORY + listOfFinalFileList.get(i).get(j).toRawString());
+                FileInputStream fileInputStream = new FileInputStream(File);
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+                ObjectInputStream br = new ObjectInputStream(bufferedInputStream);
+                PrimitiveValue[] currentRow =(PrimitiveValue[]) br.readUnshared() ;
+
+                while(currentRow != null){
+                    if(j == 0 || j == listOfFinalFileList.get(i).size()-1){
+                        convertedRow.setPrimitiveValue(currentRow[0]);
+                        convertedRow.setColumnDefinition(columnIndices.get(i));
+                        convertedRow.setTableName(this.tableName);
+                        convertedRowForEval[0] = convertedRow ;
+                        result = (PrimitiveValueWrapper) commonLib.eval(this.expressions.get(i), convertedRowForEval);
+                        if(result.getPrimitiveValue().toBool()){
+                            currentPositions.add(currentRow[1].toLong());
+                        }
+                    }else{
+                        currentPositions.add(currentRow[1].toLong());
+                    }
+                    currentRow =(PrimitiveValue[]) br.readUnshared() ;
+                }
+                fileInputStream.close() ;
+                bufferedInputStream.close();
+                br.close();
+            }
+            if(i == 0){
+                Collections.sort(currentPositions);
+                positions = currentPositions ;
+            }else{
+                Collections.sort(currentPositions);
+                positions = intersectLists(positions, currentPositions) ;
             }
         }
-
-        List<String> ret = new ArrayList(set);
-        return ret;
     }
 
-    private boolean isKeyInRange(String file, String key) {
-
-
-        String start = file.substring(0, file.indexOf("|"));
-        String end = file.substring(file.indexOf("|") + 1, file.lastIndexOf("|"));
-
-        if(isNumber(key)){
-
-            int first = Integer.parseInt(start);
-            int last = Integer.parseInt(end);
-
-            int k = Integer.parseInt(key);
-
-            if(k > first && k < last)
-                return true;
-            else
-                return false;
-
-        } else {
-            if (key.compareTo(start) >= 0 && key.compareTo(end) <= 0)
-                return true;
-            else
-                return false;
+    private ArrayList<Long> intersectLists(ArrayList<Long> leftFiles, ArrayList<Long> rightFiles) {
+        ArrayList<Long> merged = new ArrayList<Long>() ;
+        int i = 0 ;
+        int j = 0 ;
+        while (i < leftFiles.size() && j < rightFiles.size()){
+            if(leftFiles.get(i) < rightFiles.get(j)){
+                i += 1 ;
+            }else if(leftFiles.get(i).equals(rightFiles.get(j))){
+                merged.add(leftFiles.get(i)) ;
+                i += 1 ;
+                j += 1 ;
+            }else{
+                j += 1 ;
+            }
         }
+        return merged ;
     }
 
-    private String getFiles(String secondaryIndex, String colName) {
-        Index index = new Index();
-
-        List<String> indexFileList = index.getIndexList(tableName, index.getPK(tableName));
-
-        //System.out.println(indexFileList);
-
-        return "";
-    }
-
-    int cnt = 0;
     @Override
     public boolean hasNext() throws Exception {
-
-//        cnt++;
-//
-//        if(cnt >=99999)
-//            System.out.println(cnt);
-
         try {
             if (hasNext)
                 return true;
 
-            if (br == null)
-                br = getBufferedReader();
+            if(positions.size() == 0){
 
-            if (br == null)
-                return false;
-            else if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(), columnDefinitions)) != null) {
-                hasNext = true;
-                return true;
-            } else if (nextLine == null){
-                br = getBufferedReader();
-                return this.hasNext();
+                if ((nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine())) != null) {
+                    hasNext = true;
+                    return true;
+                }
+            } else {
+                if ((nextLine = getDataFromFile()) != null) {
+                    hasNext = true;
+                    return true;
+                }
             }
 
-            hasNext = false;
 
+            hasNext = false;
             return false;
 
         } catch (Exception e) {
@@ -204,22 +288,41 @@ public class IndexIterator implements RAIterator {
         }
     }
 
-    private BufferedReader getBufferedReader() throws Exception {
+    private PrimitiveValue[] getDataFromFile() {
+        try {
 
-        if (currentFileIndex < finalFileNameList.size()) {
-            String file = finalFileNameList.get(currentFileIndex);
+            if (currentPositionToRead >= positions.size()) {
+                hasNext = false;
+                return null;
+            }
 
-            br = new BufferedReader(new FileReader(new File(file)));
+            br.skip(nextPosition - currentPosition);
+            val = br.readLine();
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValue(val)) != null) {
+                if(tableName.equals("LINEITEM")){
+                    nextLine[15] = new StringValue("a");
+                    nextLine[13] = new StringValue("a");
+                }
+                hasNext = true;
+                currentPosition = nextPosition + val.length() + 1;
+                if (currentPositionToRead == positions.size())
+                    return nextLine;
+                nextPosition = positions.get(currentPositionToRead++);
+                return nextLine;
+            }
 
-            currentFileIndex++;
-            return br;
+            hasNext = false;
+            return null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return null;
     }
 
+
     @Override
-    public PrimitiveValue[] next() {
+    public PrimitiveValue[] next() throws Exception {
         currentLine = nextLine;
         nextLine = null;
         hasNext = false;
@@ -231,7 +334,7 @@ public class IndexIterator implements RAIterator {
         nextLine = null;
         currentLine = null;
         hasNext = false;
-        currentFileIndex = 0;
+        currentPositionToRead = 0;
     }
 
     @Override
@@ -248,403 +351,12 @@ public class IndexIterator implements RAIterator {
         return this.schema;
     }
 
-    //endregion
-
     @Override
     public void setSchema(Schema[] schema) {
         this.schema = schema;
     }
-
     @Override
     public RAIterator optimize(RAIterator iterator) {
         return iterator;
     }
-
-    private void createFileNameList() {
-
-        List<String> temp = new ArrayList<String>();
-        List<String> leftFiles = new ArrayList<String>();
-        List<String> rightFiles = new ArrayList<String>();
-
-        int min = Integer.MAX_VALUE;
-
-        while (expressionList.size() > 0) {
-
-            List<Expression> expressionsPair = getPair();
-
-            if (expressionsPair == null || expressionsPair.size() == 0) { // tOdO check the logic
-                return;
-            }
-
-            if (expressionsPair.size() == 1) {
-                leftFiles = getFiles(expressionsPair.get(0));
-            } else {
-                leftFiles = getFiles(expressionsPair.get(0));
-                rightFiles = getFiles(expressionsPair.get(1));
-            }
-
-            temp.addAll(intersect(leftFiles, rightFiles));
-
-            if (temp.size() < min) {
-                min = temp.size();
-                finalFileNameList.clear();
-                finalFileNameList.addAll(temp);
-                temp.clear();
-            }
-        }
-    }
-
-
-    private static boolean isPrimaryKey(String table, String columnName) {
-
-        if (table.equals("LINEITEM") && columnName.equals("ORDERKEY"))
-            return true;
-        if (table.equals("PART") && columnName.equals("PARTKEY"))
-            return true;
-        if (table.equals("CUSTOMER") && columnName.equals("CUSTKEY"))
-            return true;
-        if (table.equals("SUPPLIER") && columnName.equals("SUPPKEY"))
-            return true;
-        if (table.equals("NATION") && columnName.equals("NATIONKEY"))
-            return true;
-        if (table.equals("REGION") && columnName.equals("REGIONKEY"))
-            return true;
-        if (table.equals("ORDERS") && columnName.equals("ORDERKEY"))
-            return true;
-        if (table.equals("PARTSUPP") && columnName.equals("PARTKEY"))
-            return true;
-
-        return false;
-
-    }
-
-    private List<String> intersect(List<String> leftFiles, List<String> rightFiles) {
-
-        if(leftFiles == null || leftFiles.size() == 0)
-            return null;
-
-        if(rightFiles == null || rightFiles.size() == 0)
-            return leftFiles;
-
-        leftFiles.retainAll(rightFiles);
-
-        return leftFiles;
-    }
-
-    private List<Expression> getPair() {
-
-        Index ind = new Index();
-
-        String indexList = Index.indexMap.get(tableName);
-
-        String indexes[] = indexList.split("\\|");
-
-        for (int i = 0; i < indexes.length; i++) {
-            tableIndexList.add(tableName + "." + indexes[i]);
-        }
-
-        List<Expression> expList = getIndexExpression();
-
-        return expList;
-    }
-
-    private List<Expression> getIndexExpression() {
-
-        String indexColumnName = "";
-
-        List<Expression> returnList = new ArrayList<Expression>();
-
-        for (Expression expression : expressionList) {
-
-            if (expression instanceof GreaterThan) {
-
-                indexColumnName = ((GreaterThan) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-
-            } else if (expression instanceof GreaterThanEquals) {
-
-                indexColumnName = ((GreaterThanEquals) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-
-            } else if (expression instanceof MinorThan) {
-
-                indexColumnName = ((MinorThan) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-
-            } else if (expression instanceof MinorThanEquals) {
-
-                indexColumnName = ((MinorThanEquals) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-
-            } else if (expression instanceof EqualsTo) {
-
-                indexColumnName = ((EqualsTo) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-
-            } else if (expression instanceof NotEqualsTo) {
-
-                indexColumnName = ((NotEqualsTo) expression).getLeftExpression().toString();
-                if (tableIndexList.contains(indexColumnName)) {
-                    expressionList.remove(expression);
-                    returnList.add(expression);
-
-                    for (Expression expressionInner : expressionList) {
-                        if (tableIndexList.contains(indexColumnName)) {
-                            expressionList.remove(expressionInner);
-                            returnList.add(expressionInner);
-                            return returnList;
-                        }
-                        return returnList;
-                    }
-
-                }
-            }
-        }
-
-        return returnList;
-    }
-
-
-    private List<String> getFiles(Expression expression) {
-        List<String> fileNameList = new ArrayList<String>();
-        Index index = new Index();
-
-        String indexColumnName = "";
-        String indexColumnValue = "";
-
-        if (expression instanceof GreaterThan) {
-
-            indexColumnName = ((GreaterThan) expression).getLeftExpression().toString();
-
-            if(((GreaterThan) expression).getRightExpression() instanceof Function) {
-                indexColumnValue = ((Function) ((GreaterThan) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
-
-                char [] ch = indexColumnValue.toCharArray();
-                indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
-                    indexColumnValue += ch[i];
-            }
-            else
-                indexColumnValue = ((GreaterThan) expression).getRightExpression().toString();
-
-            List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
-
-            for (String ind : indexFileList) {
-                String indexRow[] = ind.split("\\|");
-
-                if (indexRow[0].compareTo(indexColumnValue) <= 0 && indexRow[1].compareTo(indexColumnValue) <= 0)
-                    continue;
-                else
-                    fileNameList.add(indexRow[2]);
-            }
-
-        } else if (expression instanceof GreaterThanEquals) {
-
-            indexColumnName = ((GreaterThanEquals) expression).getLeftExpression().toString();
-
-            if(((GreaterThanEquals) expression).getRightExpression() instanceof Function) {
-                indexColumnValue = ((Function) ((GreaterThanEquals) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
-
-                char [] ch = indexColumnValue.toCharArray();
-                indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
-                    indexColumnValue += ch[i];
-            }
-            else
-                indexColumnValue = ((GreaterThanEquals) expression).getRightExpression().toString();
-
-            List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
-
-            for (String ind : indexFileList) {
-                String indexRow[] = ind.split("\\|");
-
-                if (indexRow[0].compareTo(indexColumnValue) <= 0 && indexRow[1].compareTo(indexColumnValue) <= 0)
-                    continue;
-                else
-                    fileNameList.add(indexRow[2]);
-            }
-
-        } else if (expression instanceof MinorThan) {
-
-            indexColumnName = ((MinorThan) expression).getLeftExpression().toString();
-
-            if(((MinorThan) expression).getRightExpression() instanceof Function) {
-                indexColumnValue = ((Function) ((MinorThan) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
-
-                char [] ch = indexColumnValue.toCharArray();
-                indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
-                    indexColumnValue += ch[i];
-            }
-            else
-                indexColumnValue = ((MinorThan) expression).getRightExpression().toString();
-
-            List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
-
-            for (String ind : indexFileList) {
-                String indexRow[] = ind.split("\\|");
-
-                if (indexRow[1].compareTo(indexColumnValue) <= 0 )
-                    fileNameList.add(indexRow[2]);
-
-                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
-                    fileNameList.add(indexRow[2]);
-                    break;
-                }
-
-
-            }
-
-        } else if (expression instanceof MinorThanEquals) {
-
-            indexColumnName = ((MinorThanEquals) expression).getLeftExpression().toString();
-
-            if(((MinorThanEquals) expression).getRightExpression() instanceof Function) {
-                indexColumnValue = ((Function) ((MinorThanEquals) expression).getRightExpression()).getParameters().getExpressions().get(0).toString();
-
-                char [] ch = indexColumnValue.toCharArray();
-                indexColumnValue = "";
-                for(int i = 1; i < ch.length-1; i++) // TODO: did workaround for DATE
-                    indexColumnValue += ch[i];
-            }
-            else
-                indexColumnValue = ((MinorThanEquals) expression).getRightExpression().toString();
-
-            List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
-
-            for (String ind : indexFileList) {
-                String indexRow[] = ind.split("\\|");
-
-                if (indexRow[1].compareTo(indexColumnValue) <= 0 )
-                    fileNameList.add(indexRow[2]);
-                else if (indexRow[0].compareTo(indexColumnValue) <= 0 ) {
-                    fileNameList.add(indexRow[2]);
-                    break;
-                }
-            }
-
-        } else if (expression instanceof EqualsTo) {
-
-            indexColumnName = ((EqualsTo) expression).getLeftExpression().toString();
-            indexColumnValue = ((EqualsTo) expression).getRightExpression().toString();
-
-            List<String> indexFileList = index.getIndexList(tableName, indexColumnName);
-
-            for (String ind : indexFileList) {
-                String indexRow[] = ind.split("\\|");
-
-                if (indexColumnValue.compareTo(indexRow[0]) >= 0 && indexColumnValue.compareTo(indexRow[0]) <= 0) // TODO: CHECK
-                    fileNameList.add(indexRow[2]);
-            }
-
-        } else if (expression instanceof NotEqualsTo) {
-
-            indexColumnName = ((NotEqualsTo) expression).getLeftExpression().toString();
-            indexColumnValue = ((NotEqualsTo) expression).getRightExpression().toString();
-
-            fileNameList = index.getIndexList(tableName, indexColumnName);
-
-        }
-
-        return fileNameList; //TODO
-    }
-
-    private void addOriginalSchema(ColumnDefinition[] columnDefinitions, String tableName) throws Exception {
-
-        Schema[] convertedTuple = new Schema[columnDefinitions.length];
-
-        for (int index = 0; index < columnDefinitions.length; index++) {
-            Schema convertedValue = new Schema();
-            convertedValue.setColumnDefinition(columnDefinitions[index]);
-            convertedValue.setTableName(tableName);
-            convertedTuple[index] = convertedValue;
-
-        }
-        IteratorBuilder.iteratorSchemas.put(tableName, convertedTuple);
-    }
-
-    private Schema[] createSchema(ColumnDefinition[] columnDefinitions, String tableName) throws Exception {
-
-        if (columnDefinitions == null)
-            return null;
-
-        Schema[] convertedTuple = new Schema[columnDefinitions.length];
-
-        for (int index = 0; index < columnDefinitions.length; index++) {
-            Schema convertedValue = new Schema();
-            convertedValue.setColumnDefinition(columnDefinitions[index]);
-            convertedValue.setTableName(tableName);
-            convertedTuple[index] = convertedValue;
-
-        }
-        IteratorBuilder.iteratorSchemas.put(tableName, convertedTuple);
-        return convertedTuple;
-    }
-
-
 }
