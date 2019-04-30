@@ -91,14 +91,29 @@ public class JoinIterator implements RAIterator {
 
     @Override
     public boolean hasNext() throws Exception {
+
+
+
+
+
+
+
+
+
+
+
+
+
         // One pass Hash Join for In Memory
         if (Main.inMem) {
-//      if(false){
+
             if (this.first) {
                 defineHashColumns();
             }
             return hashHasNext();
         }
+
+
 
         // Sorted Merge Join for On Disk
         else {
@@ -225,11 +240,15 @@ public class JoinIterator implements RAIterator {
     public RAIterator optimize(RAIterator iterator) {
         JoinIterator joinIterator;
 
+        //System.out.println("hihi");
         if ((joinIterator = (JoinIterator) CommonLib.castAs(iterator, JoinIterator.class)) != null) {
-            RAIterator leftChild = joinIterator.getChild();
-            RAIterator rightChild = joinIterator.getRightChild();
+
+            //RAIterator leftChild = joinIterator.getChild();
             leftChild = leftChild.optimize(leftChild);
+
+            //RAIterator rightChild = joinIterator.getRightChild();
             rightChild = rightChild.optimize(rightChild);
+
             iterator = new JoinIterator(leftChild, rightChild, joinIterator.getOnExpression());
         }
 
@@ -243,7 +262,7 @@ public class JoinIterator implements RAIterator {
 
         if (this.first) {
             this.first = false;
-            // while (commonLib.memoryPending() && leftChild.hasNext()) {
+
             while (leftChild.hasNext()) {
                 onePassFillBuckets();
             }

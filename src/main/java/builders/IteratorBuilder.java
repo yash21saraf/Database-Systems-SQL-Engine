@@ -52,9 +52,10 @@ public class IteratorBuilder {
             buildCreateTable(createTable);
 
             saveCreateStatement(createTable);
-            System.out.println(createTable.getTable().getName() + "*********");
-            if(!createTable.getTable().getName().equals("NATION") && !createTable.getTable().getName().equals("REGION"))
-                createIndex(createTable);
+
+           // if(!createTable.getTable().getName().equals("NATION") && !createTable.getTable().getName().equals("REGION")) {
+                createIndex(createTable, true);
+            //}
 
             return null;
 
@@ -93,6 +94,7 @@ public class IteratorBuilder {
                     createTable = (CreateTable) parser.Statement();
 
                     buildCreateTable(createTable);
+                    createIndex(createTable, false); // TODO : REMOVE FROM HERE
 
                     in = "";
                 }
@@ -120,6 +122,7 @@ public class IteratorBuilder {
 
             ct.setTable(createTable.getTable());
             ct.setColumnDefinitions(createTable.getColumnDefinitions());
+            //ct.setIndexes(createTable.getIndexes());
 
 
             writer.write(ct.toString() + ";");
@@ -365,5 +368,88 @@ public class IteratorBuilder {
             }
         }
         return false;
+    }
+
+
+    private Select rebuildSelect(Select select) {
+        final HashMap<String, Integer> hashMap = new HashMap();
+
+        hashMap.put("REGION", 1);
+        hashMap.put("NATION", 2);
+        hashMap.put("CUSTOMER", 4);
+        hashMap.put("ORDERS", 6);
+        hashMap.put("LINEITEM", 8);
+        hashMap.put("SUPPLIER", 9);
+        hashMap.put("PARTSUPP", 10);
+
+        //Select  = select;
+        SelectBody selectBody = select.getSelectBody();
+        PlainSelect plainSelect;
+
+        if ((plainSelect = (PlainSelect) CommonLib.castAs(selectBody, PlainSelect.class)) != null) {
+            //System.out.println(plainSelect);
+        }
+
+        List<String> list = new ArrayList<String>();
+
+        PlainSelect ps = new PlainSelect();
+
+        FromItem fromItem = plainSelect.getFromItem();
+        if (fromItem != null)
+            list.add(fromItem.toString());
+
+        if (plainSelect.getJoins() != null) {
+            if (!plainSelect.getJoins().isEmpty()) {
+                for (Join join : plainSelect.getJoins())
+                    list.add(join.toString());
+
+            } else
+                return select;
+        } else
+            return select;
+
+        Collections.sort(list, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+
+                if (hashMap.containsKey(o1) && hashMap.containsKey(o2)) {
+                    if (hashMap.get(o1) < hashMap.get(o2))
+                        return -1;
+                    if (hashMap.get(o1) > hashMap.get(o2))
+                        return 1;
+                    return 0;
+                } else
+                    return -1;
+            }
+        });
+        List<Join> joinList = new ArrayList<Join>();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0)
+                plainSelect.setFromItem(new Table(list.get(i)));
+            else {
+                Join join = new Join();
+                Table table = new Table(list.get(i));
+                join.setRightItem(table);
+                join.setSimple(true);
+                joinList.add(join);
+            }
+        }
+
+        plainSelect.setJoins(joinList);
+
+        SelectBody selectBody1 = (SelectBody) plainSelect;
+
+        //Select select1 = (Select) selectBody1;
+        select.setSelectBody(selectBody1);
+        //System.out.println(plainSelect);
+
+        /*System.out.println(plainSelectbackup);
+        System.out.println("    ");
+        System.out.println(plainSelect);*/
+        list.clear();
+        hashMap.clear();
+
+        return select;
     }
 }

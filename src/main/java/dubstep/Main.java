@@ -20,6 +20,7 @@ public class Main {
     public static ColDataType colDataTypes[];
     public static boolean inMem = true ;
     static boolean debugEnabled = true;
+    static public boolean first = true;
 
     static Runtime r = Runtime.getRuntime();
 
@@ -157,7 +158,6 @@ public class Main {
                 "GROUP BY LINEITEM.ORDERKEY, ORDERS.ORDERDATE, ORDERS.SHIPPRIORITY \n" +
                 "ORDER BY ORDERDATE\n" +
                 "LIMIT 10);" ;
-
         String q15 = "SELECT LINEITEM.ORDERKEY, ORDERS.ORDERKEY  FROM LINEITEM, ORDERS WHERE LINEITEM.ORDERKEY = ORDERS.ORDERKEY";
         String q16 = "SELECT\n" +
                 "NATION.NAME,\n" +
@@ -215,7 +215,7 @@ public class Main {
                 "NATION.NAME,\n" +
                 "SUM(LINEITEM.EXTENDEDPRICE * (1 - LINEITEM.DISCOUNT)) AS REVENUE \n" +
                 "FROM\n" +
-                "REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER\n" +
+                "REGION, NATION, CUSTOMER, ORDERS, LINEITEM, SUPPLIER \n" +
                 "WHERE\n" +
                 "CUSTOMER.CUSTKEY = ORDERS.CUSTKEY\n" +
                 "AND LINEITEM.ORDERKEY = ORDERS.ORDERKEY\n" +
@@ -223,14 +223,19 @@ public class Main {
                 "AND CUSTOMER.NATIONKEY = NATION.NATIONKEY \n" +
                 "AND SUPPLIER.NATIONKEY = NATION.NATIONKEY\n" +
                 "AND NATION.REGIONKEY = REGION.REGIONKEY\n" +
-                "AND REGION.NAME = 'EUROPE'\n" +
-                "AND ORDERS.ORDERDATE >= DATE('1995-01-01')\n" +
-                "AND ORDERS.ORDERDATE < DATE('1996-01-01')\n" +
+                "AND REGION.NAME = 'AMERICA'\n" +
+                "AND ORDERS.ORDERDATE >= DATE('1996-01-01')\n" +
+                "AND ORDERS.ORDERDATE < DATE('1997-01-01')\n" +
                 "GROUP BY NATION.NAME\n" +
                 "ORDER BY REVENUE DESC;" ;
+
+        String q22 ="SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM WHERE LINEITEM.SHIPDATE <= DATE('1999-03-21') GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS; ";
+
       /*  String q18 = "select r.a,s.d,t.d from r,s,t where r.a = s.d and r.a = t.d;" ;
         String q19 = "SELECT ORDERS.ORDERDATE FROM ORDERS WHERE ORDERS.ORDERDATE < DATE('1995-03-12') AND ORDERS.ORDERDATE > DATE('1995-02-29');" ;
-*/
+
+     */
+
         String q30 = "SELECT\n" +
                 "LINEITEM.ORDERKEY,\n" +
                 "SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS REVENUE, \n" +
@@ -258,39 +263,21 @@ public class Main {
             }
         }
 
-//
-//        Thread thread = new Thread(){
-//            public void run(){
-//                while (true) {
-//                    try {
-//                        sleep(300);
-//                        r.gc();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        };
-//
-//        thread.start();
-
-        //-Djava.util.Arrays.useLegacyMergeSort=true
-
         String q33 = "CREATE TABLE LINEITEM (ORDERKEY INT , PARTKEY INT , SUPPKEY INT , LINENUMBER INT , QUANTITY DECIMAL , EXTENDEDPRICE DECIMAL , DISCOUNT DECIMAL , TAX DECIMAL , RETURNFLAG CHAR (1) , LINESTATUS CHAR (1) , SHIPDATE DATE , COMMITDATE DATE , RECEIPTDATE DATE , SHIPINSTRUCT CHAR (25) , SHIPMODE CHAR (10) , COMMENT VARCHAR (44) , PRIMARY KEY (ORDERKEY, LINENUMBER));";
 
-        String  q44 = "SELECT  \n" +
-                "SUM(LINEITEM.EXTENDEDPRICE*LINEITEM.DISCOUNT) AS REVENUE\n" +
-                "FROM\n" +
-                "LINEITEM\n" +
-                "WHERE\n" +
-                "LINEITEM.SHIPDATE >= DATE('1994-01-01')\n" +
-                "AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
-                "AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
-                "AND LINEITEM.QUANTITY < 24;";
-        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q30};
+        String  q44 = "SELECT \n" +
+                "                SUM(LINEITEM.EXTENDEDPRICE*LINEITEM.DISCOUNT) AS REVENUE\n" +
+                "                FROM\n" +
+                "                LINEITEM\n" +
+                "                WHERE\n" +
+                "                LINEITEM.SHIPDATE >= DATE('1994-01-01')\n" +
+                "                AND LINEITEM.SHIPDATE < DATE ('1995-01-01')\n" +
+                "                AND LINEITEM.DISCOUNT > 0.08 AND LINEITEM.DISCOUNT < 0.1 \n" +
+                "                AND LINEITEM.QUANTITY < 24;";
+//        String q[] = {q4, q5, q6, q7, q8, q9, q10, q11, q44};
 //        String  q45 = "SELECT * from LINEITEM";
 //        String q[] = {q9 ,q30};
-//        String q[] = {q44};
+        String q[] = {q22};
         int i = 0;
 
         IteratorBuilder iteratorBuilder = new IteratorBuilder();
@@ -308,8 +295,12 @@ public class Main {
                 e.printStackTrace();
             }
             if (rootIterator != null) {
-//                long startTime = System.nanoTime();
+                first = true;
+                rootIterator = rootIterator.optimize(rootIterator);
+
                 long startTime = System.currentTimeMillis();
+
+                first = false;
                 rootIterator = rootIterator.optimize(rootIterator);
 
                 while (rootIterator.hasNext()) {

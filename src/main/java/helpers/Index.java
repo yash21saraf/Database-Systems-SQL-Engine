@@ -14,8 +14,8 @@ public class Index {
 
     final static Map<String, List<BufferedReader>> bufferedReaderMap = new HashMap<String, List<BufferedReader>>();
     final static Map<String, List<String>> tempFileMap = new HashMap<String, List<String>>();
-    //    final static String TABLE_DIRECTORY = path + "/";
-    final static String TABLE_DIRECTORY = CommonLib.TABLE_DIRECTORY;
+
+
     public static List<String> indexFileLists = new ArrayList<String>();
     public static Map<String, String> indexMap = new HashMap<String, String>();
     static IndexSort sort = null;
@@ -104,6 +104,8 @@ public class Index {
     HashMap<String, Integer> hashMap = new HashMap();
     private List<String> indexList = new ArrayList<String>();
 
+        final static String TABLE_DIRECTORY = CommonLib.TABLE_DIRECTORY;
+//    final static String TABLE_DIRECTORY = path + "/";
     public Index() {
         init();
     }
@@ -112,14 +114,14 @@ public class Index {
         Index.indexFileLists = indexFileLists;
     }
 
-    public static void createIndex(CreateTable createTable) {
+    public static void createIndex(CreateTable createTable, boolean build) {
 
         // region variables
-//        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
-        indexMap.put("LINEITEM", "SHIPDATE");
+        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
+//        indexMap.put("LINEITEM", "SHIPDATE");
         indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
         indexMap.put("PART", "PARTKEY");
-        indexMap.put("CUSTOMER", "CUSTKEY|MKTSEGMENT");
+        indexMap.put("CUSTOMER", "CUSTKEY");
         indexMap.put("SUPPLIER", "SUPPKEY|NATIONKEY");
         indexMap.put("PARTSUPP", "PARTKEY|SUPPKEY");
         indexMap.put("NATION", "NATIONKEY");
@@ -219,21 +221,23 @@ public class Index {
          */
 
 
-        long start = 0;
-        long end = 0;
-        long res = 0;
-        for (String index : indexes) {
-            start = System.currentTimeMillis();
-            //buildIndex(createTable.getTable().getName(), index, true);
-            end = System.currentTimeMillis();
-            res = end - start;
-            System.out.println("Building indexes for " + index + " Time taken:" + res);
-        }
+        if(build) {
+            long start = 0;
+            long end = 0;
+            long res = 0;
+            for (String index : indexes) {
+                start = System.currentTimeMillis();
+                buildIndex(createTable.getTable().getName(), index, true);
+                end = System.currentTimeMillis();
+                res = end - start;
+                //System.out.println("Building indexes for " + index + " Time taken:" + res);
+            }
 
-        try {
-            //writeDataDisk(indexFileLists, "INDEX", "ALL", CommonLib.TABLE_DIRECTORY + createTable.getTable().getName() + "_INDEX_LIST");
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                writeDataDisk(indexFileLists, "INDEX", "ALL", TABLE_DIRECTORY + createTable.getTable().getName() + "_INDEX_LIST");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -269,7 +273,7 @@ public class Index {
         try {
             br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + table + CommonLib.extension));
 
-            Integer pkIndex = getPrimarykeyIndex(table);
+            //Integer pkIndex = getPrimarykeyIndex(table);
             List<String> pkFileNameList = new ArrayList<String>();
             List<String> indexDataListpk = new ArrayList<String>();
 
@@ -277,7 +281,7 @@ public class Index {
             while ((line1 = br.readLine()) != null) {
 
                 //if (br.getLineNumber() == 6001214)
-                    //System.out.println(line1);
+                //System.out.println(line1);
                 String tuple[] = line1.split("\\|");
 
                 List<String> list;
@@ -303,74 +307,6 @@ public class Index {
                 }
             }
 
-
-            /**
-             * Process remaining files
-             */
-
-                /*if (fullFile.size() != 0) {
-                    String pkFileName = table + "_" + getPK(table) + "_" + commonLib.getFileSequenceNumber();
-                    pkFileNameList.add(CommonLib.TABLE_DIRECTORY + pkFileName);
-
-                    //writeDataDisk(fullFile, table, column, CommonLib.TABLE_DIRECTORY + pkFileName);
-                    fullFile.clear();
-
-                    TreeMap<String, List<String>> pkMap = getPkMap(table);
-                    List<String> tt = new ArrayList<String>();
-                    for (Map.Entry<String, List<String>> entry : pkMap.entrySet()) {
-                        for (String val : entry.getValue())
-                            tt.add(entry.getKey() + "|" + val);
-                    }
-
-                    Collections.sort(tt, new Comparator<String>() {
-                        @Override
-                        public int compare(String o1, String o2) {
-
-                            String a[] = o1.split("\\|");
-                            String b[] = o2.split("\\|");
-
-                            if (isNumber(a[0])) {
-
-                                double pv1 = Double.parseDouble(a[0]);
-                                double pv2 = Double.parseDouble(b[0]);
-
-                                if (pv1 < pv2)
-                                    return -1;
-                                else if (pv1 > pv2)
-                                    return 1;
-
-                            } else {
-
-                                return a[0].compareTo(b[0]);
-                            }
-
-                            return 0;
-                        }
-                    });
-
-
-                    String startKeyValue = tt.get(0).split("\\|")[0];
-                    String endKeyValue = tt.get(tt.size() - 1).split("\\|")[0];
-
-                    indexDataListpk.add(startKeyValue + "|" + endKeyValue + "|" + CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
-
-                    writeDataDisk(tt, table, column, CommonLib.TABLE_DIRECTORY + "PK_" + pkFileName);
-                    pkMap.clear();
-                }*/
-/*
-
-                String indexFileName = TABLE_DIRECTORY + "INDEX_" + table + "_" + getPK(table) + "_" + commonLib.getFileSequenceNumber();
-                indexFileLists.add(indexFileName);
-
-                writeDataDisk(indexDataListpk, table, column, indexFileName);
-*/
-
-            /**
-             * Removing PK entry from the colIndexMap as pk is already sorted and stored.
-             */
-
-            //colIndexMap.remove(table + "_" + getPK(table));
-
             /**
              * writing index
              */
@@ -387,7 +323,7 @@ public class Index {
                     TreeMap<String, List<String>> treeMap = entry.getValue();
 
                     try {
-                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(CommonLib.TABLE_DIRECTORY + filename));
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(TABLE_DIRECTORY + filename));
 
                         for (Map.Entry<String, List<String>> treeMapEntry : treeMap.entrySet()) {
                             String key = treeMapEntry.getKey();
@@ -428,7 +364,7 @@ public class Index {
              */
 
             for (String file : indexFiles) {
-                LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + file));
+                LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(TABLE_DIRECTORY + file));
                 List<String> data = new ArrayList<String>();
                 String line;
                 while ((line = lineNumberReader.readLine()) != null) {
@@ -439,7 +375,6 @@ public class Index {
                 lineNumberReader = null;
 
                 long start = System.currentTimeMillis();
-                //if (isPrimaryKey(file.substring(0, file.indexOf("_")), file.substring(file.indexOf("_") + 1))) {
 
                 Collections.sort(data, new Comparator<String>() {
                     @Override
@@ -470,7 +405,7 @@ public class Index {
 
                 long end = System.currentTimeMillis();
                 long t = (end - start);
-                System.out.println("Sorting took " + t + " " + table + " ");
+                //System.out.println("Sorting took " + t + " " + table + " ");
 
 
                 /**
@@ -507,7 +442,7 @@ public class Index {
 
                             indexDataList.add(startKeyValue + "|" + endKeyValue + "|" + splitFileName);
 
-                            startKeyValue = val.substring(0, val.indexOf("|"));
+                            startKeyValue = prev.substring(0, prev.indexOf("|"));
                         }
 
                         temp.add(val);
@@ -516,7 +451,7 @@ public class Index {
                         prev = val;
                     }
 
-                    if (linenumber != 0) {
+                    if (temp.size() != 0) {
 
                         //tuple = prev.split("\\|");
                         endKeyValue = prev.substring(0, prev.indexOf("|"));
@@ -674,10 +609,11 @@ public class Index {
 
     private static void init() {
 
-        indexMap.put("LINEITEM", "SHIPDATE");
+//        indexMap.put("LINEITEM", "SHIPDATE");
+        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
         indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
         indexMap.put("PART", "PARTKEY");
-        indexMap.put("CUSTOMER", "CUSTKEY|MKTSEGMENT");
+        indexMap.put("CUSTOMER", "CUSTKEY");
         indexMap.put("SUPPLIER", "SUPPKEY|NATIONKEY");
         indexMap.put("PARTSUPP", "PARTKEY|SUPPKEY");
         indexMap.put("NATION", "NATIONKEY");
@@ -700,40 +636,25 @@ public class Index {
 
     public List<String> getIndexList(String tableName, String indexColumnName) {
 
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_CUSTKEY_100001");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_MKTSEGMENT_100003");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_SUPPKEY_100005");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_NATIONKEY_100007");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_PARTKEY_100012");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_SUPPKEY_100017");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_ORDERKEY_100042");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_RETURNFLAG_100067");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100092");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_LINENUMBER_100117");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_RECEIPTDATE_100142");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERKEY_100150");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERDATE_100157");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PART_PARTKEY_100159");
-
-        //indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_SHIPDATE_100121");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RETURNFLAG_102403");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_SHIPDATE_103605");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_LINENUMBER_104807");
-//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RECEIPTDATE_106009");
-
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_CUSTKEY_100002");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_CUSTOMER_MKTSEGMENT_100005");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_SUPPKEY_100006");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_SUPPLIER_NATIONKEY_100007");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_PARTKEY_100023");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PARTSUPP_SUPPKEY_100039");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_LINEITEM_SHIPDATE_100160");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERKEY_100190");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERKEY_100220");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERDATE_100250");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_PART_PARTKEY_100254");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERKEY_100284");
-        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/INDEX_ORDERS_ORDERDATE_100314");
+//
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_CUSTOMER_CUSTKEY_100002");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_SUPPLIER_SUPPKEY_100003");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_SUPPLIER_NATIONKEY_100004");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_PARTSUPP_PARTKEY_100020");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_PARTSUPP_SUPPKEY_100036");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_NATION_NATIONKEY_100037");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_REGION_REGIONKEY_100038");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_ORDERKEY_100159");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_LINENUMBER_100280");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RETURNFLAG_100401");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_RECEIPTDATE_100522");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_LINEITEM_SHIPDATE_100643");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_ORDERS_ORDERKEY_100673");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_ORDERS_ORDERKEY_100703");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_ORDERS_ORDERDATE_100733");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_PART_PARTKEY_100737");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_ORDERS_ORDERKEY_100767");
+//        indexFileLists.add("/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/INDEX_ORDERS_ORDERDATE_100797");
 
         String col[] = null;
         String indexFileName = "";
@@ -756,7 +677,17 @@ public class Index {
                 while ((line = bufferedReader.readLine()) != null) {
                     indexFileLists.add(line);
                 }
+//
+//                indexFileLists.add("CUSTOMER_INDEX_LIST");
+//                indexFileLists.add("SUPPLIER_INDEX_LIST");
+//                indexFileLists.add("PARTSUPP_INDEX_LIST");
+//                indexFileLists.add("NATION_INDEX_LIST");
+//                indexFileLists.add("REGION_INDEX_LIST");
+//                indexFileLists.add("LINEITEM_INDEX_LIST");
+//                indexFileLists.add("ORDERS_INDEX_LIST");
+//                indexFileLists.add("PART_INDEX_LIST");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -785,7 +716,7 @@ public class Index {
 
         //list.remove(0);
 
-        indexFileLists.clear();
+        // indexFileLists.clear();
         return filelist;
     }
 

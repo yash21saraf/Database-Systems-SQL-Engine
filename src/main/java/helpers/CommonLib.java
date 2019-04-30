@@ -183,6 +183,7 @@ public class CommonLib
 
 
       tupleArray = tupleString.split("\\|");
+
       //StringBuilder stringBuilder = new StringBuilder();
 
       convertedTuple1 = new PrimitiveValue[tupleArray.length];

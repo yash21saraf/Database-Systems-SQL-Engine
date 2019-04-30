@@ -3,6 +3,7 @@ package iterators;
 import builders.IteratorBuilder;
 import helpers.CommonLib;
 import helpers.Schema;
+import helpers.Tuple;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
@@ -29,6 +30,8 @@ public class TableIterator implements RAIterator
    private int cnter = 0;
    private CommonLib commonLib = CommonLib.getInstance();
 
+   private Tuple tuple;
+
    //endregion
 
    //region Constructor
@@ -45,6 +48,8 @@ public class TableIterator implements RAIterator
          this.schema = createSchema(columnDefinitions,this.tableAlias);
          addOriginalSchema(columnDefinitions, tableName);
       }
+
+      tuple = new Tuple(columnDefinitions, tableName);
 
       try {
          File file = new File(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension) ;
@@ -105,7 +110,10 @@ public class TableIterator implements RAIterator
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
-            if ((nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions)) != null) {
+
+
+
+            if ((nextLine = tuple.covertTupleToPrimitiveValue(br.readLine())) != null) {
                cnter++;
                hasNextValue = true;
                return true;
@@ -146,7 +154,8 @@ public class TableIterator implements RAIterator
          fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
          br = new BufferedReader(fileReader);
          cnter++;
-         nextLine = commonLib.covertTupleToPrimitiveValue(br.readLine(),columnDefinitions);
+         nextLine = tuple.covertTupleToPrimitiveValue(br.readLine());
+
       } catch (FileNotFoundException e) {
          throw e;
       } catch (IOException e) {
