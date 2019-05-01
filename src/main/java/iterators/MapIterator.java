@@ -282,7 +282,6 @@ public class MapIterator implements RAIterator
     @Override
     public RAIterator optimize(RAIterator iterator)
     {
-
         RAIterator child = iterator.getChild();
         child = child.optimize(child);
         iterator.setChild(child);

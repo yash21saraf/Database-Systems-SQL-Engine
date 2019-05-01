@@ -2,18 +2,16 @@ package iterators;
 
 import dubstep.Main;
 import helpers.CommonLib;
-import helpers.Index;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class FilterIterator implements RAIterator {
     //region Variables
@@ -104,7 +102,6 @@ public class FilterIterator implements RAIterator {
         this.expression = expression;
     }
 
-
     @Override
     public RAIterator optimize(RAIterator iterator) {
         FilterIterator filterIterator;
@@ -114,7 +111,6 @@ public class FilterIterator implements RAIterator {
         EqualsTo equalsTo;
         OrderByIterator orderByIterator;
         TableIterator tableIterator;
-        IndexIterator indexIterator;
 
         if ((filterIterator = (FilterIterator) CommonLib.castAs(iterator, FilterIterator.class)) != null) {
             if ((mapIterator = (MapIterator) CommonLib.castAs(filterIterator.getChild(), MapIterator.class)) != null) {
@@ -133,24 +129,69 @@ public class FilterIterator implements RAIterator {
                     e.printStackTrace();
                 }
             }
+//            else if (((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) && !tableIterator.getTableName().equals("LINEITEM_VIEW")) {
+            else if (((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null)) {
+                try {
+                    List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
+                    Expression remainingExpression = null;
+                    String tableName = tableIterator.getTableName();
+                    Map<String, Expression> indexExp = new HashMap<String, Expression>();
+                    Map<String, String> comparatorType = new HashMap<String, String>();
 
-            else if ( !Main.first && (filterIterator.getChild() instanceof TableIterator) && hasIndexOnExpression(expression, ((TableIterator)(filterIterator.getChild())).getTableName())) {
-                if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
+                    for(Expression expression : expressionList){
+                        List<Column> columnList = commonLib.getColumnList(expression);
+                        boolean validity = true;
+                        for(Column column : columnList){
+                            if(columnList.size() > 1){
+                                if (remainingExpression != null) {
+                                    remainingExpression = new AndExpression(remainingExpression, expression);
+                                } else {
+                                    remainingExpression = expression;
+                                }
+                                validity = false;
+                                break ;
+                            }
+                            else if(!Main.globalIndex.get(tableName).contains(column.getColumnName())){
+                                if (remainingExpression != null) {
+                                    remainingExpression = new AndExpression(remainingExpression, expression);
+                                } else {
+                                    remainingExpression = expression;
+                                }
+                                validity = false;
+                                break ;
+                            }
+                        }
+                        if(validity){
+                            if(expression instanceof EqualsTo){
+                                comparatorType.put(columnList.get(0).getColumnName(), "EQUALS");
+                            }
+                            else if(!comparatorType.containsKey(columnList.get(0).getColumnName())) {
+                                comparatorType.put(columnList.get(0).getColumnName(), "OTHERS");
+                            }
+                            if(indexExp.containsKey(columnList.get(0).getColumnName())) {
+                                indexExp.put(columnList.get(0).getColumnName(), new AndExpression(indexExp.get(columnList.get(0).getColumnName()), expression));
+                            } else{
+                                indexExp.put(columnList.get(0).getColumnName(), expression);
+                            }
+                        }
+                    }
 
-                    try {
-                        Schema[] schemas = filterIterator.getSchema();
-                        String table = schemas[0].getTableName();
-                        ColumnDefinition[] columnDefinitions = new ColumnDefinition[schemas.length];
-                        int i = 0;
-                        for (Schema schema : schemas) {
-                            columnDefinitions[i++] = schema.getColumnDefinition();
+                    if(indexExp.size() != 0){
+                        ArrayList<Expression> indexExpression = new ArrayList<Expression>(indexExp.values());
+                        ArrayList<String> columnNames = new ArrayList<String>(indexExp.keySet());
+                        ArrayList<String> conditionTypes = new ArrayList<String>(comparatorType.values()) ;
+                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes);
+                        if(remainingExpression != null){
+                            filterIterator.setChild(iterator);
+                            filterIterator.setExpression(remainingExpression);
+                            return filterIterator;
+                        }else{
+                            return iterator ;
                         }
 
-                        iterator.setChild(new IndexIterator(table, table, columnDefinitions, expression));
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             else if ((joinIterator = (JoinIterator) CommonLib.castAs(filterIterator.getChild(), JoinIterator.class)) != null) {
@@ -206,7 +247,6 @@ public class FilterIterator implements RAIterator {
                     }
                 }
 
-
                 iterator = new JoinIterator(leftChild, rightChild, onExpression);
 
                 if (remainingExpression != null) {
@@ -233,37 +273,11 @@ public class FilterIterator implements RAIterator {
             }
         }
         RAIterator child = iterator.getChild();
-        child = child.optimize(child);
-        iterator.setChild(child);
+        if(child != null){
+            child = child.optimize(child);
+            iterator.setChild(child);
+        }
         return iterator;
-    }
-
-    private boolean hasIndexOnExpression(Expression expression, String tableName) {
-        List<Expression> expressionList = commonLib.getExpressionList(expression);
-
-        HashMap<String, String> indexMap = new HashMap<String, String>();
-
-        indexMap.put("LINEITEM", "ORDERKEY|LINENUMBER|RETURNFLAG|RECEIPTDATE|SHIPDATE");
-//        indexMap.put("LINEITEM", "SHIPDATE");
-        indexMap.put("ORDERS", "ORDERKEY|ORDERDATE");
-        indexMap.put("PART", "PARTKEY");
-        indexMap.put("CUSTOMER", "CUSTKEY");
-        indexMap.put("SUPPLIER", "SUPPKEY|NATIONKEY");
-        indexMap.put("PARTSUPP", "PARTKEY|SUPPKEY");
-        indexMap.put("NATION", "NATIONKEY");
-        indexMap.put("REGION", "REGIONKEY");
-
-        String[] indexes = indexMap.get(tableName).split("\\|");
-
-
-        for (String str : indexes)
-            for(Expression expression1 : expressionList)
-                for(Column column : commonLib.getColumnList(expression1))
-                    if (column.getColumnName().equals(str))
-                        return true;
-
-
-        return false;
     }
 
     //endregion

@@ -91,29 +91,14 @@ public class JoinIterator implements RAIterator {
 
     @Override
     public boolean hasNext() throws Exception {
-
-
-
-
-
-
-
-
-
-
-
-
-
         // One pass Hash Join for In Memory
         if (Main.inMem) {
-
+//      if(false){
             if (this.first) {
                 defineHashColumns();
             }
             return hashHasNext();
         }
-
-
 
         // Sorted Merge Join for On Disk
         else {
@@ -240,15 +225,11 @@ public class JoinIterator implements RAIterator {
     public RAIterator optimize(RAIterator iterator) {
         JoinIterator joinIterator;
 
-        //System.out.println("hihi");
         if ((joinIterator = (JoinIterator) CommonLib.castAs(iterator, JoinIterator.class)) != null) {
-
-            //RAIterator leftChild = joinIterator.getChild();
+            RAIterator leftChild = joinIterator.getChild();
+            RAIterator rightChild = joinIterator.getRightChild();
             leftChild = leftChild.optimize(leftChild);
-
-            //RAIterator rightChild = joinIterator.getRightChild();
             rightChild = rightChild.optimize(rightChild);
-
             iterator = new JoinIterator(leftChild, rightChild, joinIterator.getOnExpression());
         }
 
@@ -262,7 +243,7 @@ public class JoinIterator implements RAIterator {
 
         if (this.first) {
             this.first = false;
-
+            // while (commonLib.memoryPending() && leftChild.hasNext()) {
             while (leftChild.hasNext()) {
                 onePassFillBuckets();
             }
@@ -471,15 +452,14 @@ public class JoinIterator implements RAIterator {
 
 
     private void onePassFillBuckets() throws Exception {
-        int cnt = 0;
-        PrimitiveValue[] leftTuple = null;
-        Integer leftBucketSize = 0;
+
+        PrimitiveValue[] leftTuple;
+
         try {
             while (leftChild.hasNext()) {
                 leftTuple = leftChild.next();
                 if (leftTuple != null) {
 
-                    leftBucketSize++;
                     String leftKey;
 
                     leftKey = createKey(leftTuple, leftExpList, "left");
@@ -490,12 +470,6 @@ public class JoinIterator implements RAIterator {
                     updatedList.add(leftTuple);
                     leftBucket.put(leftKey, updatedList);
 
-                    if (leftBucketSize == 100)
-                        break;
-                    leftBucketSize++;
-                    cnt++;
-                    //if(cnt % 10000 == 0)
-                       // System.out.println(cnt);
 
                 }
             }
@@ -569,7 +543,7 @@ public class JoinIterator implements RAIterator {
     }
 
     private String createKey(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
-        String key = "";
+        StringBuilder key = new StringBuilder();
         if (expression == null) {
             return "crossJoin";
         }
@@ -583,9 +557,9 @@ public class JoinIterator implements RAIterator {
                 wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema());
             }
             result = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
-            key = key + "|" + result.toRawString();
+            key.append("|").append(result);
         }
-        return key;
+        return key.toString();
     }
 
     private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {

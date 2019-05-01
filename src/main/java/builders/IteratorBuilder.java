@@ -1,10 +1,11 @@
 package builders;
 
+import dubstep.Main;
 import helpers.CommonLib;
+import helpers.IndexMaker;
 import helpers.Schema;
 import iterators.*;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
@@ -14,15 +15,9 @@ import net.sf.jsqlparser.statement.select.*;
 import java.io.*;
 import java.util.*;
 
-import static helpers.Index.createIndex;
-
 public class IteratorBuilder {
 
     public static Map<String, Schema[]> iteratorSchemas = new HashMap();
-    //    String path = TableIterator.TABLE_DIRECTORY;
-    //    String path = "tempfolder/";
-    private String path = System.getProperty("user.dir");
-    private String fileName = "/createTableTeam3.sql";
 
     private FileReader fileReader;
     private BufferedWriter writer = null;
@@ -50,91 +45,22 @@ public class IteratorBuilder {
 
         if ((createTable = (CreateTable) CommonLib.castAs(statement, CreateTable.class)) != null) {
             buildCreateTable(createTable);
+            if(Main.isPhase1){
+//                System.out.println(createTable.getTable().getName() + "*********");
+                IndexMaker.createIndex(createTable);
 
-            saveCreateStatement(createTable);
 
-           // if(!createTable.getTable().getName().equals("NATION") && !createTable.getTable().getName().equals("REGION")) {
-                createIndex(createTable, true);
-            //}
 
+            }
             return null;
 
         } else if ((select = (Select) CommonLib.castAs(statement, Select.class)) != null) {
-
-            if (schemas == null || schemas.size() == 0)
-                createSchema();
-
-            //select = rebuildSelect(select);
             return buildSelect(select);
 
         }
         throw new Exception("Invalid statement");
-
     }
 
-    private void createSchema() {
-
-        BufferedReader reader = null;
-        String line;
-        String in = "";
-        CreateTable createTable = null;
-
-        try {
-
-            fileReader = new FileReader(path + fileName);
-            reader = new BufferedReader(fileReader);
-
-            while ((line = reader.readLine()) != null) {
-                in += line + " ";
-                if (line.charAt(line.length() - 1) == ';') {
-
-                    StringReader input = new StringReader(in);
-                    CCJSqlParser parser = new CCJSqlParser(input);
-
-                    createTable = (CreateTable) parser.Statement();
-
-                    buildCreateTable(createTable);
-                    createIndex(createTable, false); // TODO : REMOVE FROM HERE
-
-                    in = "";
-                }
-                //System.out.println(in);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private synchronized void saveCreateStatement(CreateTable createTable) {
-
-        try {
-
-            file = new File(path + fileName);
-            file.createNewFile();
-
-            if (writer == null)
-                writer = new BufferedWriter(new FileWriter(path + fileName, true));
-
-
-            CreateTable ct = new CreateTable();
-
-            ct.setTable(createTable.getTable());
-            ct.setColumnDefinitions(createTable.getColumnDefinitions());
-            //ct.setIndexes(createTable.getIndexes());
-
-
-            writer.write(ct.toString() + ";");
-            writer.write("\n");
-
-            writer.close();
-            writer = null;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Method to parse the SelectBody interface which can be a PlainSelect object or Union object
@@ -195,7 +121,6 @@ public class IteratorBuilder {
          schemas.put(createTable.getTable().getAlias(),createTable);
       else*/
         schemas.put(createTable.getTable().getName().toUpperCase(), createTable);
-
     }
 
     /**
@@ -368,88 +293,5 @@ public class IteratorBuilder {
             }
         }
         return false;
-    }
-
-
-    private Select rebuildSelect(Select select) {
-        final HashMap<String, Integer> hashMap = new HashMap();
-
-        hashMap.put("REGION", 1);
-        hashMap.put("NATION", 2);
-        hashMap.put("CUSTOMER", 4);
-        hashMap.put("ORDERS", 6);
-        hashMap.put("LINEITEM", 8);
-        hashMap.put("SUPPLIER", 9);
-        hashMap.put("PARTSUPP", 10);
-
-        //Select  = select;
-        SelectBody selectBody = select.getSelectBody();
-        PlainSelect plainSelect;
-
-        if ((plainSelect = (PlainSelect) CommonLib.castAs(selectBody, PlainSelect.class)) != null) {
-            //System.out.println(plainSelect);
-        }
-
-        List<String> list = new ArrayList<String>();
-
-        PlainSelect ps = new PlainSelect();
-
-        FromItem fromItem = plainSelect.getFromItem();
-        if (fromItem != null)
-            list.add(fromItem.toString());
-
-        if (plainSelect.getJoins() != null) {
-            if (!plainSelect.getJoins().isEmpty()) {
-                for (Join join : plainSelect.getJoins())
-                    list.add(join.toString());
-
-            } else
-                return select;
-        } else
-            return select;
-
-        Collections.sort(list, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-
-                if (hashMap.containsKey(o1) && hashMap.containsKey(o2)) {
-                    if (hashMap.get(o1) < hashMap.get(o2))
-                        return -1;
-                    if (hashMap.get(o1) > hashMap.get(o2))
-                        return 1;
-                    return 0;
-                } else
-                    return -1;
-            }
-        });
-        List<Join> joinList = new ArrayList<Join>();
-
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0)
-                plainSelect.setFromItem(new Table(list.get(i)));
-            else {
-                Join join = new Join();
-                Table table = new Table(list.get(i));
-                join.setRightItem(table);
-                join.setSimple(true);
-                joinList.add(join);
-            }
-        }
-
-        plainSelect.setJoins(joinList);
-
-        SelectBody selectBody1 = (SelectBody) plainSelect;
-
-        //Select select1 = (Select) selectBody1;
-        select.setSelectBody(selectBody1);
-        //System.out.println(plainSelect);
-
-        /*System.out.println(plainSelectbackup);
-        System.out.println("    ");
-        System.out.println(plainSelect);*/
-        list.clear();
-        hashMap.clear();
-
-        return select;
     }
 }

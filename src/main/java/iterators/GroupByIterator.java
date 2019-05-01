@@ -72,7 +72,6 @@ public class GroupByIterator implements RAIterator {
 
         mapAggtypeToIndex();
 
-
     }
 
     private void mapAggtypeToIndex() {
@@ -267,18 +266,22 @@ public class GroupByIterator implements RAIterator {
                         continue;
                 }
 
-                List<PrimitiveValue> projectedTuple = Arrays.asList(tuple);
+//                List<PrimitiveValue> projectedTuple = Arrays.asList(tuple);
 
-                String groupByCols = "";
-                for (Integer index : indexOfNonGroupByCols)
-                    groupByCols = groupByCols + projectedTuple.get(index).toRawString() + "|";
+                //String groupByCols = "";
+                StringBuilder groupByCols = new StringBuilder();
+
+                for (Integer index : indexOfNonGroupByCols) {
+                    groupByCols.append(tuple[index].toRawString());
+                    groupByCols.append("|");
+                }
 
                 List<String> aggPrimitiveValues = new ArrayList<String>();
 
-                for (Integer index : indexOfGroupByCols)
-                    aggPrimitiveValues.add(projectedTuple.get(index).toRawString());
+                //for (Integer index : indexOfGroupByCols)
+                    //aggPrimitiveValues.add(tuple[index].toRawString());
 
-                groupByAccumulator(tuple, aggTypeOfSelectItems, indexOfNonGroupByCols, groupByCols);
+                groupByAccumulator(tuple, aggTypeOfSelectItems, indexOfNonGroupByCols, groupByCols.toString());
 
                 tuple = null; // current tuple has been processed.
             }
@@ -392,7 +395,7 @@ public class GroupByIterator implements RAIterator {
         }
         return true;
     }
- // todo: FIX HERE
+    // todo: FIX HERE
     private PrimitiveValue[] groupByAccumulator(PrimitiveValue[] currentTuple, PrimitiveValue[] aggPrimitiveValues) throws PrimitiveValue.InvalidPrimitive {
 
         if (aggPrimitiveValues != null) {

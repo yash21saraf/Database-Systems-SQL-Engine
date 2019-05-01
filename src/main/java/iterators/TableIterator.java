@@ -16,7 +16,6 @@ public class TableIterator implements RAIterator
 
    //region Variables
 
-
    private ColumnDefinition[] columnDefinitions;
    private String tableName;
    private String tableAlias;
@@ -30,8 +29,7 @@ public class TableIterator implements RAIterator
    private int cnter = 0;
    private CommonLib commonLib = CommonLib.getInstance();
 
-   private Tuple tuple;
-
+   private Tuple tupleClass ;
    //endregion
 
    //region Constructor
@@ -42,6 +40,7 @@ public class TableIterator implements RAIterator
       this.tableName = tableName;
       this.tableAlias = tableAlias;
 
+      this.tupleClass = new Tuple(columnDefinitions, tableName);
       if(this.tableAlias == null)
          this.schema = createSchema(columnDefinitions, tableName);
       else{
@@ -49,12 +48,13 @@ public class TableIterator implements RAIterator
          addOriginalSchema(columnDefinitions, tableName);
       }
 
-      tuple = new Tuple(columnDefinitions, tableName);
-
       try {
          File file = new File(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension) ;
-         fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
-         br = new BufferedReader(fileReader);
+
+         
+            fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
+
+         br = new LineNumberReader(fileReader);
 
 
       } catch (FileNotFoundException e) {
@@ -104,16 +104,13 @@ public class TableIterator implements RAIterator
    @Override
    public boolean hasNext() throws Exception
    {
-//      if((cnter % 20000) == 0)
-//         System.out.println("asdfasf");
+      //if((cnter >= 1299) )
+       //  System.out.println(cnter);
 
       try {
          if (!hasNextChecked) {
             hasNextChecked = true;
-
-
-
-            if ((nextLine = tuple.covertTupleToPrimitiveValue(br.readLine())) != null) {
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine())) != null) {
                cnter++;
                hasNextValue = true;
                return true;
@@ -154,8 +151,7 @@ public class TableIterator implements RAIterator
          fileReader = new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension);
          br = new BufferedReader(fileReader);
          cnter++;
-         nextLine = tuple.covertTupleToPrimitiveValue(br.readLine());
-
+         nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine());
       } catch (FileNotFoundException e) {
          throw e;
       } catch (IOException e) {
@@ -190,8 +186,16 @@ public class TableIterator implements RAIterator
       return iterator;
    }
 
+   public String getTableAlias(){
+      return this.tableAlias;
+   }
+
+   public ColumnDefinition[] getColumnDefinitions(){
+      return this.columnDefinitions ;
+   }
+
    public String getTableName(){
-      return this.tableName;
+      return  tableName ;
    }
 
    //endregion
