@@ -276,7 +276,7 @@ public class GroupByIterator implements RAIterator {
                     groupByCols.append("|");
                 }
 
-                List<String> aggPrimitiveValues = new ArrayList<String>();
+                // List<String> aggPrimitiveValues = new ArrayList<String>();
 
                 //for (Integer index : indexOfGroupByCols)
                     //aggPrimitiveValues.add(tuple[index].toRawString());

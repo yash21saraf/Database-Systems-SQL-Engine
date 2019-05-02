@@ -4,20 +4,28 @@
 //import helpers.CommonLib;
 //import iterators.RAIterator;
 //
+//import net.sf.jsqlparser.expression.Expression;
+//import net.sf.jsqlparser.expression.Function;
 //import net.sf.jsqlparser.expression.PrimitiveValue;
 //import net.sf.jsqlparser.parser.CCJSqlParser;
+//import net.sf.jsqlparser.schema.Column;
 //import net.sf.jsqlparser.statement.Statement;
+//import net.sf.jsqlparser.statement.create.table.CreateTable;
+//import net.sf.jsqlparser.statement.select.*;
 //
 //
 //import java.io.*;
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.Map;
+//import java.util.*;
+//
+//import static helpers.CommonLib.castAs;
 //
 //public class Main {
 //
 //    public static boolean inMem = true ;
 //    static boolean debugEnabled = true;
+//
+//    ///////////////////////////////////////////////////////////
+//    static public boolean create_lineitem_view = false;
 //
 //    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //    public static Map<String, ArrayList<String>> globalIndex = new HashMap<String, ArrayList<String>>();
@@ -28,32 +36,33 @@
 //    public static boolean closedFlag = false ;
 //    public static String currentQuery ;
 //
+//    public static List<Column> columnList = null ;
+//
+//
 //
 //    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    static Runtime r = Runtime.getRuntime();
 //
 //
 //    public static void main(String[] args) throws Exception
 //    {
 //
-//        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+////        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 //        File f = new File(CommonLib.INDEX_DIRECTORY + "GlobalIndex");
 //
-//
-//        if(f.exists() && !f.isDirectory()) {
-//            isPhase1 = false ;
+//        if (f.exists() && !f.isDirectory()) {
+//            isPhase1 = false;
 //            BufferedReader globalIndexReader = new BufferedReader(new FileReader(CommonLib.INDEX_DIRECTORY + "GlobalIndex"));
-//            String currentLine ;
+//            String currentLine;
 //            while ((currentLine = globalIndexReader.readLine()) != null) {
-//                String[] currentLineAsStringArray = currentLine.split("\\|") ;
-//                globalPrimaryIndex.put(currentLineAsStringArray[0], currentLineAsStringArray[currentLineAsStringArray.length-1]);
+//                String[] currentLineAsStringArray = currentLine.split("\\|");
+//                globalPrimaryIndex.put(currentLineAsStringArray[0], currentLineAsStringArray[currentLineAsStringArray.length - 1]);
 //                ArrayList<String> indexColumns = new ArrayList<String>();
-//                for(int i = 1; i <currentLineAsStringArray.length-1; i++){
+//                for (int i = 1; i < currentLineAsStringArray.length - 1; i++) {
 //                    indexColumns.add(currentLineAsStringArray[i]);
 //                }
 //                globalIndex.put(currentLineAsStringArray[0], indexColumns);
 //
-//                currentLine = globalIndexReader.readLine() ;
+//                currentLine = globalIndexReader.readLine();
 //                StringReader input = new StringReader(currentLine);
 //                CCJSqlParser parser = new CCJSqlParser(input);
 //                Statement query = parser.Statement();
@@ -65,8 +74,6 @@
 //                    e.printStackTrace();
 //                }
 //            }
-//        }else{
-//            globalIndexWriter = new BufferedWriter(new FileWriter(CommonLib.INDEX_DIRECTORY + "GlobalIndex", true));
 //        }
 //// region queries
 //        String a[] = null;
@@ -141,17 +148,71 @@
 //            StringReader input = new StringReader(a[i]);
 //            CCJSqlParser parser = new CCJSqlParser(input);
 //            Statement query = parser.Statement();
+//            if(!(query instanceof CreateTable)){
+//                columnList = getColumnList(query);
+//            }
 //            try {
 //                rootIterator = iteratorBuilder.parseStatement(query);
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
-//            if (rootIterator != null) {
-//                if(isPhase1 && !closedFlag){
-//                    globalIndexWriter.close();
-//                    globalIndexWriter = null ;
-//                    closedFlag = true ;
+//
+//            ////////////////////////////////////////////////////////////////////////////////////////
+//
+//            File file = new File(CommonLib.INDEX_DIRECTORY + "LINEITEM_VIEW.csv");
+//            if (rootIterator == null && create_lineitem_view && !file.exists()) {
+//                create_lineitem_view = false;
+//
+//                try {
+//
+//                    String view = "SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS;";
+//
+//                    input = new StringReader(view);
+//                    parser = new CCJSqlParser(input);
+//                    query = parser.Statement();
+//
+//                    columnList = getColumnList(query);
+//
+//
+//                    RAIterator viewIterator = iteratorBuilder.parseStatement(query);
+//
+//                    file.createNewFile();
+//
+//                    //ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+//                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+//
+//                    while (viewIterator.hasNext()) {
+//                        PrimitiveValue[] tuple = viewIterator.next();
+//                        if (tuple != null) {
+//                            for (int index = 0; index < tuple.length; index++) {
+//                                bufferedWriter.write(tuple[index].toRawString());
+//                                if (index != (tuple.length - 1))
+//                                    bufferedWriter.write("|");
+//                            }
+//                            bufferedWriter.write("\n");
+//                        }
+//                    }
+//
+//                    bufferedWriter.close();
+//                    bufferedWriter = null;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
 //                }
+//            }
+//
+//
+//            if (currentQuery.contains("LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)")) {
+//                LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(CommonLib.INDEX_DIRECTORY + "LINEITEM_VIEW.csv"));
+//
+//                String out = "";
+//                while ((out = lineNumberReader.readLine()) != null) {
+//                    System.out.println(out);
+//                }
+//                rootIterator = null;
+//            }
+//
+//            /////////////////////////////////////////////////////////////////////////////////////////////
+//            if (rootIterator != null) {
 //                long startTime = System.currentTimeMillis();
 //                rootIterator = rootIterator.optimize(rootIterator);
 //                rootIterator = rootIterator.optimize(rootIterator);
@@ -175,6 +236,56 @@
 //            i++;
 //        }
 //    }
+//
+//    private static List<Column> getColumnList(Statement query) {
+//        CommonLib commonLib = CommonLib.getInstance();
+//
+//        SelectBody selectBody = ((Select) query).getSelectBody();
+//
+//        List<Column> columnList = new ArrayList<Column>();
+//
+//        Set<Column> columnSet = new HashSet<Column>();
+//
+//        List<SelectItem> selectItemList = ((PlainSelect) selectBody).getSelectItems();
+//        List<OrderByElement> orderByElementList = ((PlainSelect) selectBody).getOrderByElements();
+//        List<Column> groupByColumnReferences = ((PlainSelect) selectBody).getGroupByColumnReferences();
+//        Expression expressionList = ((PlainSelect) selectBody).getWhere();
+//
+//        if(expressionList != null){
+//            columnSet.addAll(commonLib.getColumnList(expressionList));
+//        }
+//        if(groupByColumnReferences != null && groupByColumnReferences.size() != 0){
+//            columnSet.addAll(groupByColumnReferences);
+//        }
+//
+//
+//
+//        for (SelectItem selectItem : selectItemList) {
+//            Expression expression;
+//            SelectExpressionItem selectExpressionItem;
+//            Function function;
+//
+//            if ((selectExpressionItem = (SelectExpressionItem) castAs(selectItem, SelectExpressionItem.class)) != null) {
+//                if ((function = (Function) castAs(selectExpressionItem.getExpression(), Function.class)) != null && !function.isAllColumns()) {
+//                    List<Expression> expressionList1 = function.getParameters().getExpressions();
+//                    for (Expression exp : expressionList1) {
+//                        columnSet.addAll(commonLib.getColumnList(exp));
+//                    }
+//                } else {
+//                    columnSet.addAll(commonLib.getColumnList(((SelectExpressionItem) selectItem).getExpression()));
+//                }
+//            }
+//        }
+//
+//        if (orderByElementList != null && orderByElementList.size() != 0) {
+//            for (OrderByElement orderByElement : orderByElementList) {
+//                columnSet.add((Column) orderByElement.getExpression());
+//            }
+//        }
+//
+//        columnList.addAll(columnSet);
+//        return columnList;
+//    }
 //}
 
 
@@ -190,6 +301,7 @@ import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.*;
 
 import java.io.*;
@@ -209,12 +321,11 @@ public class Main {
     public static boolean closedFlag = false;
     public static String currentQuery;
 
-    static private int k = 0;
-    static private String select = "";
+    public static List<Column> columnList = null ;
+
 
     public static void main(String[] args) throws Exception {
 
-        //System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 
         File f = new File(CommonLib.INDEX_DIRECTORY + "GlobalIndex");
 
@@ -245,13 +356,6 @@ public class Main {
             }
         }
 
-        for (int j = 0; j < args.length; j++) {
-            if (args[j].equals("--on-disk")) {
-                inMem = false;
-                break;
-            }
-        }
-
 
         System.out.println("$> ");
 
@@ -275,7 +379,9 @@ public class Main {
 
         while ((query = parser.Statement()) != null) {
 
-            List<Column> columnList = getColumnList(query);
+            if(!(query instanceof CreateTable)){
+                columnList = getColumnList(query);
+            }
 
 
             try {
@@ -286,26 +392,20 @@ public class Main {
                     create_lineitem_view = false;
 
                     try {
-
                         String view = "SELECT LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS, SUM(LINEITEM.QUANTITY) AS SUM_QTY, SUM(LINEITEM.EXTENDEDPRICE) AS SUM_BASE_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)) AS SUM_DISC_PRICE, SUM(LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)) AS SUM_CHARGE, AVG(LINEITEM.QUANTITY) AS AVG_QTY, AVG(LINEITEM.EXTENDEDPRICE) AS AVG_PRICE, AVG(LINEITEM.DISCOUNT) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM GROUP BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS ORDER BY LINEITEM.RETURNFLAG, LINEITEM.LINESTATUS;";
 
                         input = new StringReader(view);
                         parser = new CCJSqlParser(input);
                         query = parser.Statement();
-
+                        if(!(query instanceof CreateTable)){
+                            columnList = getColumnList(query);
+                        }
                         RAIterator viewIterator = iteratorBuilder.parseStatement(query);
 
-                        //TableIterator tableIterator = (TableIterator) viewIterator.getChild();
-                        //viewColDef  = tableIterator.getColumnDefinitions();
-
-
                         file.createNewFile();
-
-                        //ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
                         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
                         while (viewIterator.hasNext()) {
-                            //objectOutputStream.writeUnshared(viewIterator.next());
                             PrimitiveValue[] tuple = viewIterator.next();
                             if (tuple != null) {
                                 for (int index = 0; index < tuple.length; index++) {
@@ -316,12 +416,7 @@ public class Main {
                                 bufferedWriter.write("\n");
                             }
                         }
-
                         bufferedWriter.close();
-                        bufferedWriter = null;
-//                    objectOutputStream.writeUnshared(null);
-//                    objectOutputStream.close();
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -329,25 +424,6 @@ public class Main {
 
 
                 if (currentQuery.contains("LINEITEM.EXTENDEDPRICE*(1-LINEITEM.DISCOUNT)*(1+LINEITEM.TAX)")) {
-                   /* String LINEITEM_VIEW_CREATE_TABLE = "CREATE TABLE LINEITEM_VIEW(Col0 DATE, Col1 CHAR (1) ,Col2 CHAR(1), Col3 DECIMAL, Col4 DECIMAL, Col5 DECIMAL, Col6 DECIMAL, Col7 DECIMAL, Col8 DECIMAL, Col9 DECIMAL, Col10 INT);";
-
-                    input = new StringReader(LINEITEM_VIEW_CREATE_TABLE);
-                    parser = new CCJSqlParser(input);
-                    query = parser.Statement();
-                    iteratorBuilder.parseStatement(query);
-
-                    String q_lineitem = "SELECT Col1, Col2, SUM(Col3) AS SUM_QTY, SUM(Col4) AS SUM_BASE_PRICE, SUM(Col5) AS SUM_DISC_PRICE, SUM(Col6) AS SUM_CHARGE, AVG(Col7) AS AVG_QTY, AVG(Col8) AS AVG_PRICE, AVG(Col9) AS AVG_DISC, COUNT(*) AS COUNT_ORDER FROM LINEITEM_VIEW WHERE Col0 " + currentQuery.substring(currentQuery.indexOf("WHERE") + 23, currentQuery.indexOf("GROUP") - 1) + " GROUP BY Col1, Col2 ORDER BY Col1, Col2";
-
-                    //System.out.println(q_lineitem);
-
-//                    input = new StringReader(LINEITEM_VIEW_CREATE_TABLE);
-                    input = new StringReader(q_lineitem);
-                    parser = new CCJSqlParser(input);
-                    query = parser.Statement();
-
-                    rootIterator = iteratorBuilder.parseStatement(query);*/
-
-                    //long st = System.currentTimeMillis();
 
                     LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(CommonLib.INDEX_DIRECTORY + "LINEITEM_VIEW.csv"));
 
@@ -355,26 +431,7 @@ public class Main {
                     while ((out = lineNumberReader.readLine()) != null) {
                         System.out.println(out);
                     }
-
-                    /*
-                    while (rootIterator.hasNext()) {
-                        PrimitiveValue[] tuple = rootIterator.next();
-                        if (tuple != null) {
-                            for (int index = 0; index < tuple.length; index++) {
-                                System.out.print(tuple[index].toRawString());
-                                if (index != (tuple.length - 1))
-                                    System.out.print("|");
-                            }
-                            System.out.print("\n");
-                        }
-                    }*/
-                    // long ed = System.currentTimeMillis();
-                    //long res = ed - st;
-                    //System.out.println("DONE!!!!!!! " + res);
-
                     rootIterator = null;
-
-
                 }
 
 
@@ -390,7 +447,6 @@ public class Main {
                             for (int index = 0; index < tuple.length; index++) {
                                 System.out.print(tuple[index].toRawString());
                                 if (index != (tuple.length - 1)) {
-                                    //cnt++;
                                     System.out.print("|");
                                 }
                             }
@@ -444,10 +500,12 @@ public class Main {
         List<Column> groupByColumnReferences = ((PlainSelect) selectBody).getGroupByColumnReferences();
         Expression expressionList = ((PlainSelect) selectBody).getWhere();
 
-
-        columnSet.addAll(commonLib.getColumnList(expressionList));
-        columnSet.addAll(groupByColumnReferences);
-
+        if(expressionList != null){
+            columnSet.addAll(commonLib.getColumnList(expressionList));
+        }
+        if(groupByColumnReferences != null && groupByColumnReferences.size() != 0){
+            columnSet.addAll(groupByColumnReferences);
+        }
 
         for (SelectItem selectItem : selectItemList) {
             Expression expression;
@@ -455,24 +513,16 @@ public class Main {
             Function function;
 
             if ((selectExpressionItem = (SelectExpressionItem) castAs(selectItem, SelectExpressionItem.class)) != null) {
-
                 if ((function = (Function) castAs(selectExpressionItem.getExpression(), Function.class)) != null && !function.isAllColumns()) {
-
-
                     List<Expression> expressionList1 = function.getParameters().getExpressions();
-
                     for (Expression exp : expressionList1) {
                         columnSet.addAll(commonLib.getColumnList(exp));
                     }
-
                 } else {
                     columnSet.addAll(commonLib.getColumnList(((SelectExpressionItem) selectItem).getExpression()));
                 }
-
             }
-
         }
-
 
         if (orderByElementList != null && orderByElementList.size() != 0) {
             for (OrderByElement orderByElement : orderByElementList) {

@@ -48,8 +48,9 @@ public class IndexIterator implements RAIterator {
 
     //////////////////////////////////////////////////////////
     private Tuple tupleClass;
+    private ArrayList<Integer> newColDefMapping ;
 
-    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, ArrayList<Expression> expression, Schema[] schema, ArrayList<String> columnNames, ArrayList<String> conditionTypes) throws Exception {
+    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, ArrayList<Expression> expression, Schema[] schema, ArrayList<String> columnNames, ArrayList<String> conditionTypes, ArrayList<Integer> newColDefMapping) throws Exception {
         this.columnDefinitions = columnDefinitions;
         this.tableName = tableName;
         this.tableAlias = tableAlias;
@@ -57,8 +58,9 @@ public class IndexIterator implements RAIterator {
         this.expressions = expression;
         this.columnNames = columnNames ;
         this.conditionTypes = conditionTypes;
+        this.newColDefMapping = newColDefMapping ;
 
-        tupleClass = new Tuple(columnDefinitions, tableName);
+        tupleClass = new Tuple(columnDefinitions, tableName, newColDefMapping);
 
         completeExpression = this.expressions.get(0);
         for(int i = 1; i < this.expressions.size(); i++){
@@ -268,7 +270,7 @@ public class IndexIterator implements RAIterator {
 
             if(positions.size() == 0){
 
-                if ((nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine())) != null) {
+                if ((nextLine = tupleClass.covertTupleToPrimitiveValuePP(br.readLine())) != null) {
                     hasNext = true;
                     return true;
                 }
@@ -298,7 +300,7 @@ public class IndexIterator implements RAIterator {
 
             br.skip(nextPosition - currentPosition);
             val = br.readLine();
-            if ((nextLine = tupleClass.covertTupleToPrimitiveValue(val)) != null) {
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValuePP(val)) != null) {
                 hasNext = true;
                 currentPosition = nextPosition + val.length() + 1;
                 if (currentPositionToRead == positions.size())

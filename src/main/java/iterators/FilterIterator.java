@@ -180,7 +180,7 @@ public class FilterIterator implements RAIterator {
                         ArrayList<Expression> indexExpression = new ArrayList<Expression>(indexExp.values());
                         ArrayList<String> columnNames = new ArrayList<String>(indexExp.keySet());
                         ArrayList<String> conditionTypes = new ArrayList<String>(comparatorType.values()) ;
-                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes);
+                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes, tableIterator.getNewColDefMapping());
                         if(remainingExpression != null){
                             filterIterator.setChild(iterator);
                             filterIterator.setExpression(remainingExpression);

@@ -33,9 +33,9 @@ public class CommonLib
    public volatile int sortMergeSeqNumber = 50000;
    public volatile int orderBySeqNumber = 70000;
 
-//      public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHDATA/";
+      public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHDATA/";
 //      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
-   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
+//   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
    public static final String extension = ".csv" ;
 //      public static final String TABLE_DIRECTORY = "data/";
 //   public static final String INDEX_DIRECTORY = System.getProperty("user.dir") + "/";

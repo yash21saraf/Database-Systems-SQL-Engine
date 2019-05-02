@@ -15,9 +15,21 @@ public class IndexMaker {
     private static Map<String, ArrayList<net.sf.jsqlparser.statement.create.table.Index>> secondaryIndexMap = new HashMap<String, ArrayList<net.sf.jsqlparser.statement.create.table.Index>>();
     private static Map<String, ArrayList<Integer>> secondaryIndexColumnIndices = new HashMap<String, ArrayList<Integer>>();
     private static Map<String, ArrayList<Integer>> primaryIndexColumnIndices = new HashMap<String, ArrayList<Integer>>();
+    private static boolean createTableCopy = false ;
+
+    //////////////////////////////////////////////////////////////////
+    private static ColumnDefinition[] columnDefinitions ;
+    private static Tuple tupleClass;
+    ////////////////////////////////////////////////////////////////
 
 
     public static void createIndex(CreateTable createTable) throws IOException {
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+//        createTableCopy = true ;
+//        columnDefinitions = createTable.getColumnDefinitions().toArray(new ColumnDefinition[0]);
+//        tupleClass = new Tuple(columnDefinitions, createTable.getTable().getName());
+        ////////////////////////////////////////////////////////////////////////////////////////
 
         if(createTable.getTable().getName().equals("LINEITEM")) {
             Main.create_lineitem_view = true;
@@ -35,9 +47,6 @@ public class IndexMaker {
 
         buildIndexes(createTable, tableName) ;
         writeToGlobalIndex(tableName, createTable);
-
-//        if(tableName.equals("LINEITEM"))
-//            Main.create_lineitem_view = true;
 
     }
 
@@ -93,28 +102,66 @@ public class IndexMaker {
         try {
             LineNumberReader br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension), 100);
 
-            while ((currentLineAsString = br.readLine()) != null) {
+            if(createTableCopy){
+                String newTableName = tableName + "_" + "NEW" ;
+                File newTableFile = new File(CommonLib.INDEX_DIRECTORY + newTableName);
+                FileOutputStream newTableFileOutputStream = new FileOutputStream(newTableFile);
+                BufferedOutputStream newTableBufferedOutputStream = new BufferedOutputStream(newTableFileOutputStream, 5000);
+                ObjectOutputStream newTableObjectOutputStream = new ObjectOutputStream(newTableFileOutputStream);
+                PrimitiveValue[] currentRowPV ;
 
-                String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
-                String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
+                while ((currentLineAsString = br.readLine()) != null) {
+                    currentRowPV = tupleClass.covertTupleToPrimitiveValue(currentLineAsString) ;
+                    newTableObjectOutputStream.writeUnshared(currentRowPV);
+
+                    String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
+                    String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
 
 
-                if(currentIndex.containsKey(currentLineIndexCols)){
-                    currentIndex.get(currentLineIndexCols).add(Long.toString(position));
-                }else{
-                    ArrayList<String> positionArray = new ArrayList<String>();
-                    positionArray.add(Long.toString(position)) ;
-                    currentIndex.put(currentLineIndexCols, positionArray) ;
+                    if(currentIndex.containsKey(currentLineIndexCols)){
+                        currentIndex.get(currentLineIndexCols).add(Long.toString(position));
+                    }else{
+                        ArrayList<String> positionArray = new ArrayList<String>();
+                        positionArray.add(Long.toString(position)) ;
+                        currentIndex.put(currentLineIndexCols, positionArray) ;
+                    }
+
+                    position += currentLineAsString.length() + 1;
                 }
+                newTableObjectOutputStream.writeUnshared(null);
+                newTableObjectOutputStream.close();
+//                newTableBufferedOutputStream.close();
+                newTableFileOutputStream.close() ;
 
-                position += currentLineAsString.length() + 1;
+
+                createTableCopy = false ;
+            }else{
+                while ((currentLineAsString = br.readLine()) != null) {
+
+                    String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
+                    String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
+
+
+                    if(currentIndex.containsKey(currentLineIndexCols)){
+                        currentIndex.get(currentLineIndexCols).add(Long.toString(position));
+                    }else{
+                        ArrayList<String> positionArray = new ArrayList<String>();
+                        positionArray.add(Long.toString(position)) ;
+                        currentIndex.put(currentLineIndexCols, positionArray) ;
+                    }
+
+                    position += currentLineAsString.length() + 1;
+                }
             }
+
             br.close();
             br = null;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -215,6 +262,8 @@ public class IndexMaker {
                     currentMapForMasterIndex.add(currentItemForMasterIndex);
                 }else{
                     bw.writeUnshared(null);
+                    bufferedOutputStream.close();
+                    fileOutputStream.close();
                     bw.close() ;
                     bw = null ;
 
@@ -247,9 +296,14 @@ public class IndexMaker {
 
         indexBW.writeUnshared(null);
         indexBW.close();
+        indexBufferedOutputStream.close();
+        indexFileOutputStream.close();
 
         indexBW = null ;
         bw.writeUnshared(null);
+        bw.close();
+        bufferedOutputStream.close();
+        fileOutputStream.close();
         bw.close();
         bw = null ;
         currentIndex.clear();

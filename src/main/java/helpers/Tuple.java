@@ -3,11 +3,14 @@ package helpers;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
+import java.util.ArrayList;
+
 public class Tuple {
 
-    private String dataTypes[];
+    private String[] dataTypes;
     private int rowSize;
-    String table;
+    private String table;
+    private ArrayList<Integer> newColDefMapping ;
 
     public Tuple(ColumnDefinition[] columnDefinitions, String table) {
 
@@ -18,6 +21,20 @@ public class Tuple {
         for (int i = 0; i < columnDefinitions.length; i++) {
             dataTypes[i] = columnDefinitions[i].getColDataType().getDataType();
         }
+
+        rowSize = columnDefinitions.length;
+    }
+
+    public Tuple(ColumnDefinition[] columnDefinitions, String table, ArrayList<Integer> newColDefMapping) {
+
+        this.table = table;
+
+        this.dataTypes = new String[columnDefinitions.length];
+
+        for (int i = 0; i < columnDefinitions.length; i++) {
+            dataTypes[i] = columnDefinitions[i].getColDataType().getDataType();
+        }
+        this.newColDefMapping = newColDefMapping ;
 
         rowSize = columnDefinitions.length;
     }
@@ -46,13 +63,30 @@ public class Tuple {
 
         PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
 
-
-        if (tupleString == null)
-            return null;
-
         for (int index = 0; index < rowSize; index++) {
             PrimitiveValue convertedValue;
             convertedValue = convertToPrimitiveValue(tupleArray[index], dataTypes[index]);
+            if (convertedValue != null) {
+                convertedTuple[index] = convertedValue;
+            } else {
+                throw new Exception("Invalid columnType.");
+            }
+        }
+        return convertedTuple;
+
+    }
+
+    public PrimitiveValue[] covertTupleToPrimitiveValuePP(String tupleString) throws Exception {
+
+        if(tupleString == null)
+            return null;
+
+        String[] tupleArray = tupleString.split("\\|");
+
+        PrimitiveValue[] convertedTuple = new PrimitiveValue[rowSize];
+
+        for (int index = 0; index < rowSize; index++) {
+            PrimitiveValue convertedValue = convertToPrimitiveValue(tupleArray[newColDefMapping.get(index)], dataTypes[index]);
             if (convertedValue != null) {
                 convertedTuple[index] = convertedValue;
             } else {
