@@ -87,24 +87,24 @@ public class updateIterator implements RAIterator {
     }
 
     private PrimitiveValue[] processTuple(PrimitiveValue[] tuple) throws Exception {
-            PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
-            CaseExpression exp = new CaseExpression() ;
-            ArrayList<WhenClause> whenClauseArray = new ArrayList<>() ;
-            WhenClause whenClause = new WhenClause() ;
-            whenClause.setWhenExpression(statement.getWhere());
-            Expression thenExp = null;
-            Expression elseExp = null ;
-            for(int i = 0; i < statement.getColumns().size(); i++){
-                thenExp = statement.getExpressions().get(i) ;
-                elseExp = statement.getColumns().get(i) ;
-                whenClause.setThenExpression(thenExp);
-                whenClauseArray.add(whenClause) ;
-                exp.setWhenClauses(whenClauseArray);
-                exp.setElseExpression(elseExp);
-                PrimitiveValueWrapper result = commonLib.eval(exp, nextLineWrapper);
-                tuple[updateIndex.get(i)] = result.getPrimitiveValue() ;
-            }
-            return tuple;
+        PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
+        CaseExpression exp = new CaseExpression() ;
+        ArrayList<WhenClause> whenClauseArray = new ArrayList<>() ;
+        WhenClause whenClause = new WhenClause() ;
+        whenClause.setWhenExpression(statement.getWhere());
+        Expression thenExp = null;
+        Expression elseExp = null ;
+        for(int i = 0; i < statement.getColumns().size(); i++){
+            thenExp = statement.getExpressions().get(i) ;
+            elseExp = statement.getColumns().get(i) ;
+            whenClause.setThenExpression(thenExp);
+            whenClauseArray.add(whenClause) ;
+            exp.setWhenClauses(whenClauseArray);
+            exp.setElseExpression(elseExp);
+            PrimitiveValueWrapper result = commonLib.eval(exp, nextLineWrapper);
+            tuple[updateIndex.get(i)] = result.getPrimitiveValue() ;
+        }
+        return tuple;
     }
 
     @Override

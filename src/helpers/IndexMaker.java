@@ -24,14 +24,7 @@ public class IndexMaker {
 
 
     public static void createIndex(CreateTable createTable) throws IOException {
-
-        ////////////////////////////////////////////////////////////////////////////////////////
-//        createTableCopy = true ;
-//        columnDefinitions = createTable.getColumnDefinitions().toArray(new ColumnDefinition[0]);
-//        tupleClass = new Tuple(columnDefinitions, createTable.getTable().getName());
-        ////////////////////////////////////////////////////////////////////////////////////////
-
-
+        
         ArrayList<net.sf.jsqlparser.statement.create.table.Index> listOfIndexes = (ArrayList<net.sf.jsqlparser.statement.create.table.Index>) createTable.getIndexes();
         String tableName = createTable.getTable().getName() ;
 

@@ -81,7 +81,7 @@ public class TableIterator implements RAIterator
       for(int i = 0; i < this.fileColumnDefinitions.length; i++){
          for(Column col : Main.columnList){
             if(col.getColumnName().equals(this.fileColumnDefinitions[i].getColumnName()) &&
-            col.getTable().getName().equals(this.tableName)){
+                    col.getTable().getName().equals(this.tableName)){
                newColDefMapping.add(i) ;
                newColDef.add(this.fileColumnDefinitions[i]);
             }

@@ -33,13 +33,12 @@ public class CommonLib
    public volatile int sortMergeSeqNumber = 50000;
    public volatile int orderBySeqNumber = 70000;
 
-      public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHDATA/";
+//      public static final String TABLE_DIRECTORY = "/home/yash/Desktop/Databases/data/TPCHDATA/";
 //      public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHinmem/";
 //   public static final String TABLE_DIRECTORY = "/Users/deepak/Desktop/Database/data/a/thcp/TPCHDATA/";
    public static final String extension = ".csv" ;
-//      public static final String TABLE_DIRECTORY = "data/";
-//   public static final String INDEX_DIRECTORY = System.getProperty("user.dir") + "/";
-   public static final String INDEX_DIRECTORY = TABLE_DIRECTORY + "index/";
+      public static final String TABLE_DIRECTORY = "data/";
+   public static final String INDEX_DIRECTORY = System.getProperty("user.dir") + "/";
 
 
    //region Variables
@@ -113,6 +112,7 @@ public class CommonLib
             convertedValue.setTableName(tableName);
             convertedTuple[index] = convertedValue;
          } else {
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
          }
       }
@@ -137,6 +137,7 @@ public class CommonLib
             convertedValue.setTableName(tableName);
             convertedTuple[index] = convertedValue;
          } else {
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
          }
       }
@@ -162,6 +163,7 @@ public class CommonLib
              convertedValuein.setTableName(schema[index].getTableName());
             convertedTuple[index] = convertedValuein;
          } else {
+            //logger.error("Invalid columnType: {} at columnName: {}.",columnDefinitions[index].getColDataType().getDataType(),columnDefinitions[index].getColumnName());
             throw new Exception("Invalid columnType.");
          }
       }
@@ -234,23 +236,6 @@ public class CommonLib
          throw e;
       }
    }
-
-
-//
-//   public PrimitiveValue eval(Expression expression,PrimitiveValue[] tuple) throws SQLException
-//   {
-//      try {
-//         PrimitiveValue evaluatedExpression = new PrimitiveValue();
-//         this.tuples.add(tuple);
-//         evaluatedExpression.setPrimitiveValue(eval.eval(expression));
-//         this.tuples.remove(tuple);
-//         return evaluatedExpression;
-//      } catch (SQLException e) {
-//         //e.printStackTrace();
-//         throw e;
-//      }
-//   }
-
 
    public PrimitiveValueWrapper eval(Expression expression,PrimitiveValueWrapper[]... tuples) throws SQLException
    {
@@ -460,14 +445,14 @@ public class CommonLib
 
    public PrimitiveValue PrimitiveValueComparator(PrimitiveValue first, PrimitiveValue second, String operator) throws PrimitiveValue.InvalidPrimitive {
 
-      if(operator.equals("sum")){
+      if(operator.toLowerCase().equals("sum")){
          if(first instanceof LongValue){
             return new LongValue(first.toLong() + second.toLong()) ;
          }else{
             return new DoubleValue(first.toDouble() + second.toDouble()) ;
          }
       }
-      else if(operator.equals("min")){
+      else if(operator.toLowerCase().equals("min")){
          if(first instanceof LongValue){
               return new LongValue(Math.min(first.toLong(), second.toLong()));
          }
@@ -488,7 +473,7 @@ public class CommonLib
             }
             else return new StringValue(second.toRawString()) ;
          }
-      }else if(operator.equals("max")){
+      }else if(operator.toLowerCase().equals("max")){
          if(first instanceof LongValue){
             return new LongValue(Math.max(first.toLong(), second.toLong()));
          }

@@ -1,55 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/main/java/helpers/IndexMaker.java" line="335" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="cbfb9328-d402-46ad-b13e-31318aa8f672" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/META-INF/sqlparse.kotlin_module" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/builders/IteratorBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/dubstep/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/BasicEval$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/BasicEval.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/CommonLib$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/CommonLib.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/FileIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/IndexMaker$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/IndexMaker.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/PrimitiveValueWrapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Schema.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Sort$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Sort$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Sort$3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Sort$4.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Sort.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Tuple$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Tuple$types.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/helpers/Tuple.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/FilterIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/GroupByIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/HavingIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/IndexIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/JoinIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/LimitIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/MapIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/OrderByIterator$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/OrderByIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/RAIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/TableIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/UnionIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/sqlparse/iterators/aggregateIterator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sqlparse.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dubstep/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/BasicEval.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/BasicEval.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/IndexMaker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/IndexMaker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Tuple.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/Tuple.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/IndexIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/IndexIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/builders/IteratorBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dubstep/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/BasicEval.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/CommonLib.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/FileIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/IndexMaker.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/PrimitiveValueWrapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Schema.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Sort.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Tuple.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/GroupByIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/HavingIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/IndexIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/LimitIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/MapIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/OrderByIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/RAIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/TableIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/UnionIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/aggregateIterator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/iterators/updateIterator.java" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -63,76 +38,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5100">
-              <caret line="300" column="33" selection-start-line="300" selection-start-column="33" selection-end-line="300" selection-end-column="33" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/RAIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1853">
-              <caret line="133" column="45" selection-start-line="133" selection-start-column="45" selection-end-line="133" selection-end-column="45" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/FileIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="43" column="50" selection-start-line="43" selection-start-column="50" selection-end-line="43" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/PrimitiveValueWrapper.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#410#411#0" expanded="true" />
-                <element signature="e#444#445#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/IndexIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2839">
-              <caret line="167" selection-start-line="167" selection-end-line="167" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#15196#15197#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="323">
@@ -145,31 +51,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6222">
-              <caret line="366" selection-start-line="366" selection-end-line="366" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="jar://$PROJECT_DIR$/../../Resources/evallib-1.0.jar!/net/sf/jsqlparser/eval/Eval.class">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="4471">
               <caret line="346" selection-start-line="346" selection-end-line="346" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/iterators/JoinIterator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3485">
-              <caret line="229" column="65" selection-start-line="229" selection-start-column="65" selection-end-line="229" selection-end-column="65" />
             </state>
           </provider>
         </entry>
@@ -234,7 +119,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="833" />
@@ -294,6 +179,14 @@
       <option name="presentableId" value="Default" />
       <updated>1550887892427</updated>
     </task>
+    <task id="LOCAL-00001" summary="Updated checkpoint 4">
+      <created>1558336798341</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1558336798341</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -355,12 +248,6 @@
           <line>264</line>
           <properties />
           <option name="timeStamp" value="109" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/dubstep/Main.java</url>
-          <line>205</line>
-          <properties />
-          <option name="timeStamp" value="133" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java</url>
@@ -591,7 +478,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/iterators/FilterIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5100">
+        <state relative-caret-position="554">
           <caret line="300" column="33" selection-start-line="300" selection-start-column="33" selection-end-line="300" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -639,16 +526,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
-          <folding>
-            <element signature="e#686#687#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/helpers/CommonLib.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6222">
@@ -675,8 +552,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/dubstep/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1853">
-          <caret line="133" column="45" selection-start-line="133" selection-start-column="45" selection-end-line="133" selection-end-column="45" />
+        <state relative-caret-position="408">
+          <caret line="48" lean-forward="true" selection-start-line="48" selection-end-line="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/../../Resources/jsqlparser-1.0.0.jar!/net/sf/jsqlparser/expression/BinaryExpression.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
+          <folding>
+            <element signature="e#686#687#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
