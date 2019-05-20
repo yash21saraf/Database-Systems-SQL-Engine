@@ -38,18 +38,23 @@ public class IndexIterator implements RAIterator {
     private ArrayList<ColumnDefinition> columnIndices = new ArrayList<ColumnDefinition>() ;
     private ArrayList<String> conditionTypes ;
     private ArrayList<Long> positions= new ArrayList<Long>() ;
+    private Tuple tupleClass;
 
     //////////////////////////////////////////////////////////
     private int currentPositionToRead = 0;
-    long currentPosition = 0;
-    long nextPosition = 0;
+    private long currentPosition = 0;
+    private long nextPosition = 0;
     private LineNumberReader br;
-    String val = null;
+    private String val = null;
 
     //////////////////////////////////////////////////////////
-    private Tuple tupleClass;
+    private Integer currentValueInMap = 0;
+    private boolean usingInserts = false ;
 
-    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, ArrayList<Expression> expression, Schema[] schema, ArrayList<String> columnNames, ArrayList<String> conditionTypes) throws Exception {
+
+    //////////////////////////////////////////////////////////
+
+    public IndexIterator(String tableName, String tableAlias, ColumnDefinition[] columnDefinitions, ArrayList<Expression> expression, Schema[] schema, ArrayList<String> columnNames, ArrayList<String> conditionTypes, ArrayList<Integer> newColDefMapping) throws Exception {
         this.columnDefinitions = columnDefinitions;
         this.tableName = tableName;
         this.tableAlias = tableAlias;
@@ -58,7 +63,7 @@ public class IndexIterator implements RAIterator {
         this.columnNames = columnNames ;
         this.conditionTypes = conditionTypes;
 
-        tupleClass = new Tuple(columnDefinitions, tableName);
+        tupleClass = new Tuple(columnDefinitions, tableName, newColDefMapping);
 
         completeExpression = this.expressions.get(0);
         for(int i = 1; i < this.expressions.size(); i++){
@@ -69,11 +74,10 @@ public class IndexIterator implements RAIterator {
         br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension));
 
 
+
         if(positions.size() != 0) {
             nextPosition = positions.get(currentPositionToRead++);
         }
-
-
 
     }
 
@@ -93,7 +97,7 @@ public class IndexIterator implements RAIterator {
         for(int i = 0; i <expressions.size(); i++){
             if(!Main.masterIndex.containsKey(tableName + "|" + columnNames.get(i))){
                 String indexListName = tableName + "_" + columnNames.get(i) ;
-                File indexFile = new File(CommonLib.TABLE_DIRECTORY + indexListName);
+                File indexFile = new File(CommonLib.INDEX_DIRECTORY + indexListName);
                 FileInputStream indexFileInputStream = new FileInputStream(indexFile);
                 BufferedInputStream indexBufferedInputStream = new BufferedInputStream(indexFileInputStream);
                 ObjectInputStream indexBW = new ObjectInputStream(indexBufferedInputStream);
@@ -207,7 +211,7 @@ public class IndexIterator implements RAIterator {
             ArrayList<Long> currentPositions = new ArrayList<Long>() ;
 
             for(int j = 0; j < listOfFinalFileList.get(i).size(); j++){
-                File File = new File(CommonLib.TABLE_DIRECTORY + listOfFinalFileList.get(i).get(j).toRawString());
+                File File = new File(CommonLib.INDEX_DIRECTORY + listOfFinalFileList.get(i).get(j).toRawString());
                 FileInputStream fileInputStream = new FileInputStream(File);
                 BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
                 ObjectInputStream br = new ObjectInputStream(bufferedInputStream);
@@ -240,6 +244,7 @@ public class IndexIterator implements RAIterator {
                 positions = intersectLists(positions, currentPositions) ;
             }
         }
+        positions.add(positions.size(), 0L);
     }
 
     private ArrayList<Long> intersectLists(ArrayList<Long> leftFiles, ArrayList<Long> rightFiles) {
@@ -262,47 +267,65 @@ public class IndexIterator implements RAIterator {
 
     @Override
     public boolean hasNext() throws Exception {
-        try {
-            if (hasNext)
+        if (hasNext)
+            return true;
+
+        if(positions.size() == 0){
+
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValuePP(br.readLine())) != null) {
+                hasNext = true;
                 return true;
-
-            if(positions.size() == 0){
-
-                if ((nextLine = tupleClass.covertTupleToPrimitiveValue(br.readLine())) != null) {
-                    hasNext = true;
-                    return true;
+            }else if(IteratorBuilder.newInserts.containsKey(tableName) && currentValueInMap < IteratorBuilder.newInserts.get(tableName).size()){
+                this.usingInserts = true ;
+                while(currentValueInMap < IteratorBuilder.newInserts.get(tableName).size()){
+                    nextLine = tupleClass.covertTupleToPrimitiveValuePP(IteratorBuilder.newInserts.get(tableName).get(currentValueInMap)) ;
+                    currentValueInMap += 1 ;
+                    PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(nextLine, this.schema);
+                    PrimitiveValueWrapper result = commonLib.eval(this.completeExpression, nextLineWrapper);
+                    if(result.getPrimitiveValue().toBool()){
+                        break ;
+                    }
                 }
-            } else {
-                if ((nextLine = getDataFromFile()) != null) {
-                    hasNext = true;
-                    return true;
+                if(nextLine != null){
+                    return true ;
                 }
             }
-
-
-            hasNext = false;
-            return false;
-
-        } catch (Exception e) {
-            throw e;
+        } else {
+            if ((nextLine = getDataFromFile()) != null) {
+                hasNext = true;
+                return true;
+            }
         }
+
+
+        hasNext = false;
+        return false;
+
     }
 
     private PrimitiveValue[] getDataFromFile() {
         try {
 
             if (currentPositionToRead >= positions.size()) {
+                if(IteratorBuilder.newInserts.containsKey(tableName) && currentValueInMap < IteratorBuilder.newInserts.get(tableName).size()){
+                    this.usingInserts = true ;
+                    while(currentValueInMap < IteratorBuilder.newInserts.get(tableName).size()){
+                        nextLine = tupleClass.covertTupleToPrimitiveValuePP(IteratorBuilder.newInserts.get(tableName).get(currentValueInMap)) ;
+                        currentValueInMap += 1 ;
+                        PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(nextLine, this.schema);
+                        PrimitiveValueWrapper result = commonLib.eval(this.completeExpression, nextLineWrapper);
+                        if(result.getPrimitiveValue().toBool()){
+                            return nextLine ;
+                        }
+                    }
+                }
                 hasNext = false;
                 return null;
             }
 
             br.skip(nextPosition - currentPosition);
             val = br.readLine();
-            if ((nextLine = tupleClass.covertTupleToPrimitiveValue(val)) != null) {
-                if(tableName.equals("LINEITEM")){
-                    nextLine[15] = new StringValue("a");
-                    nextLine[13] = new StringValue("a");
-                }
+            if ((nextLine = tupleClass.covertTupleToPrimitiveValuePP(val)) != null) {
                 hasNext = true;
                 currentPosition = nextPosition + val.length() + 1;
                 if (currentPositionToRead == positions.size())
@@ -335,6 +358,8 @@ public class IndexIterator implements RAIterator {
         currentLine = null;
         hasNext = false;
         currentPositionToRead = 0;
+        currentValueInMap = 0;
+        this.usingInserts = false ;
     }
 
     @Override
@@ -358,5 +383,13 @@ public class IndexIterator implements RAIterator {
     @Override
     public RAIterator optimize(RAIterator iterator) {
         return iterator;
+    }
+
+    public boolean getUsingInserts(){
+        return this.usingInserts ;
+    }
+
+    public String getTableName(){
+        return this.tableName ;
     }
 }

@@ -452,15 +452,14 @@ public class JoinIterator implements RAIterator {
 
 
     private void onePassFillBuckets() throws Exception {
-        int cnt = 0;
-        PrimitiveValue[] leftTuple = null;
-        Integer leftBucketSize = 0;
+
+        PrimitiveValue[] leftTuple;
+
         try {
             while (leftChild.hasNext()) {
                 leftTuple = leftChild.next();
                 if (leftTuple != null) {
 
-                    leftBucketSize++;
                     String leftKey;
 
                     leftKey = createKey(leftTuple, leftExpList, "left");
@@ -471,12 +470,6 @@ public class JoinIterator implements RAIterator {
                     updatedList.add(leftTuple);
                     leftBucket.put(leftKey, updatedList);
 
-                    if (leftBucketSize == 100)
-                        break;
-                    leftBucketSize++;
-                    cnt++;
-                    //if(cnt % 10000 == 0)
-                       // System.out.println(cnt);
 
                 }
             }
@@ -550,7 +543,7 @@ public class JoinIterator implements RAIterator {
     }
 
     private String createKey(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {
-        String key = "";
+        StringBuilder key = new StringBuilder();
         if (expression == null) {
             return "crossJoin";
         }
@@ -564,9 +557,9 @@ public class JoinIterator implements RAIterator {
                 wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, rightChild.getSchema());
             }
             result = commonLib.eval(expression.get(i), wrappedTuple).getPrimitiveValue();
-            key = key + "|" + result.toRawString();
+            key.append("|").append(result);
         }
-        return key;
+        return key.toString();
     }
 
     private PrimitiveValue[] createKeyPrimitive(PrimitiveValue[] tuple, List<Expression> expression, String side) throws Exception {

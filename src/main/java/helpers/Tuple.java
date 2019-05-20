@@ -3,11 +3,14 @@ package helpers;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 
+import java.util.ArrayList;
+
 public class Tuple {
 
-    private String dataTypes[];
+    private String[] dataTypes;
     private int rowSize;
-    String table;
+    private String table;
+    private ArrayList<Integer> newColDefMapping ;
 
     public Tuple(ColumnDefinition[] columnDefinitions, String table) {
 
@@ -22,6 +25,20 @@ public class Tuple {
         rowSize = columnDefinitions.length;
     }
 
+    public Tuple(ColumnDefinition[] columnDefinitions, String table, ArrayList<Integer> newColDefMapping) {
+
+        this.table = table;
+
+        this.dataTypes = new String[columnDefinitions.length];
+
+        for (int i = 0; i < columnDefinitions.length; i++) {
+            dataTypes[i] = columnDefinitions[i].getColDataType().getDataType();
+        }
+        this.newColDefMapping = newColDefMapping ;
+
+        rowSize = columnDefinitions.length;
+    }
+
     public PrimitiveValue[] covertTupleToPrimitiveValue(String tupleString) throws Exception {
 
         if(tupleString == null)
@@ -29,26 +46,7 @@ public class Tuple {
 
         String[] tupleArray = tupleString.split("\\|");
 
-        if(table != null) {
-            if (table.equals("LINEITEM")) {
-                tupleArray[13] = null;
-                tupleArray[15] = null;
-            } else if (table.equals("ORDERS")) {
-                tupleArray[6] = null;
-                tupleArray[8] = null;
-            } else if (table.equals("SUPPLIER")) {
-                tupleArray[2] = null;
-                tupleArray[6] = null;
-            } else if (table.equals("PARTSUPP")) {
-                tupleArray[4] = null;
-            }
-        }
-
         PrimitiveValue[] convertedTuple = new PrimitiveValue[tupleArray.length];
-
-
-        if (tupleString == null)
-            return null;
 
         for (int index = 0; index < rowSize; index++) {
             PrimitiveValue convertedValue;
@@ -61,6 +59,40 @@ public class Tuple {
         }
         return convertedTuple;
 
+    }
+
+    public PrimitiveValue[] covertTupleToPrimitiveValuePP(String tupleString) throws Exception {
+
+        if(tupleString == null)
+            return null;
+
+        String[] tupleArray = tupleString.split("\\|");
+
+        PrimitiveValue[] convertedTuple = new PrimitiveValue[rowSize];
+
+        for (int index = 0; index < rowSize; index++) {
+            PrimitiveValue convertedValue = convertToPrimitiveValue(tupleArray[newColDefMapping.get(index)], dataTypes[index]);
+            if (convertedValue != null) {
+                convertedTuple[index] = convertedValue;
+            } else {
+                throw new Exception("Invalid columnType.");
+            }
+        }
+        return convertedTuple;
+
+    }
+
+    public PrimitiveValue[] covertTupleToPrimitiveValuePP(PrimitiveValue[] tuple) {
+
+        if(tuple == null)
+            return null;
+
+        PrimitiveValue[] convertedTuple = new PrimitiveValue[rowSize];
+
+        for (int index = 0; index < rowSize; index++) {
+            convertedTuple[index] = tuple[newColDefMapping.get(index)];
+        }
+        return convertedTuple;
     }
 
     public PrimitiveValue convertToPrimitiveValue(String value, String dataType) {

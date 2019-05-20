@@ -4,7 +4,9 @@ import dubstep.Main;
 import helpers.CommonLib;
 import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
+import net.sf.jsqlparser.expression.CaseExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.InverseExpression;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
@@ -24,6 +26,7 @@ public class FilterIterator implements RAIterator {
     private Schema[] schema;
     private PrimitiveValue[] tuple;
     private boolean hasNextValue = false;
+    private boolean usingInserts = false ;
 
     //endregion
 
@@ -35,8 +38,6 @@ public class FilterIterator implements RAIterator {
         this.expression = expression;
         this.schema = child.getSchema();
 
-        commonLib.getExpressionList(expression);
-        commonLib.getColumnList(expression);
     }
 
     //endregion
@@ -52,6 +53,20 @@ public class FilterIterator implements RAIterator {
             tuple = child.next();
             if (tuple == null)
                 return false;
+            else if(child instanceof TableIterator && ((TableIterator) child).getUsingInserts()){
+                this.usingInserts = true ;
+                return true ;
+            }
+            else if(child instanceof IndexIterator && ((IndexIterator) child).getUsingInserts()){
+                this.usingInserts = true ;
+                return true ;
+            }else if(child instanceof FilterIterator && ((FilterIterator) child).getUsingInserts()){
+                this.usingInserts = true ;
+                return true ;
+            }else if(child instanceof updateIterator && ((updateIterator) child).getUsingInserts()){
+                this.usingInserts = true ;
+                return true ;
+            }
             PrimitiveValueWrapper[] wrappedTuple = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, this.schema);
             if (commonLib.eval(expression, wrappedTuple).getPrimitiveValue().toBool()) {
                 hasNextValue = true;
@@ -70,6 +85,7 @@ public class FilterIterator implements RAIterator {
 
     @Override
     public void reset() throws Exception {
+        this.usingInserts = false ;
         child.reset();
     }
 
@@ -129,7 +145,7 @@ public class FilterIterator implements RAIterator {
                     e.printStackTrace();
                 }
             }
-            else if ((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null) {
+            else if (((tableIterator = (TableIterator) CommonLib.castAs(filterIterator.getChild(), TableIterator.class)) != null)) {
                 try {
                     List<Expression> expressionList = commonLib.getExpressionList(filterIterator.getExpression());
                     Expression remainingExpression = null;
@@ -138,39 +154,48 @@ public class FilterIterator implements RAIterator {
                     Map<String, String> comparatorType = new HashMap<String, String>();
 
                     for(Expression expression : expressionList){
-                        List<Column> columnList = commonLib.getColumnList(expression);
                         boolean validity = true;
-                        for(Column column : columnList){
-                            if(columnList.size() > 1){
-                                if (remainingExpression != null) {
-                                    remainingExpression = new AndExpression(remainingExpression, expression);
-                                } else {
-                                    remainingExpression = expression;
+                        if(!(expression instanceof InverseExpression || expression instanceof CaseExpression)) {
+                            List<Column> columnList = commonLib.getColumnList(expression);
+
+                            for(Column column : columnList){
+                                if(columnList.size() > 1){
+                                    if (remainingExpression != null) {
+                                        remainingExpression = new AndExpression(remainingExpression, expression);
+                                    } else {
+                                        remainingExpression = expression;
+                                    }
+                                    validity = false;
+                                    break ;
                                 }
-                                validity = false;
-                                break ;
-                            }
-                            else if(!Main.globalIndex.get(tableName).contains(column.getColumnName())){
-                                if (remainingExpression != null) {
-                                    remainingExpression = new AndExpression(remainingExpression, expression);
-                                } else {
-                                    remainingExpression = expression;
+                                else if(!Main.globalIndex.get(tableName).contains(column.getColumnName())){
+                                    if (remainingExpression != null) {
+                                        remainingExpression = new AndExpression(remainingExpression, expression);
+                                    } else {
+                                        remainingExpression = expression;
+                                    }
+                                    validity = false;
+                                    break ;
                                 }
-                                validity = false;
-                                break ;
                             }
-                        }
-                        if(validity){
-                            if(expression instanceof EqualsTo){
-                                comparatorType.put(columnList.get(0).getColumnName(), "EQUALS");
+                            if(validity){
+                                if(expression instanceof EqualsTo){
+                                    comparatorType.put(columnList.get(0).getColumnName(), "EQUALS");
+                                }
+                                else if(!comparatorType.containsKey(columnList.get(0).getColumnName())) {
+                                    comparatorType.put(columnList.get(0).getColumnName(), "OTHERS");
+                                }
+                                if(indexExp.containsKey(columnList.get(0).getColumnName())) {
+                                    indexExp.put(columnList.get(0).getColumnName(), new AndExpression(indexExp.get(columnList.get(0).getColumnName()), expression));
+                                } else{
+                                    indexExp.put(columnList.get(0).getColumnName(), expression);
+                                }
                             }
-                            else if(!comparatorType.containsKey(columnList.get(0).getColumnName())) {
-                                comparatorType.put(columnList.get(0).getColumnName(), "OTHERS");
-                            }
-                            if(indexExp.containsKey(columnList.get(0).getColumnName())) {
-                                indexExp.put(columnList.get(0).getColumnName(), new AndExpression(indexExp.get(columnList.get(0).getColumnName()), expression));
-                            } else{
-                                indexExp.put(columnList.get(0).getColumnName(), expression);
+                        }else{
+                            if (remainingExpression != null) {
+                                remainingExpression = new AndExpression(remainingExpression, expression);
+                            } else {
+                                remainingExpression = expression;
                             }
                         }
                     }
@@ -179,7 +204,7 @@ public class FilterIterator implements RAIterator {
                         ArrayList<Expression> indexExpression = new ArrayList<Expression>(indexExp.values());
                         ArrayList<String> columnNames = new ArrayList<String>(indexExp.keySet());
                         ArrayList<String> conditionTypes = new ArrayList<String>(comparatorType.values()) ;
-                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes);
+                        iterator = new IndexIterator(tableName, tableIterator.getTableAlias(), tableIterator.getColumnDefinitions(), indexExpression, tableIterator.getSchema(), columnNames, conditionTypes, tableIterator.getNewColDefMapping());
                         if(remainingExpression != null){
                             filterIterator.setChild(iterator);
                             filterIterator.setExpression(remainingExpression);
@@ -272,9 +297,15 @@ public class FilterIterator implements RAIterator {
             }
         }
         RAIterator child = iterator.getChild();
-        child = child.optimize(child);
-        iterator.setChild(child);
+        if(child != null){
+            child = child.optimize(child);
+            iterator.setChild(child);
+        }
         return iterator;
+    }
+
+    public boolean getUsingInserts(){
+        return this.usingInserts ;
     }
 
     //endregion

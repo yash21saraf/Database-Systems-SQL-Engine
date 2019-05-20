@@ -3,28 +3,38 @@ package builders;
 import dubstep.Main;
 import helpers.CommonLib;
 import helpers.IndexMaker;
+import helpers.PrimitiveValueWrapper;
 import helpers.Schema;
 import iterators.*;
-import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.update.Update;
 
-import java.io.*;
 import java.util.*;
 
 public class IteratorBuilder {
 
     public static Map<String, Schema[]> iteratorSchemas = new HashMap();
-
-    private FileReader fileReader;
-    private BufferedWriter writer = null;
-
     public static Map<String, CreateTable> schemas = new HashMap();
 
-    private File file;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static Map<String, List<PrimitiveValue[]>> newInserts = new HashMap<>();
+    public static HashMap<String, List<Statement>> listOfStatements = new HashMap<>() ;
+    private CommonLib commonLib = CommonLib.getInstance();
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     public IteratorBuilder() {
@@ -42,19 +52,110 @@ public class IteratorBuilder {
 
         CreateTable createTable;
         Select select;
+        Insert insert ;
+        Delete delete ;
+        Update update ;
 
         if ((createTable = (CreateTable) CommonLib.castAs(statement, CreateTable.class)) != null) {
             buildCreateTable(createTable);
             if(Main.isPhase1){
-                System.out.println(createTable.getTable().getName() + "*********");
                 IndexMaker.createIndex(createTable);
-
             }
             return null;
 
         } else if ((select = (Select) CommonLib.castAs(statement, Select.class)) != null) {
             return buildSelect(select);
 
+        } else if ((insert = (Insert) CommonLib.castAs(statement, Insert.class)) != null){
+            List<PrimitiveValue[]> updatedList;
+            List<PrimitiveValue[]> currentList = newInserts.get(insert.getTable().getName());
+            updatedList = (currentList != null) ? currentList : new LinkedList<PrimitiveValue[]>();
+            ExpressionList itemsList = (ExpressionList) insert.getItemsList();
+            ArrayList<PrimitiveValue> currentTuple = new ArrayList<>() ;
+            for(Expression expression : itemsList.getExpressions()){
+                currentTuple.add((PrimitiveValue) expression);
+            }
+            PrimitiveValue[] currentTupleArray = currentTuple.toArray(new PrimitiveValue[0]);
+            updatedList.add(currentTupleArray);
+            newInserts.put(insert.getTable().getName(), updatedList);
+            return null ;
+        } else if ((delete = (Delete) CommonLib.castAs(statement, Delete.class)) != null){
+
+            // Update the present list
+            if(newInserts.containsKey(delete.getTable().getName())){
+                List<PrimitiveValue[]> currentInserts = newInserts.get(delete.getTable().getName());
+                List<PrimitiveValue[]> updatedInserts = new ArrayList<>() ;
+                for(PrimitiveValue[] tuple : currentInserts){
+                    PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, schemas.get(delete.getTable().getName()).getColumnDefinitions().toArray(new ColumnDefinition[0]), delete.getTable().getName());
+                    PrimitiveValueWrapper result = commonLib.eval(new InverseExpression(delete.getWhere()), nextLineWrapper);
+                    if(result.getPrimitiveValue().toBool()){
+                        updatedInserts.add(tuple) ;
+                    }
+                }
+                newInserts.put(delete.getTable().getName(), updatedInserts) ;
+            }
+
+            // Maintain list for original Table values
+            List<Statement> updatedList;
+            List<Statement> currentList = listOfStatements.get(delete.getTable().getName());
+            updatedList = (currentList != null) ? currentList : new LinkedList<Statement>();
+            if(updatedList.size() == 0){
+                updatedList.add(delete) ;
+            }else{
+                if (updatedList.get(updatedList.size()-1) instanceof Delete){
+                    delete.setWhere(new OrExpression(delete.getWhere(), ((Delete) updatedList.get(updatedList.size()-1)).getWhere()));
+                    updatedList.set(updatedList.size()-1, delete) ;
+                }else{
+                    updatedList.add(delete) ;
+                }
+            }
+            listOfStatements.put(delete.getTable().getName(), updatedList);
+            return null ;
+        } else if ((update = (Update) CommonLib.castAs(statement, Update.class)) != null){
+            // Update the newly inserted values
+            if(newInserts.containsKey(update.getTable().getName())){
+                List<PrimitiveValue[]> currentInserts = newInserts.get(update.getTable().getName());
+                List<PrimitiveValue[]> updatedInserts = new ArrayList<>() ;
+
+
+                ArrayList<Integer> updateIndex = new ArrayList<>() ;
+                for(Column column : update.getColumns()){
+                    for(int i = 0; i < schemas.get(update.getTable().getName()).getColumnDefinitions().size() ; i++){
+                        if(column.getColumnName().equals(schemas.get(update.getTable().getName()).getColumnDefinitions().get(i).getColumnName())){
+                            updateIndex.add(i) ;
+                        }
+                    }
+                }
+                for(PrimitiveValue[] tuple : currentInserts){
+                    PrimitiveValueWrapper[]  nextLineWrapper = commonLib.convertTuplePrimitiveValueToPrimitiveValueWrapperArray(tuple, schemas.get(update.getTable().getName()).getColumnDefinitions().toArray(new ColumnDefinition[0]), update.getTable().getName());
+                    CaseExpression exp = new CaseExpression() ;
+                    ArrayList<WhenClause> whenClauseArray = new ArrayList<>() ;
+                    WhenClause whenClause = new WhenClause() ;
+                    whenClause.setWhenExpression(update.getWhere());
+                    Expression thenExp = null;
+                    Expression elseExp = null ;
+                    for(int i = 0; i < update.getColumns().size(); i++){
+                        thenExp = update.getExpressions().get(i) ;
+                        elseExp = update.getColumns().get(i) ;
+                        whenClause.setThenExpression(thenExp);
+                        whenClauseArray.add(whenClause) ;
+                        exp.setWhenClauses(whenClauseArray);
+                        exp.setElseExpression(elseExp);
+                        PrimitiveValueWrapper result = commonLib.eval(exp, nextLineWrapper);
+                        tuple[updateIndex.get(i)] = result.getPrimitiveValue() ;
+                    }
+                    updatedInserts.add(tuple) ;
+                }
+                newInserts.put(update.getTable().getName(), updatedInserts) ;
+            }
+
+            // Update the original Table values
+            List<Statement> updatedList;
+            List<Statement> currentList = listOfStatements.get(update.getTable().getName());
+            updatedList = (currentList != null) ? currentList : new LinkedList<Statement>();
+            updatedList.add(update) ;
+            listOfStatements.put(update.getTable().getName(), updatedList);
+            return null ;
         }
         throw new Exception("Invalid statement");
     }
@@ -223,7 +324,6 @@ public class IteratorBuilder {
      * @return RAIterator object containing a TableIterator
      */
     private RAIterator buildTable(Table table, RAIterator rootIterator) throws Exception {
-
         String tableAlias;
         if (table.getAlias() != null)
             tableAlias = table.getAlias();
@@ -233,7 +333,6 @@ public class IteratorBuilder {
         ColumnDefinition[] columnDefinitions = schemas.get(table.getName().toUpperCase()).getColumnDefinitions().toArray(new ColumnDefinition[schemas.get(table.getName().toUpperCase()).getColumnDefinitions().size()]);
         rootIterator = new TableIterator(table.getName(), tableAlias, columnDefinitions);
         return rootIterator;
-
     }
 
     /**

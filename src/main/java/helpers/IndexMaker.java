@@ -4,12 +4,9 @@ import dubstep.Main;
 import net.sf.jsqlparser.expression.PrimitiveValue;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
-import net.sf.jsqlparser.statement.create.table.Index;
 
 import java.io.*;
 import java.util.*;
-
-import static helpers.CommonLib.TABLE_DIRECTORY;
 
 public class IndexMaker {
 
@@ -18,9 +15,22 @@ public class IndexMaker {
     private static Map<String, ArrayList<net.sf.jsqlparser.statement.create.table.Index>> secondaryIndexMap = new HashMap<String, ArrayList<net.sf.jsqlparser.statement.create.table.Index>>();
     private static Map<String, ArrayList<Integer>> secondaryIndexColumnIndices = new HashMap<String, ArrayList<Integer>>();
     private static Map<String, ArrayList<Integer>> primaryIndexColumnIndices = new HashMap<String, ArrayList<Integer>>();
+    private static boolean createTableCopy = false ;
+
+    //////////////////////////////////////////////////////////////////
+    private static ColumnDefinition[] columnDefinitions ;
+    private static Tuple tupleClass;
+    ////////////////////////////////////////////////////////////////
 
 
     public static void createIndex(CreateTable createTable) throws IOException {
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+//        createTableCopy = true ;
+//        columnDefinitions = createTable.getColumnDefinitions().toArray(new ColumnDefinition[0]);
+//        tupleClass = new Tuple(columnDefinitions, createTable.getTable().getName());
+        ////////////////////////////////////////////////////////////////////////////////////////
+
 
         ArrayList<net.sf.jsqlparser.statement.create.table.Index> listOfIndexes = (ArrayList<net.sf.jsqlparser.statement.create.table.Index>) createTable.getIndexes();
         String tableName = createTable.getTable().getName() ;
@@ -31,6 +41,7 @@ public class IndexMaker {
 
         buildIndexes(createTable, tableName) ;
         writeToGlobalIndex(tableName, createTable);
+
     }
 
     private static void buildIndexes(CreateTable createTable, String tableName) throws IOException {
@@ -51,7 +62,7 @@ public class IndexMaker {
             buildColumnIndex(tableName, columnIndices.get(i), columnNames.get(i), colDataType);
         }
         long et = System.currentTimeMillis();
-        System.out.println(et-st);
+//        System.out.println(et-st);
 //
     }
 
@@ -61,20 +72,20 @@ public class IndexMaker {
         TreeMap<String, ArrayList<String>> currentIndex ;
         if(validateDataType(colDataType)){
             currentIndex= new TreeMap<String, ArrayList<String>>(
-                new Comparator<String>() {
-                    @Override
-                    public int compare(String o1, String o2) {
-                        double a = Double.parseDouble(o1);
-                        double b = Double.parseDouble(o2);
-                        if(a < b) {
-                            return -1;
+                    new Comparator<String>() {
+                        @Override
+                        public int compare(String o1, String o2) {
+                            double a = Double.parseDouble(o1);
+                            double b = Double.parseDouble(o2);
+                            if(a < b) {
+                                return -1;
+                            }
+                            else if(a > b) {
+                                return 1 ;
+                            }
+                            return 0;
                         }
-                        else if(a > b) {
-                            return 1 ;
-                        }
-                        return 0;
                     }
-                }
             );
         }else{
             currentIndex= new TreeMap<String, ArrayList<String>>();
@@ -85,28 +96,66 @@ public class IndexMaker {
         try {
             LineNumberReader br = new LineNumberReader(new FileReader(CommonLib.TABLE_DIRECTORY + tableName + CommonLib.extension), 100);
 
-            while ((currentLineAsString = br.readLine()) != null) {
+            if(createTableCopy){
+                String newTableName = tableName + "_" + "NEW" ;
+                File newTableFile = new File(CommonLib.INDEX_DIRECTORY + newTableName);
+                FileOutputStream newTableFileOutputStream = new FileOutputStream(newTableFile);
+                BufferedOutputStream newTableBufferedOutputStream = new BufferedOutputStream(newTableFileOutputStream, 5000);
+                ObjectOutputStream newTableObjectOutputStream = new ObjectOutputStream(newTableFileOutputStream);
+                PrimitiveValue[] currentRowPV ;
 
-                String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
-                String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
+                while ((currentLineAsString = br.readLine()) != null) {
+                    currentRowPV = tupleClass.covertTupleToPrimitiveValue(currentLineAsString) ;
+                    newTableObjectOutputStream.writeUnshared(currentRowPV);
+
+                    String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
+                    String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
 
 
-                if(currentIndex.containsKey(currentLineIndexCols)){
-                    currentIndex.get(currentLineIndexCols).add(Long.toString(position));
-                }else{
-                    ArrayList<String> positionArray = new ArrayList<String>();
-                    positionArray.add(Long.toString(position)) ;
-                    currentIndex.put(currentLineIndexCols, positionArray) ;
+                    if(currentIndex.containsKey(currentLineIndexCols)){
+                        currentIndex.get(currentLineIndexCols).add(Long.toString(position));
+                    }else{
+                        ArrayList<String> positionArray = new ArrayList<String>();
+                        positionArray.add(Long.toString(position)) ;
+                        currentIndex.put(currentLineIndexCols, positionArray) ;
+                    }
+
+                    position += currentLineAsString.length() + 1;
                 }
+                newTableObjectOutputStream.writeUnshared(null);
+                newTableObjectOutputStream.close();
+//                newTableBufferedOutputStream.close();
+                newTableFileOutputStream.close() ;
 
-                position += currentLineAsString.length() + 1;
+
+                createTableCopy = false ;
+            }else{
+                while ((currentLineAsString = br.readLine()) != null) {
+
+                    String[] currentLineAsStringArray = currentLineAsString.split("\\|") ;
+                    String currentLineIndexCols = currentLineAsStringArray[columnIndex] ;
+
+
+                    if(currentIndex.containsKey(currentLineIndexCols)){
+                        currentIndex.get(currentLineIndexCols).add(Long.toString(position));
+                    }else{
+                        ArrayList<String> positionArray = new ArrayList<String>();
+                        positionArray.add(Long.toString(position)) ;
+                        currentIndex.put(currentLineIndexCols, positionArray) ;
+                    }
+
+                    position += currentLineAsString.length() + 1;
+                }
             }
+
             br.close();
             br = null;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -169,7 +218,7 @@ public class IndexMaker {
     private static void writeIndexToDisk(TreeMap<String, ArrayList<String>> currentIndex, String tableName, String columnName, String colDataType) throws IOException {
 
         String indexListName = tableName + "_" + columnName ;
-        File indexFile = new File(CommonLib.TABLE_DIRECTORY + indexListName);
+        File indexFile = new File(CommonLib.INDEX_DIRECTORY + indexListName);
         FileOutputStream indexFileOutputStream = new FileOutputStream(indexFile);
         BufferedOutputStream indexBufferedOutputStream = new BufferedOutputStream(indexFileOutputStream);
         ObjectOutputStream indexBW = new ObjectOutputStream(indexBufferedOutputStream);
@@ -178,14 +227,13 @@ public class IndexMaker {
 
         String indexFileName = tableName + "_" + columnName + "_" + CommonLib.getsortFileSeqNumber();
 
-        File file = new File(CommonLib.TABLE_DIRECTORY + indexFileName);
+        File file = new File(CommonLib.INDEX_DIRECTORY + indexFileName);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
         ObjectOutputStream bw = new ObjectOutputStream(bufferedOutputStream);
 
         // For master IndexMaker Writing
         ArrayList<PrimitiveValue[]> currentMapForMasterIndex = new ArrayList<PrimitiveValue[]>();
-        PrimitiveValue[] currentItemForMasterIndex = new PrimitiveValue[3];
         PrimitiveValue firstKey = CommonLib.convertToPrimitiveValue(currentIndex.firstEntry().getKey(), colDataType);
         PrimitiveValue[] writeValue = new PrimitiveValue[2] ;
 
@@ -200,7 +248,7 @@ public class IndexMaker {
                     writeValue[0] = currentKey;
                     writeValue[1] = CommonLib.convertToPrimitiveValue(currentValue, "INT");
                     bw.writeUnshared(writeValue);
-
+                    PrimitiveValue[] currentItemForMasterIndex = new PrimitiveValue[3];
                     currentItemForMasterIndex[0] = firstKey ;
                     currentItemForMasterIndex[1] = currentKey ;
                     currentItemForMasterIndex[2] = CommonLib.convertToPrimitiveValue(indexFileName, "STRING") ;
@@ -208,11 +256,13 @@ public class IndexMaker {
                     currentMapForMasterIndex.add(currentItemForMasterIndex);
                 }else{
                     bw.writeUnshared(null);
+                    bufferedOutputStream.close();
+                    fileOutputStream.close();
                     bw.close() ;
                     bw = null ;
 
                     indexFileName = tableName + "_" + columnName + "_" + CommonLib.getsortFileSeqNumber();
-                    file = new File(CommonLib.TABLE_DIRECTORY + indexFileName);
+                    file = new File(CommonLib.INDEX_DIRECTORY + indexFileName);
                     fileOutputStream = new FileOutputStream(file);
                     bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                     bw = new ObjectOutputStream(bufferedOutputStream);
@@ -227,17 +277,27 @@ public class IndexMaker {
             }
         }
 
-        currentItemForMasterIndex[0] = firstKey ;
-        currentItemForMasterIndex[1] = CommonLib.convertToPrimitiveValue(currentIndex.lastKey(), colDataType) ;
-        currentItemForMasterIndex[2] = CommonLib.convertToPrimitiveValue(indexFileName, "STRING") ;
-        currentMapForMasterIndex.add(currentItemForMasterIndex);
+        if(!lineNumber.equals(indexBlockSize+1)){
+            PrimitiveValue[] currentItemForMasterIndex = new PrimitiveValue[3];
+            currentItemForMasterIndex[0] = firstKey ;
+            currentItemForMasterIndex[1] = CommonLib.convertToPrimitiveValue(currentIndex.lastKey(), colDataType) ;
+            currentItemForMasterIndex[2] = CommonLib.convertToPrimitiveValue(indexFileName, "STRING") ;
+            indexBW.writeUnshared(currentItemForMasterIndex);
 
-        indexBW.writeUnshared(currentItemForMasterIndex);
+            currentMapForMasterIndex.add(currentItemForMasterIndex);
+        }
+
+
         indexBW.writeUnshared(null);
         indexBW.close();
+        indexBufferedOutputStream.close();
+        indexFileOutputStream.close();
 
         indexBW = null ;
         bw.writeUnshared(null);
+        bw.close();
+        bufferedOutputStream.close();
+        fileOutputStream.close();
         bw.close();
         bw = null ;
         currentIndex.clear();
@@ -308,7 +368,10 @@ public class IndexMaker {
         }
         diskWrite += primaryKey ;
         Main.globalIndex.put(tableName, ColumnList) ;
-        Main.globalIndexWriter.write(diskWrite + "\n");
-        Main.globalIndexWriter.write(Main.currentQuery + "\n");
+        BufferedWriter globalIndexWriter = new BufferedWriter(new FileWriter(CommonLib.INDEX_DIRECTORY + "GlobalIndex", true));
+        globalIndexWriter.write(diskWrite + "\n");
+        globalIndexWriter.write(Main.currentQuery + "\n");
+        globalIndexWriter.close();
+        globalIndexWriter = null ;
     }
 }
